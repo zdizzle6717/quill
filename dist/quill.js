@@ -2496,6 +2496,7 @@ class Range {
 
 class Selection {
   constructor(scroll, emitter, editorRegistry) {
+    this.editorRegistry = editorRegistry;
     this.emitter = emitter;
     this.scroll = scroll;
     this.composing = false;
