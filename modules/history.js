@@ -112,7 +112,7 @@ function endsWithNewlineChange(delta) {
   }
   if (lastOp.attributes != null) {
     return Object.keys(lastOp.attributes).some(attr => {
-      return Parchment.query(attr, Parchment.Scope.BLOCK) != null;
+      return this.quill.editorInstance.query(attr, Parchment.Scope.BLOCK) != null;
     });
   }
   return false;

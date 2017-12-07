@@ -8,6 +8,21 @@ import Selection, { Range } from './selection';
 import logger from './logger';
 import Theme from './theme';
 
+// Default blots
+import Block, { BlockEmbed } from '../blots/block';
+import Break from '../blots/break';
+import Container from '../blots/container';
+import Cursor from '../blots/cursor';
+import Embed from '../blots/embed';
+import Inline from '../blots/inline';
+import Scroll from '../blots/scroll';
+import TextBlot from '../blots/text';
+
+// Default modules
+import Clipboard from '../modules/clipboard';
+import History from '../modules/history';
+import Keyboard from '../modules/keyboard';
+
 const debug = logger('quill');
 
 class Quill {
@@ -20,7 +35,7 @@ class Quill {
 
   static find(node) {
     // eslint-disable-next-line no-underscore-dangle
-    return node.__quill || Parchment.find(node);
+    return node.__quill || this.editorRegistry.find(node);
   }
 
   static import(name) {
@@ -50,7 +65,7 @@ class Quill {
         (path.startsWith('blots/') || path.startsWith('formats/')) &&
         target.blotName !== 'abstract'
       ) {
-        Parchment.register(target);
+        this.editorRegistry.register(target);
       }
       if (typeof target.register === 'function') {
         target.register();
@@ -60,6 +75,22 @@ class Quill {
 
   constructor(container, options = {}, editorRegistry = new EditorRegistry) {
     this.editorRegistry = editorRegistry;
+    this.register({
+      'blots/block': Block,
+      'blots/block/embed': BlockEmbed,
+      'blots/break': Break,
+      'blots/container': Container,
+      'blots/cursor': Cursor,
+      'blots/embed': Embed,
+      'blots/inline': Inline,
+      'blots/scroll': Scroll,
+      'blots/text': TextBlot,
+
+      'modules/clipboard': Clipboard,
+      'modules/history': History,
+      'modules/keyboard': Keyboard,
+    });
+    this.editorRegistry.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
     this.options = expandConfig(container, options);
     this.container = this.options.container;
     if (this.container == null) {
@@ -77,12 +108,12 @@ class Quill {
     this.root.setAttribute('data-gramm', false);
     this.scrollingContainer = this.options.scrollingContainer || this.root;
     this.emitter = new Emitter();
-    this.scroll = Parchment.create(this.root, {
+    this.scroll = this.editorRegistry.create(this.root, {
       emitter: this.emitter,
       whitelist: this.options.formats,
     });
     this.editor = new Editor(this.scroll);
-    this.selection = new Selection(this.scroll, this.emitter);
+    this.selection = new Selection(this.scroll, this.emitter, this.editorRegistry);
     this.theme = new this.options.theme(this, this.options); // eslint-disable-line new-cap
     this.keyboard = this.theme.addModule('keyboard');
     this.clipboard = this.theme.addModule('clipboard');
@@ -168,7 +199,7 @@ class Quill {
         let change = new Delta();
         if (range == null) {
           return change;
-        } else if (Parchment.query(name, Parchment.Scope.BLOCK)) {
+        } else if (this.editorRegistry.query(name, Parchment.Scope.BLOCK)) {
           change = this.editor.formatLine(range.index, range.length, {
             [name]: value,
           });

@@ -66,7 +66,7 @@ class Toolbar extends Module {
         debug.warn('ignoring attaching to disabled format', format, input);
         return;
       }
-      if (Parchment.query(format) == null) {
+      if (this.quill.editorRegistry.query(format) == null) {
         debug.warn('ignoring attaching to nonexistent format', format, input);
         return;
       }
@@ -94,7 +94,7 @@ class Toolbar extends Module {
       const [range] = this.quill.selection.getRange();
       if (this.handlers[format] != null) {
         this.handlers[format].call(this, value);
-      } else if (Parchment.query(format).prototype instanceof Parchment.Embed) {
+      } else if (this.quill.editorRegistry.query(format).prototype instanceof Parchment.Embed) {
         value = prompt(`Enter ${format}`); // eslint-disable-line no-alert
         if (!value) return;
         this.quill.updateContents(
@@ -214,7 +214,7 @@ Toolbar.DEFAULTS = {
         const formats = this.quill.getFormat();
         Object.keys(formats).forEach(name => {
           // Clean functionality in existing apps only clean inline formats
-          if (Parchment.query(name, Parchment.Scope.INLINE) != null) {
+          if (this.quill.editorRegistry.query(name, Parchment.Scope.INLINE) != null) {
             this.quill.format(name, false);
           }
         });

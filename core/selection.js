@@ -14,13 +14,13 @@ class Range {
 }
 
 class Selection {
-  constructor(scroll, emitter) {
+  constructor(scroll, emitter, editorRegistry) {
     this.emitter = emitter;
     this.scroll = scroll;
     this.composing = false;
     this.mouseDown = false;
     this.root = this.scroll.domNode;
-    this.cursor = Parchment.create('cursor', this);
+    this.cursor = editorRegistry.create('cursor', this);
     // savedRange is last non-null range
     this.savedRange = new Range(0, 0);
     this.lastRange = this.savedRange;
@@ -108,11 +108,11 @@ class Selection {
     if (
       nativeRange == null ||
       !nativeRange.native.collapsed ||
-      Parchment.query(format, Parchment.Scope.BLOCK)
+      this.editorRegistry.query(format, Parchment.Scope.BLOCK)
     )
       return;
     if (nativeRange.start.node !== this.cursor.textNode) {
-      const blot = Parchment.find(nativeRange.start.node, false);
+      const blot = this.editorRegistry.find(nativeRange.start.node, false);
       if (blot == null) return;
       // TODO Give blot ability to not split
       if (blot instanceof Parchment.Leaf) {
@@ -200,7 +200,7 @@ class Selection {
     }
     const indexes = positions.map(position => {
       const [node, offset] = position;
-      const blot = Parchment.find(node, true);
+      const blot = this.editorRegistry.find(node, true);
       const index = blot.offset(this.scroll);
       if (offset === 0) {
         return index;

@@ -204,10 +204,10 @@ class Editor {
       mutations.length === 1 &&
       mutations[0].type === 'characterData' &&
       mutations[0].target.data.match(ASCII) &&
-      Parchment.find(mutations[0].target)
+      this.editorRegistry.find(mutations[0].target)
     ) {
       // Optimization for character changes
-      const textBlot = Parchment.find(mutations[0].target);
+      const textBlot = this.editorRegistry.find(mutations[0].target);
       const formats = bubbleFormats(textBlot);
       const index = textBlot.offset(this.scroll);
       const oldValue = mutations[0].oldValue.replace(CursorBlot.CONTENTS, '');

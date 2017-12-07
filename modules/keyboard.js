@@ -467,7 +467,7 @@ function handleEnter(range, context) {
   }
   const lineFormats = Object.keys(context.format).reduce((formats, format) => {
     if (
-      Parchment.query(format, Parchment.Scope.BLOCK) &&
+      this.quill.editorRegistry.query(format, Parchment.Scope.BLOCK) &&
       !Array.isArray(context.format[format])
     ) {
       formats[format] = context.format[format];
@@ -493,7 +493,7 @@ function makeCodeBlockHandler(indent) {
     shiftKey: !indent,
     format: { 'code-block': true },
     handler(range) {
-      const CodeBlock = Parchment.query('code-block');
+      const CodeBlock = this.quill.editorRegistry.query('code-block');
       let { index, length } = range;
       const [block, blockOffset] = this.quill.scroll.descendant(
         CodeBlock,
