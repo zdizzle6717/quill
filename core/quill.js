@@ -38,14 +38,13 @@ class Quill {
     return node.__quill || this.editorRegistry.find(node);
   }
 
-  static import(name) {
-    if (this.imports[name] == null) {
-      debug.error(`Cannot import ${name}. Are you sure it was registered?`);
-    }
-    return this.imports[name];
-  }
-
   constructor(container, options = {}, editorRegistry = new EditorRegistry) {
+    this.imports = {
+      delta: Delta,
+      parchment: Parchment,
+      'core/module': Module,
+      'core/theme': Theme,
+    };
     this.editorRegistry = editorRegistry;
     this.register({
       'blots/block': Block,
@@ -304,6 +303,13 @@ class Quill {
     return this.selection.hasFocus();
   }
 
+  import(name) {
+    if (this.imports[name] == null) {
+      debug.error(`Cannot import ${name}. Are you sure it was registered?`);
+    }
+    return this.imports[name];
+  }
+
   insertEmbed(index, embed, value, source = Quill.sources.API) {
     return modify.call(
       this,
@@ -461,13 +467,6 @@ Quill.events = Emitter.events;
 Quill.sources = Emitter.sources;
 // eslint-disable-next-line no-undef
 Quill.version = typeof QUILL_VERSION === 'undefined' ? 'dev' : QUILL_VERSION;
-
-Quill.imports = {
-  delta: Delta,
-  parchment: Parchment,
-  'core/module': Module,
-  'core/theme': Theme,
-};
 
 function expandConfig(container, userConfig) {
   userConfig = extend(
