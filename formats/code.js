@@ -44,7 +44,7 @@ class CodeBlock extends Block {
     if (
       this.editorRegistry.query(name, Parchment.Scope.BLOCK) == null ||
       (name === this.statics.blotName &&
-        value === this.statics.formats(this.domNode))
+        value === this.statics.formats(this.domNode, this.editorRegistry))
     ) {
       return;
     }
@@ -97,7 +97,7 @@ class CodeBlock extends Block {
       next != null &&
       next.prev === this &&
       next.statics.blotName === this.statics.blotName &&
-      this.statics.formats(this.domNode) === next.statics.formats(next.domNode)
+      this.statics.formats(this.domNode, this.editorRegistry) === next.statics.formats(next.domNode, this.editorRegistry)
     ) {
       next.optimize(context);
       next.moveChildren(this);

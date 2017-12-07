@@ -277,10 +277,10 @@ function matchBlot(node, delta, editorRegistry) {
     const value = match.value(node);
     if (value != null) {
       embed[match.blotName] = value;
-      return new Delta().insert(embed, match.formats(node));
+      return new Delta().insert(embed, match.formats(node, editorRegistry));
     }
   } else if (typeof match.formats === 'function') {
-    return applyFormat(delta, match.blotName, match.formats(node));
+    return applyFormat(delta, match.blotName, match.formats(node, editorRegistry));
   }
   return delta;
 }

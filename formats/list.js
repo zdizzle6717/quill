@@ -5,10 +5,10 @@ import Container from '../blots/container';
 const LIST_BLOT = 'list';
 
 class ListItem extends Block {
-  static formats(domNode) {
+  static formats(domNode, editorRegistry) {
     return domNode.tagName === this.tagName
       ? undefined
-      : super.formats(domNode);
+      : super.formats(domNode, editorRegistry);
   }
 
   format(name, value) {

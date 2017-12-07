@@ -2048,7 +2048,7 @@ class CodeBlock extends _block2.default {
 
   formatAt(index, length, name, value) {
     if (length === 0) return;
-    if (this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK) == null || name === this.statics.blotName && value === this.statics.formats(this.domNode)) {
+    if (this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK) == null || name === this.statics.blotName && value === this.statics.formats(this.domNode, this.editorRegistry)) {
       return;
     }
     const nextNewline = this.newlineIndex(index);
@@ -2100,7 +2100,7 @@ class CodeBlock extends _block2.default {
     super.optimize(context);
     const next = this.next;
 
-    if (next != null && next.prev === this && next.statics.blotName === this.statics.blotName && this.statics.formats(this.domNode) === next.statics.formats(next.domNode)) {
+    if (next != null && next.prev === this && next.statics.blotName === this.statics.blotName && this.statics.formats(this.domNode, this.editorRegistry) === next.statics.formats(next.domNode, this.editorRegistry)) {
       next.optimize(context);
       next.moveChildren(this);
       next.remove();
@@ -7591,10 +7591,10 @@ function matchBlot(node, delta, editorRegistry) {
     const value = match.value(node);
     if (value != null) {
       embed[match.blotName] = value;
-      return new _quillDelta2.default().insert(embed, match.formats(node));
+      return new _quillDelta2.default().insert(embed, match.formats(node, editorRegistry));
     }
   } else if (typeof match.formats === 'function') {
-    return applyFormat(delta, match.blotName, match.formats(node));
+    return applyFormat(delta, match.blotName, match.formats(node, editorRegistry));
   }
   return delta;
 }
