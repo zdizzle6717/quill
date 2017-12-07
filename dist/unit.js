@@ -1086,31 +1086,6 @@ class Quill {
     return this.imports[name];
   }
 
-  static register(path, target, overwrite = false) {
-    if (typeof path !== 'string') {
-      const name = path.attrName || path.blotName;
-      if (typeof name === 'string') {
-        // register(Blot | Attributor, overwrite)
-        this.register(`formats/${name}`, path, target);
-      } else {
-        Object.keys(path).forEach(key => {
-          this.register(key, path[key], target);
-        });
-      }
-    } else {
-      if (this.imports[path] != null && !overwrite) {
-        debug.warn(`Overwriting ${path} with`, target);
-      }
-      this.imports[path] = target;
-      if ((path.startsWith('blots/') || path.startsWith('formats/')) && target.blotName !== 'abstract') {
-        this.editorRegistry.register(target);
-      }
-      if (typeof target.register === 'function') {
-        target.register();
-      }
-    }
-  }
-
   constructor(container, options = {}, editorRegistry = new _parchment.EditorRegistry()) {
     this.editorRegistry = editorRegistry;
     this.register({
@@ -1405,6 +1380,31 @@ class Quill {
 
   once(...args) {
     return this.emitter.once(...args);
+  }
+
+  register(path, target, overwrite = false) {
+    if (typeof path !== 'string') {
+      const name = path.attrName || path.blotName;
+      if (typeof name === 'string') {
+        // register(Blot | Attributor, overwrite)
+        this.register(`formats/${name}`, path, target);
+      } else {
+        Object.keys(path).forEach(key => {
+          this.register(key, path[key], target);
+        });
+      }
+    } else {
+      if (this.imports[path] != null && !overwrite) {
+        debug.warn(`Overwriting ${path} with`, target);
+      }
+      this.imports[path] = target;
+      if ((path.startsWith('blots/') || path.startsWith('formats/')) && target.blotName !== 'abstract') {
+        this.editorRegistry.register(target);
+      }
+      if (typeof target.register === 'function') {
+        target.register();
+      }
+    }
   }
 
   removeFormat(index, length, source) {
