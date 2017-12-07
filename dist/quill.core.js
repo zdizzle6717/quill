@@ -1080,13 +1080,13 @@ class Quill {
   }
 
   constructor(container, options = {}, editorRegistry = new _parchment.EditorRegistry()) {
+    this.editorRegistry = editorRegistry;
     this.imports = {
       delta: _quillDelta2.default,
       parchment: _parchment2.default,
       'core/module': _module2.default,
       'core/theme': _theme2.default
     };
-    this.editorRegistry = editorRegistry;
     this.register({
       'blots/block': _block2.default,
       'blots/block/embed': _block.BlockEmbed,

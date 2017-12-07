@@ -39,13 +39,13 @@ class Quill {
   }
 
   constructor(container, options = {}, editorRegistry = new EditorRegistry) {
+    this.editorRegistry = editorRegistry;
     this.imports = {
       delta: Delta,
       parchment: Parchment,
       'core/module': Module,
       'core/theme': Theme,
-    };
-    this.editorRegistry = editorRegistry;
+    }
     this.register({
       'blots/block': Block,
       'blots/block/embed': BlockEmbed,
