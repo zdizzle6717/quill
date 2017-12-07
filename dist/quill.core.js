@@ -4686,7 +4686,7 @@ class Theme {
   }
 
   addModule(name) {
-    const ModuleClass = this.quill.constructor.import(`modules/${name}`);
+    const ModuleClass = this.quill.import(`modules/${name}`);
     this.modules[name] = new ModuleClass(this.quill, this.options.modules[name] || {});
     return this.modules[name];
   }
