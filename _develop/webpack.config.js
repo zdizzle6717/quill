@@ -52,7 +52,7 @@ module.exports = env => {
       alias: {
         parchment: path.resolve(
           __dirname,
-          '../node_modules/parchment/src/parchment',
+          '../node_modules/parchment/src/parchment'
         ),
       },
       extensions: ['.js', '.styl', '.ts'],
@@ -154,7 +154,7 @@ module.exports = env => {
     config.plugins.push(
       new webpack.optimize.UglifyJsPlugin({
         sourceMap: true,
-      }),
+      })
     );
     config.devtool = 'source-map';
   }
