@@ -45,7 +45,8 @@ class Quill {
       parchment: Parchment,
       'core/module': Module,
       'core/theme': Theme,
-    }
+    };
+
     this.register({
       'blots/block': Block,
       'blots/block/embed': BlockEmbed,
@@ -62,6 +63,7 @@ class Quill {
       'modules/keyboard': Keyboard,
     });
     this.editorRegistry.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
+
     this.options = expandConfig(container, options);
     this.container = this.options.container;
     if (this.container == null) {

@@ -52,8 +52,8 @@ CodeToken.className = CODE_TOKEN_CLASS;
 
 class Syntax extends Module {
   static register() {
-    Quill.register(CodeToken, true);
-    Quill.register(SyntaxCodeBlock, true);
+    this.quill.register(CodeToken, true);
+    this.quill.register(SyntaxCodeBlock, true);
   }
 
   constructor(quill, options) {

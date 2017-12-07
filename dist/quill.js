@@ -1087,6 +1087,7 @@ class Quill {
       'core/module': _module2.default,
       'core/theme': _theme2.default
     };
+
     this.register({
       'blots/block': _block2.default,
       'blots/block/embed': _block.BlockEmbed,
@@ -1103,6 +1104,7 @@ class Quill {
       'modules/keyboard': _keyboard2.default
     });
     this.editorRegistry.register(_block2.default, _break2.default, _cursor2.default, _inline2.default, _scroll2.default, _text2.default);
+
     this.options = expandConfig(container, options);
     this.container = this.options.container;
     if (this.container == null) {
@@ -4461,6 +4463,23 @@ var _quill = __webpack_require__(6);
 var _quill2 = _interopRequireDefault(_quill);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// this.register({
+//   'blots/block': Block,
+//   'blots/block/embed': BlockEmbed,
+//   'blots/break': Break,
+//   'blots/container': Container,
+//   'blots/cursor': Cursor,
+//   'blots/embed': Embed,
+//   'blots/inline': Inline,
+//   'blots/scroll': Scroll,
+//   'blots/text': TextBlot,
+//
+//   'modules/clipboard': Clipboard,
+//   'modules/history': History,
+//   'modules/keyboard': Keyboard,
+// });
+// this.editorRegistry.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
 
 exports.default = _quill2.default;
 
@@ -8868,8 +8887,8 @@ CodeToken.className = CODE_TOKEN_CLASS;
 
 class Syntax extends _module2.default {
   static register() {
-    _quill2.default.register(CodeToken, true);
-    _quill2.default.register(SyntaxCodeBlock, true);
+    this.quill.register(CodeToken, true);
+    this.quill.register(SyntaxCodeBlock, true);
   }
 
   constructor(quill, options) {
