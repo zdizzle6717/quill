@@ -1,5 +1,5 @@
 import Delta from 'quill-delta';
-import Parchment from 'parchment';
+import Parchment, { EditorRegistry } from 'parchment';
 import extend from 'extend';
 import Editor from './editor';
 import Emitter from './emitter';
@@ -58,7 +58,8 @@ class Quill {
     }
   }
 
-  constructor(container, options = {}) {
+  constructor(container, options = {}, editorRegistry = new EditorRegistry) {
+    this.editorRegistry = editorRegistry;
     this.options = expandConfig(container, options);
     this.container = this.options.container;
     if (this.container == null) {

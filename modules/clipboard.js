@@ -248,19 +248,19 @@ function matchAttributor(node, delta) {
     .concat(classes)
     .concat(styles)
     .forEach(name => {
-      let attr = Parchment.query(name, Parchment.Scope.ATTRIBUTE);
+      let attr = this.quill.editorRegistry.query(name, Parchment.Scope.ATTRIBUTE);
       if (attr != null) {
-        formats[attr.attrName] = attr.value(node);
+        formats[attr.attrName] = attr.value(node, this.quill.editorRegistry);
         if (formats[attr.attrName]) return;
       }
       attr = ATTRIBUTE_ATTRIBUTORS[name];
       if (attr != null && attr.attrName === name) {
-        formats[attr.attrName] = attr.value(node) || undefined;
+        formats[attr.attrName] = attr.value(node, this.quill.editorRegistry) || undefined;
       }
       attr = STYLE_ATTRIBUTORS[name];
       if (attr != null && attr.attrName === name) {
         attr = STYLE_ATTRIBUTORS[name];
-        formats[attr.attrName] = attr.value(node) || undefined;
+        formats[attr.attrName] = attr.value(node, this.quill.editorRegistry) || undefined;
       }
     });
   if (Object.keys(formats).length > 0) {
@@ -270,7 +270,7 @@ function matchAttributor(node, delta) {
 }
 
 function matchBlot(node, delta) {
-  const match = Parchment.query(node);
+  const match = this.quill.editorRegistry.query(node);
   if (match == null) return delta;
   if (match.prototype instanceof Parchment.Embed) {
     const embed = {};
@@ -297,7 +297,7 @@ function matchIgnore() {
 }
 
 function matchIndent(node, delta) {
-  const match = Parchment.query(node);
+  const match = this.quill.editorRegistry.query(node);
   if (
     match == null ||
     match.blotName !== 'list-item' ||
@@ -308,7 +308,7 @@ function matchIndent(node, delta) {
   let indent = -1;
   let parent = node.parentNode;
   while (!parent.classList.contains('ql-clipboard')) {
-    if ((Parchment.query(parent) || {}).blotName === 'list') {
+    if ((this.quill.editorRegistry.query(parent) || {}).blotName === 'list') {
       indent += 1;
     }
     parent = parent.parentNode;

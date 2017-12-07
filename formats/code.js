@@ -42,7 +42,7 @@ class CodeBlock extends Block {
   formatAt(index, length, name, value) {
     if (length === 0) return;
     if (
-      Parchment.query(name, Parchment.Scope.BLOCK) == null ||
+      this.editorRegistry.query(name, Parchment.Scope.BLOCK) == null ||
       (name === this.statics.blotName &&
         value === this.statics.formats(this.domNode))
     ) {
@@ -89,7 +89,7 @@ class CodeBlock extends Block {
 
   optimize(context) {
     if (!this.domNode.textContent.endsWith('\n')) {
-      this.appendChild(Parchment.create('text', '\n'));
+      this.appendChild(this.editorRegistry.create('text', '\n'));
     }
     super.optimize(context);
     const { next } = this;
@@ -108,7 +108,7 @@ class CodeBlock extends Block {
   replace(target) {
     super.replace(target);
     [].slice.call(this.domNode.querySelectorAll('*')).forEach(node => {
-      const blot = Parchment.find(node);
+      const blot = this.editorRegistry.find(node);
       if (blot == null) {
         node.parentNode.removeChild(node);
       } else if (blot instanceof Parchment.Embed) {

@@ -10,8 +10,8 @@ function isLine(blot) {
 }
 
 class Scroll extends Parchment.Scroll {
-  constructor(domNode, config) {
-    super(domNode);
+  constructor(editorRegistry, domNode, config) {
+    super(editorRegistry, domNode);
     this.emitter = config.emitter;
     if (Array.isArray(config.whitelist)) {
       this.whitelist = config.whitelist.reduce((whitelist, format) => {
@@ -82,9 +82,9 @@ class Scroll extends Parchment.Scroll {
     if (index >= this.length()) {
       if (
         def == null ||
-        Parchment.query(value, Parchment.Scope.BLOCK) == null
+        this.editorRegistry.query(value, Parchment.Scope.BLOCK) == null
       ) {
-        const blot = Parchment.create(this.statics.defaultChild);
+        const blot = this.editorRegistry.create(this.statics.defaultChild);
         this.appendChild(blot);
         if (def == null && value.endsWith('\n')) {
           blot.insertAt(0, value.slice(0, -1), def);
@@ -92,7 +92,7 @@ class Scroll extends Parchment.Scroll {
           blot.insertAt(0, value, def);
         }
       } else {
-        const embed = Parchment.create(value, def);
+        const embed = this.editorRegistry.create(value, def);
         this.appendChild(embed);
       }
     } else {
@@ -103,7 +103,7 @@ class Scroll extends Parchment.Scroll {
 
   insertBefore(blot, ref) {
     if (blot.statics.scope === Parchment.Scope.INLINE_BLOT) {
-      const wrapper = Parchment.create(this.statics.defaultChild);
+      const wrapper = this.editorRegistry.create(this.statics.defaultChild);
       wrapper.appendChild(blot);
       super.insertBefore(wrapper, ref);
     } else {

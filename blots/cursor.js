@@ -6,8 +6,8 @@ class Cursor extends Parchment.Embed {
     return undefined;
   }
 
-  constructor(domNode, selection) {
-    super(domNode);
+  constructor(editorRegistry, domNode, selection) {
+    super(editorRegistry, domNode);
     this.selection = selection;
     this.textNode = document.createTextNode(Cursor.CONTENTS);
     this.domNode.appendChild(this.textNode);
@@ -94,7 +94,7 @@ class Cursor extends Parchment.Embed {
         this.textNode.data = Cursor.CONTENTS;
       } else {
         this.textNode.data = text;
-        this.parent.insertBefore(Parchment.create(this.textNode), this);
+        this.parent.insertBefore(this.editorRegistry.create(this.textNode), this);
         this.textNode = document.createTextNode(Cursor.CONTENTS);
         this.domNode.appendChild(this.textNode);
       }

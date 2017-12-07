@@ -1,24 +1,24 @@
 import Parchment from 'parchment';
 
 class IdentAttributor extends Parchment.Attributor.Class {
-  add(node, value) {
+  add(node, value, editorRegistry) {
     if (value === '+1' || value === '-1') {
-      const indent = this.value(node) || 0;
+      const indent = this.value(node, editorRegistry) || 0;
       value = value === '+1' ? indent + 1 : indent - 1;
     }
     if (value === 0) {
       this.remove(node);
       return true;
     }
-    return super.add(node, value);
+    return super.add(node, value, editorRegistry);
   }
 
-  canAdd(node, value) {
-    return super.canAdd(node, value) || super.canAdd(node, parseInt(value, 10));
+  canAdd(node, value, editorRegistry) {
+    return super.canAdd(node, value, editorRegistry) || super.canAdd(node, parseInt(value, 10), editorRegistry);
   }
 
-  value(node) {
-    return parseInt(super.value(node), 10) || undefined; // Don't return NaN
+  value(node, editorRegistry) {
+    return parseInt(super.value(node, editorRegistry), 10) || undefined; // Don't return NaN
   }
 }
 

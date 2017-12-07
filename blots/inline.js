@@ -18,7 +18,7 @@ class Inline extends Parchment.Inline {
   formatAt(index, length, name, value) {
     if (
       Inline.compare(this.statics.blotName, name) < 0 &&
-      Parchment.query(name, Parchment.Scope.BLOT)
+      this.editorRegistry.query(name, Parchment.Scope.BLOT)
     ) {
       const blot = this.isolate(index, length);
       if (value) {

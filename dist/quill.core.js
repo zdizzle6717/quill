@@ -737,8 +737,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const NEWLINE_LENGTH = 1;
 
 class Block extends _parchment2.default.Block {
-  constructor(domNode) {
-    super(domNode);
+  constructor(editorRegistry, domNode) {
+    super(editorRegistry, domNode);
     this.cache = {};
   }
 
@@ -761,7 +761,7 @@ class Block extends _parchment2.default.Block {
 
   formatAt(index, length, name, value) {
     if (length <= 0) return;
-    if (_parchment2.default.query(name, _parchment2.default.Scope.BLOCK)) {
+    if (this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK)) {
       if (index + length === this.length()) {
         this.format(name, value);
       }
@@ -854,7 +854,7 @@ Block.allowedChildren = [_inline2.default, _parchment2.default.Embed, _text2.def
 class BlockEmbed extends _parchment2.default.Embed {
   attach() {
     super.attach();
-    this.attributes = new _parchment2.default.Attributor.Store(this.domNode);
+    this.attributes = new _parchment2.default.Attributor.Store(this.editorRegistry, this.domNode);
   }
 
   delta() {
@@ -862,7 +862,7 @@ class BlockEmbed extends _parchment2.default.Embed {
   }
 
   format(name, value) {
-    const attribute = _parchment2.default.query(name, _parchment2.default.Scope.BLOCK_ATTRIBUTE);
+    const attribute = this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK_ATTRIBUTE);
     if (attribute != null) {
       this.attributes.attribute(attribute, value);
     }
@@ -874,7 +874,7 @@ class BlockEmbed extends _parchment2.default.Embed {
 
   insertAt(index, value, def) {
     if (typeof value === 'string' && value.endsWith('\n')) {
-      const block = _parchment2.default.create(Block.blotName);
+      const block = this.editorRegistry.create(Block.blotName);
       this.parent.insertBefore(block, index === 0 ? this : this.next);
       block.insertAt(0, value.slice(0, -1));
     } else {
@@ -936,7 +936,7 @@ class Inline extends _parchment2.default.Inline {
   }
 
   formatAt(index, length, name, value) {
-    if (Inline.compare(this.statics.blotName, name) < 0 && _parchment2.default.query(name, _parchment2.default.Scope.BLOT)) {
+    if (Inline.compare(this.statics.blotName, name) < 0 && this.editorRegistry.query(name, _parchment2.default.Scope.BLOT)) {
       const blot = this.isolate(index, length);
       if (value) {
         blot.wrap(name, value);
@@ -1061,7 +1061,8 @@ class Quill {
     }
   }
 
-  constructor(container, options = {}) {
+  constructor(container, options = {}, editorRegistry = new _parchment.EditorRegistry()) {
+    this.editorRegistry = editorRegistry;
     this.options = expandConfig(container, options);
     this.container = this.options.container;
     if (this.container == null) {
@@ -1979,7 +1980,7 @@ class CodeBlock extends _block2.default {
 
   formatAt(index, length, name, value) {
     if (length === 0) return;
-    if (_parchment2.default.query(name, _parchment2.default.Scope.BLOCK) == null || name === this.statics.blotName && value === this.statics.formats(this.domNode)) {
+    if (this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK) == null || name === this.statics.blotName && value === this.statics.formats(this.domNode)) {
       return;
     }
     const nextNewline = this.newlineIndex(index);
@@ -2026,7 +2027,7 @@ class CodeBlock extends _block2.default {
 
   optimize(context) {
     if (!this.domNode.textContent.endsWith('\n')) {
-      this.appendChild(_parchment2.default.create('text', '\n'));
+      this.appendChild(this.editorRegistry.create('text', '\n'));
     }
     super.optimize(context);
     const next = this.next;
@@ -2041,7 +2042,7 @@ class CodeBlock extends _block2.default {
   replace(target) {
     super.replace(target);
     [].slice.call(this.domNode.querySelectorAll('*')).forEach(node => {
-      const blot = _parchment2.default.find(node);
+      const blot = this.editorRegistry.find(node);
       if (blot == null) {
         node.parentNode.removeChild(node);
       } else if (blot instanceof _parchment2.default.Embed) {
@@ -3712,8 +3713,8 @@ function isLine(blot) {
 }
 
 class Scroll extends _parchment2.default.Scroll {
-  constructor(domNode, config) {
-    super(domNode);
+  constructor(editorRegistry, domNode, config) {
+    super(editorRegistry, domNode);
     this.emitter = config.emitter;
     if (Array.isArray(config.whitelist)) {
       this.whitelist = config.whitelist.reduce((whitelist, format) => {
@@ -3791,8 +3792,8 @@ class Scroll extends _parchment2.default.Scroll {
   insertAt(index, value, def) {
     if (def != null && this.whitelist != null && !this.whitelist[value]) return;
     if (index >= this.length()) {
-      if (def == null || _parchment2.default.query(value, _parchment2.default.Scope.BLOCK) == null) {
-        const blot = _parchment2.default.create(this.statics.defaultChild);
+      if (def == null || this.editorRegistry.query(value, _parchment2.default.Scope.BLOCK) == null) {
+        const blot = this.editorRegistry.create(this.statics.defaultChild);
         this.appendChild(blot);
         if (def == null && value.endsWith('\n')) {
           blot.insertAt(0, value.slice(0, -1), def);
@@ -3800,7 +3801,7 @@ class Scroll extends _parchment2.default.Scroll {
           blot.insertAt(0, value, def);
         }
       } else {
-        const embed = _parchment2.default.create(value, def);
+        const embed = this.editorRegistry.create(value, def);
         this.appendChild(embed);
       }
     } else {
@@ -3811,7 +3812,7 @@ class Scroll extends _parchment2.default.Scroll {
 
   insertBefore(blot, ref) {
     if (blot.statics.scope === _parchment2.default.Scope.INLINE_BLOT) {
-      const wrapper = _parchment2.default.create(this.statics.defaultChild);
+      const wrapper = this.editorRegistry.create(this.statics.defaultChild);
       wrapper.appendChild(blot);
       super.insertBefore(wrapper, ref);
     } else {
@@ -3913,8 +3914,8 @@ class Cursor extends _parchment2.default.Embed {
     return undefined;
   }
 
-  constructor(domNode, selection) {
-    super(domNode);
+  constructor(editorRegistry, domNode, selection) {
+    super(editorRegistry, domNode);
     this.selection = selection;
     this.textNode = document.createTextNode(Cursor.CONTENTS);
     this.domNode.appendChild(this.textNode);
@@ -3987,7 +3988,7 @@ class Cursor extends _parchment2.default.Embed {
         this.textNode.data = Cursor.CONTENTS;
       } else {
         this.textNode.data = text;
-        this.parent.insertBefore(_parchment2.default.create(this.textNode), this);
+        this.parent.insertBefore(this.editorRegistry.create(this.textNode), this);
         this.textNode = document.createTextNode(Cursor.CONTENTS);
         this.domNode.appendChild(this.textNode);
       }
@@ -4083,8 +4084,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const GUARD_TEXT = '\uFEFF';
 
 class Embed extends _parchment2.default.Embed {
-  constructor(node) {
-    super(node);
+  constructor(editorRegistry, node) {
+    super(editorRegistry, node);
     this.contentNode = document.createElement('span');
     this.contentNode.setAttribute('contenteditable', false);
     [].slice.call(this.domNode.childNodes).forEach(childNode => {
@@ -4117,7 +4118,7 @@ class Embed extends _parchment2.default.Embed {
         };
       } else {
         textNode = document.createTextNode(text);
-        this.parent.insertBefore(_parchment2.default.create(textNode), this);
+        this.parent.insertBefore(this.editorRegistry.create(textNode), this);
         range = {
           startNode: textNode,
           startOffset: text.length
@@ -4132,7 +4133,7 @@ class Embed extends _parchment2.default.Embed {
         };
       } else {
         textNode = document.createTextNode(text);
-        this.parent.insertBefore(_parchment2.default.create(textNode), this.next);
+        this.parent.insertBefore(this.editorRegistry.create(textNode), this.next);
         range = {
           startNode: textNode,
           startOffset: text.length
@@ -7532,19 +7533,19 @@ function matchAttributor(node, delta) {
   const styles = _parchment2.default.Attributor.Style.keys(node);
   const formats = {};
   attributes.concat(classes).concat(styles).forEach(name => {
-    let attr = _parchment2.default.query(name, _parchment2.default.Scope.ATTRIBUTE);
+    let attr = this.quill.editorRegistry.query(name, _parchment2.default.Scope.ATTRIBUTE);
     if (attr != null) {
-      formats[attr.attrName] = attr.value(node);
+      formats[attr.attrName] = attr.value(node, this.quill.editorRegistry);
       if (formats[attr.attrName]) return;
     }
     attr = ATTRIBUTE_ATTRIBUTORS[name];
     if (attr != null && attr.attrName === name) {
-      formats[attr.attrName] = attr.value(node) || undefined;
+      formats[attr.attrName] = attr.value(node, this.quill.editorRegistry) || undefined;
     }
     attr = STYLE_ATTRIBUTORS[name];
     if (attr != null && attr.attrName === name) {
       attr = STYLE_ATTRIBUTORS[name];
-      formats[attr.attrName] = attr.value(node) || undefined;
+      formats[attr.attrName] = attr.value(node, this.quill.editorRegistry) || undefined;
     }
   });
   if (Object.keys(formats).length > 0) {
@@ -7554,7 +7555,7 @@ function matchAttributor(node, delta) {
 }
 
 function matchBlot(node, delta) {
-  const match = _parchment2.default.query(node);
+  const match = this.quill.editorRegistry.query(node);
   if (match == null) return delta;
   if (match.prototype instanceof _parchment2.default.Embed) {
     const embed = {};
@@ -7581,14 +7582,14 @@ function matchIgnore() {
 }
 
 function matchIndent(node, delta) {
-  const match = _parchment2.default.query(node);
+  const match = this.quill.editorRegistry.query(node);
   if (match == null || match.blotName !== 'list-item' || !deltaEndsWith(delta, '\n')) {
     return delta;
   }
   let indent = -1;
   let parent = node.parentNode;
   while (!parent.classList.contains('ql-clipboard')) {
-    if ((_parchment2.default.query(parent) || {}).blotName === 'list') {
+    if ((this.quill.editorRegistry.query(parent) || {}).blotName === 'list') {
       indent += 1;
     }
     parent = parent.parentNode;

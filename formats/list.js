@@ -13,7 +13,7 @@ class ListItem extends Block {
 
   format(name, value) {
     if (name === LIST_BLOT && !value) {
-      this.replaceWith(Parchment.create(this.statics.scope));
+      this.replaceWith(this.editorRegistry.create(this.statics.scope));
     } else {
       super.format(name, value);
     }
@@ -68,7 +68,7 @@ class List extends Container {
     const listEventHandler = e => {
       if (e.target.parentNode !== domNode) return;
       const format = this.statics.formats(domNode);
-      const blot = Parchment.find(e.target);
+      const blot = this.editorRegistry.find(e.target);
       if (format === 'checked') {
         blot.format('list', 'unchecked');
       } else if (format === 'unchecked') {
@@ -119,7 +119,7 @@ class List extends Container {
 
   replace(target) {
     if (target.statics.blotName !== this.statics.blotName) {
-      const item = Parchment.create(this.statics.defaultChild);
+      const item = this.editorRegistry.create(this.statics.defaultChild);
       target.moveChildren(item);
       this.appendChild(item);
     }

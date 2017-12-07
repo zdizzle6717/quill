@@ -8,10 +8,10 @@ import TextBlot from './text';
 const NEWLINE_LENGTH = 1;
 
 class Block extends Parchment.Block {
-  constructor(domNode) {
-    super(domNode);
+  constructor(editorRegistry, domNode) {
+    super(editorRegistry, domNode);
     this.cache = {};
-  }
+  };
 
   delta() {
     if (this.cache.delta == null) {
@@ -34,7 +34,7 @@ class Block extends Parchment.Block {
 
   formatAt(index, length, name, value) {
     if (length <= 0) return;
-    if (Parchment.query(name, Parchment.Scope.BLOCK)) {
+    if (this.editorRegistry.query(name, Parchment.Scope.BLOCK)) {
       if (index + length === this.length()) {
         this.format(name, value);
       }
@@ -131,7 +131,7 @@ Block.allowedChildren = [Inline, Parchment.Embed, TextBlot];
 class BlockEmbed extends Parchment.Embed {
   attach() {
     super.attach();
-    this.attributes = new Parchment.Attributor.Store(this.domNode);
+    this.attributes = new Parchment.Attributor.Store(this.editorRegistry, this.domNode);
   }
 
   delta() {
@@ -142,7 +142,7 @@ class BlockEmbed extends Parchment.Embed {
   }
 
   format(name, value) {
-    const attribute = Parchment.query(name, Parchment.Scope.BLOCK_ATTRIBUTE);
+    const attribute = this.editorRegistry.query(name, Parchment.Scope.BLOCK_ATTRIBUTE);
     if (attribute != null) {
       this.attributes.attribute(attribute, value);
     }
@@ -154,7 +154,7 @@ class BlockEmbed extends Parchment.Embed {
 
   insertAt(index, value, def) {
     if (typeof value === 'string' && value.endsWith('\n')) {
-      const block = Parchment.create(Block.blotName);
+      const block = this.editorRegistry.create(Block.blotName);
       this.parent.insertBefore(block, index === 0 ? this : this.next);
       block.insertAt(0, value.slice(0, -1));
     } else {
