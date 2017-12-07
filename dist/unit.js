@@ -555,13 +555,14 @@ var EditorRegistry = /** @class */ (function () {
         return null;
     };
     EditorRegistry.prototype.register = function () {
+        var _this = this;
         var Definitions = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             Definitions[_i] = arguments[_i];
         }
         if (Definitions.length > 1) {
             return Definitions.map(function (d) {
-                return this.register(d);
+                return _this.register(d);
             });
         }
         var Definition = Definitions[0];
@@ -590,8 +591,8 @@ var EditorRegistry = /** @class */ (function () {
                 }
                 var tagNames = Array.isArray(Definition.tagName) ? Definition.tagName : [Definition.tagName];
                 tagNames.forEach(function (tag) {
-                    if (this.tags[tag] == null || Definition.className == null) {
-                        this.tags[tag] = Definition;
+                    if (_this.tags[tag] == null || Definition.className == null) {
+                        _this.tags[tag] = Definition;
                     }
                 });
             }
@@ -7244,14 +7245,14 @@ var ScrollBlot = /** @class */ (function (_super) {
                 throw new Error('[Parchment] Maximum optimize iterations reached');
             }
             remaining.forEach(function (mutation) {
-                var blot = this.editorRegistry.find(mutation.target, true);
+                var blot = _this.editorRegistry.find(mutation.target, true);
                 if (blot == null)
                     return;
                 if (blot.domNode === mutation.target) {
                     if (mutation.type === 'childList') {
-                        mark(this.editorRegistry.find(mutation.previousSibling, false));
+                        mark(_this.editorRegistry.find(mutation.previousSibling, false));
                         [].forEach.call(mutation.addedNodes, function (node) {
-                            var child = this.editorRegistry.find(node, false);
+                            var child = _this.editorRegistry.find(node, false);
                             mark(child, false);
                             if (child instanceof container_1.default) {
                                 child.children.forEach(function (grandChild) {
@@ -7280,7 +7281,7 @@ var ScrollBlot = /** @class */ (function (_super) {
         // TODO use WeakMap
         mutations
             .map(function (mutation) {
-            var blot = this.editorRegistry.find(mutation.target, true);
+            var blot = _this.editorRegistry.find(mutation.target, true);
             if (blot == null)
                 return;
             if (blot.domNode[Registry.DATA_KEY].mutations == null) {
