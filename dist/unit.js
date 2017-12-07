@@ -1127,7 +1127,7 @@ class Quill {
       emitter: this.emitter,
       whitelist: this.options.formats
     });
-    this.editor = new _editor2.default(this.scroll);
+    this.editor = new _editor2.default(this.scroll, this.editorRegistry);
     this.selection = new _selection2.default(this.scroll, this.emitter, this.editorRegistry);
     this.theme = new this.options.theme(this, this.options); // eslint-disable-line new-cap
     this.keyboard = this.theme.addModule('keyboard');
@@ -2186,7 +2186,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const ASCII = /^[ -~]*$/;
 
 class Editor {
-  constructor(scroll) {
+  constructor(scroll, editorRegistry) {
+    this.editorRegistry = editorRegistry;
     this.scroll = scroll;
     this.delta = this.getDelta();
   }

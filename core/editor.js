@@ -12,7 +12,8 @@ import Break from '../blots/break';
 const ASCII = /^[ -~]*$/;
 
 class Editor {
-  constructor(scroll) {
+  constructor(scroll, editorRegistry) {
+    this.editorRegistry = editorRegistry;
     this.scroll = scroll;
     this.delta = this.getDelta();
   }
