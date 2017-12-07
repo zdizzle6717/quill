@@ -38,7 +38,7 @@ SyntaxCodeBlock.className = 'ql-syntax';
 class CodeToken extends Inline {
   static formats(node) {
     while (node != null) {
-      const parent = Quill.find(node);
+      const parent = Quill.find(node, this.editorRegistry);
       if (parent instanceof SyntaxCodeBlock) {
         return true;
       }

@@ -33,9 +33,9 @@ class Quill {
     logger.level(limit);
   }
 
-  static find(node) {
+  static find(node, editorRegistry) {
     // eslint-disable-next-line no-underscore-dangle
-    return node.__quill || this.editorRegistry.find(node);
+    return node.__quill || editorRegistry.find(node);
   }
 
   constructor(container, options = {}, editorRegistry = new EditorRegistry) {
