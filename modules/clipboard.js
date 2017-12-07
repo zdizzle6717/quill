@@ -83,7 +83,7 @@ class Clipboard extends Module {
       });
     }
     const [elementMatchers, textMatchers] = this.prepareMatching();
-    let delta = traverse(this.container, elementMatchers, textMatchers);
+    let delta = traverse(this.container, elementMatchers, textMatchers, this.quill.editorRegistry);
     // Remove trailing newline
     if (
       deltaEndsWith(delta, '\n') &&
@@ -207,24 +207,24 @@ function isLine(node) {
   return ['block', 'list-item'].indexOf(style.display) > -1;
 }
 
-function traverse(node, elementMatchers, textMatchers) {
+function traverse(node, elementMatchers, textMatchers, editorRegistry) {
   // Post-order
   if (node.nodeType === node.TEXT_NODE) {
     return textMatchers.reduce((delta, matcher) => {
-      return matcher(node, delta);
+      return matcher(node, delta, editorRegistry);
     }, new Delta());
   } else if (node.nodeType === node.ELEMENT_NODE) {
     return [].reduce.call(
       node.childNodes || [],
       (delta, childNode) => {
-        let childrenDelta = traverse(childNode, elementMatchers, textMatchers);
+        let childrenDelta = traverse(childNode, elementMatchers, textMatchers, editorRegistry);
         if (childNode.nodeType === node.ELEMENT_NODE) {
           childrenDelta = elementMatchers.reduce((reducedDelta, matcher) => {
-            return matcher(childNode, reducedDelta);
+            return matcher(childNode, reducedDelta, editorRegistry);
           }, childrenDelta);
           childrenDelta = (childNode[DOM_KEY] || []
           ).reduce((reducedDelta, matcher) => {
-            return matcher(childNode, reducedDelta);
+            return matcher(childNode, reducedDelta, editorRegistry);
           }, childrenDelta);
         }
         return delta.concat(childrenDelta);
@@ -239,7 +239,7 @@ function matchAlias(format, node, delta) {
   return applyFormat(delta, format, true);
 }
 
-function matchAttributor(node, delta) {
+function matchAttributor(node, delta, editorRegistry) {
   const attributes = Parchment.Attributor.Attribute.keys(node);
   const classes = Parchment.Attributor.Class.keys(node);
   const styles = Parchment.Attributor.Style.keys(node);
@@ -248,19 +248,19 @@ function matchAttributor(node, delta) {
     .concat(classes)
     .concat(styles)
     .forEach(name => {
-      let attr = this.quill.editorRegistry.query(name, Parchment.Scope.ATTRIBUTE);
+      let attr = editorRegistry.query(name, Parchment.Scope.ATTRIBUTE);
       if (attr != null) {
-        formats[attr.attrName] = attr.value(node, this.quill.editorRegistry);
+        formats[attr.attrName] = attr.value(node, editorRegistry);
         if (formats[attr.attrName]) return;
       }
       attr = ATTRIBUTE_ATTRIBUTORS[name];
       if (attr != null && attr.attrName === name) {
-        formats[attr.attrName] = attr.value(node, this.quill.editorRegistry) || undefined;
+        formats[attr.attrName] = attr.value(node, editorRegistry) || undefined;
       }
       attr = STYLE_ATTRIBUTORS[name];
       if (attr != null && attr.attrName === name) {
         attr = STYLE_ATTRIBUTORS[name];
-        formats[attr.attrName] = attr.value(node, this.quill.editorRegistry) || undefined;
+        formats[attr.attrName] = attr.value(node, editorRegistry) || undefined;
       }
     });
   if (Object.keys(formats).length > 0) {
@@ -269,8 +269,8 @@ function matchAttributor(node, delta) {
   return delta;
 }
 
-function matchBlot(node, delta) {
-  const match = this.quill.editorRegistry.query(node);
+function matchBlot(node, delta, editorRegistry) {
+  const match = editorRegistry.query(node);
   if (match == null) return delta;
   if (match.prototype instanceof Parchment.Embed) {
     const embed = {};
@@ -296,8 +296,8 @@ function matchIgnore() {
   return new Delta();
 }
 
-function matchIndent(node, delta) {
-  const match = this.quill.editorRegistry.query(node);
+function matchIndent(node, delta, editorRegistry) {
+  const match = editorRegistry.query(node);
   if (
     match == null ||
     match.blotName !== 'list-item' ||
@@ -308,7 +308,7 @@ function matchIndent(node, delta) {
   let indent = -1;
   let parent = node.parentNode;
   while (!parent.classList.contains('ql-clipboard')) {
-    if ((this.quill.editorRegistry.query(parent) || {}).blotName === 'list') {
+    if ((editorRegistry.query(parent) || {}).blotName === 'list') {
       indent += 1;
     }
     parent = parent.parentNode;
