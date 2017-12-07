@@ -1105,7 +1105,7 @@ class Quill {
     });
     this.editorRegistry.register(_block2.default, _break2.default, _cursor2.default, _inline2.default, _scroll2.default, _text2.default);
 
-    this.options = expandConfig(container, options);
+    this.options = expandConfig(this, container, options);
     this.container = this.options.container;
     if (this.container == null) {
       return debug.error('Invalid Quill container', container);
@@ -1499,7 +1499,7 @@ Quill.sources = _emitter2.default.sources;
 // eslint-disable-next-line no-undef
 Quill.version =  false ? 'dev' : "1.3.4";
 
-function expandConfig(container, userConfig) {
+function expandConfig(quillInstance, container, userConfig) {
   userConfig = (0, _extend2.default)(true, {
     container,
     modules: {
@@ -1511,7 +1511,7 @@ function expandConfig(container, userConfig) {
   if (!userConfig.theme || userConfig.theme === Quill.DEFAULTS.theme) {
     userConfig.theme = _theme2.default;
   } else {
-    userConfig.theme = Quill.import(`themes/${userConfig.theme}`);
+    userConfig.theme = quillInstance.import(`themes/${userConfig.theme}`);
     if (userConfig.theme == null) {
       throw new Error(`Invalid theme ${userConfig.theme}. Did you register it?`);
     }
@@ -1527,7 +1527,7 @@ function expandConfig(container, userConfig) {
   });
   const moduleNames = Object.keys(themeConfig.modules).concat(Object.keys(userConfig.modules));
   const moduleConfig = moduleNames.reduce((config, name) => {
-    const moduleClass = Quill.import(`modules/${name}`);
+    const moduleClass = quillInstance.import(`modules/${name}`);
     if (moduleClass == null) {
       debug.error(`Cannot load ${name} module. Are you sure you registered it?`);
     } else {
