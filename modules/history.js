@@ -42,7 +42,7 @@ class History extends Module {
     this.ignoreChange = true;
     this.quill.updateContents(delta[source], Quill.sources.USER);
     this.ignoreChange = false;
-    const index = getLastChangeIndex(delta[source]);
+    const index = getLastChangeIndex(delta[source], this.quill.editorInstance);
     this.quill.setSelection(index);
     this.stack[dest].push(delta);
   }
@@ -104,7 +104,7 @@ History.DEFAULTS = {
   userOnly: false,
 };
 
-function endsWithNewlineChange(delta) {
+function endsWithNewlineChange(delta, editorInstance) {
   const lastOp = delta.ops[delta.ops.length - 1];
   if (lastOp == null) return false;
   if (lastOp.insert != null) {
@@ -112,18 +112,18 @@ function endsWithNewlineChange(delta) {
   }
   if (lastOp.attributes != null) {
     return Object.keys(lastOp.attributes).some(attr => {
-      return this.quill.editorInstance.query(attr, Parchment.Scope.BLOCK) != null;
+      return editorInstance.query(attr, Parchment.Scope.BLOCK) != null;
     });
   }
   return false;
 }
 
-function getLastChangeIndex(delta) {
+function getLastChangeIndex(delta, editorInstance) {
   const deleteLength = delta.reduce((length, op) => {
     return length + (op.delete || 0);
   }, 0);
   let changeIndex = delta.length() - deleteLength;
-  if (endsWithNewlineChange(delta)) {
+  if (endsWithNewlineChange(delta, editorInstance)) {
     changeIndex -= 1;
   }
   return changeIndex;
