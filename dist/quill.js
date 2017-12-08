@@ -977,12 +977,6 @@ exports.default = exports.overload = exports.expandConfig = undefined;
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-// Default blots
-
-
-// Default modules
-
-
 var _quillDelta = __webpack_require__(1);
 
 var _quillDelta2 = _interopRequireDefault(_quillDelta);
@@ -1019,50 +1013,6 @@ var _theme = __webpack_require__(34);
 
 var _theme2 = _interopRequireDefault(_theme);
 
-var _block = __webpack_require__(4);
-
-var _block2 = _interopRequireDefault(_block);
-
-var _break = __webpack_require__(16);
-
-var _break2 = _interopRequireDefault(_break);
-
-var _container = __webpack_require__(24);
-
-var _container2 = _interopRequireDefault(_container);
-
-var _cursor = __webpack_require__(23);
-
-var _cursor2 = _interopRequireDefault(_cursor);
-
-var _embed = __webpack_require__(25);
-
-var _embed2 = _interopRequireDefault(_embed);
-
-var _inline = __webpack_require__(5);
-
-var _inline2 = _interopRequireDefault(_inline);
-
-var _scroll = __webpack_require__(22);
-
-var _scroll2 = _interopRequireDefault(_scroll);
-
-var _text = __webpack_require__(7);
-
-var _text2 = _interopRequireDefault(_text);
-
-var _clipboard = __webpack_require__(54);
-
-var _clipboard2 = _interopRequireDefault(_clipboard);
-
-var _history = __webpack_require__(41);
-
-var _history2 = _interopRequireDefault(_history);
-
-var _keyboard = __webpack_require__(42);
-
-var _keyboard2 = _interopRequireDefault(_keyboard);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const debug = (0, _logger2.default)('quill');
@@ -1089,22 +1039,12 @@ class Quill {
       'core/theme': _theme2.default
     };
 
-    this.register({
-      'blots/block': _block2.default,
-      'blots/block/embed': _block.BlockEmbed,
-      'blots/break': _break2.default,
-      'blots/container': _container2.default,
-      'blots/cursor': _cursor2.default,
-      'blots/embed': _embed2.default,
-      'blots/inline': _inline2.default,
-      'blots/scroll': _scroll2.default,
-      'blots/text': _text2.default,
+    // Manage configuration settings for 'quill' or 'quill/core'
+    this.register(Quill.QUILL_DEFAULTS, Quill.QUILL_OVERWRITE);
 
-      'modules/clipboard': _clipboard2.default,
-      'modules/history': _history2.default,
-      'modules/keyboard': _keyboard2.default
-    });
-    this.editorRegistry.register(_block2.default, _break2.default, _cursor2.default, _inline2.default, _scroll2.default, _text2.default);
+    if (Quill.PARCHMENT_DEFAULTS) {
+      this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
+    }
 
     this.options = expandConfig(this, container, options);
     this.container = this.options.container;
@@ -4465,24 +4405,75 @@ var _quill = __webpack_require__(6);
 
 var _quill2 = _interopRequireDefault(_quill);
 
+var _block = __webpack_require__(4);
+
+var _block2 = _interopRequireDefault(_block);
+
+var _break = __webpack_require__(16);
+
+var _break2 = _interopRequireDefault(_break);
+
+var _container = __webpack_require__(24);
+
+var _container2 = _interopRequireDefault(_container);
+
+var _cursor = __webpack_require__(23);
+
+var _cursor2 = _interopRequireDefault(_cursor);
+
+var _embed = __webpack_require__(25);
+
+var _embed2 = _interopRequireDefault(_embed);
+
+var _inline = __webpack_require__(5);
+
+var _inline2 = _interopRequireDefault(_inline);
+
+var _scroll = __webpack_require__(22);
+
+var _scroll2 = _interopRequireDefault(_scroll);
+
+var _text = __webpack_require__(7);
+
+var _text2 = _interopRequireDefault(_text);
+
+var _clipboard = __webpack_require__(54);
+
+var _clipboard2 = _interopRequireDefault(_clipboard);
+
+var _history = __webpack_require__(41);
+
+var _history2 = _interopRequireDefault(_history);
+
+var _keyboard = __webpack_require__(42);
+
+var _keyboard2 = _interopRequireDefault(_keyboard);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// this.register({
-//   'blots/block': Block,
-//   'blots/block/embed': BlockEmbed,
-//   'blots/break': Break,
-//   'blots/container': Container,
-//   'blots/cursor': Cursor,
-//   'blots/embed': Embed,
-//   'blots/inline': Inline,
-//   'blots/scroll': Scroll,
-//   'blots/text': TextBlot,
-//
-//   'modules/clipboard': Clipboard,
-//   'modules/history': History,
-//   'modules/keyboard': Keyboard,
-// });
-// this.editorRegistry.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
+_quill2.default.QUILL_DEFAULTS = {
+  'blots/block': _block2.default,
+  'blots/block/embed': _block.BlockEmbed,
+  'blots/break': _break2.default,
+  'blots/container': _container2.default,
+  'blots/cursor': _cursor2.default,
+  'blots/embed': _embed2.default,
+  'blots/inline': _inline2.default,
+  'blots/scroll': _scroll2.default,
+  'blots/text': _text2.default,
+
+  'modules/clipboard': _clipboard2.default,
+  'modules/history': _history2.default,
+  'modules/keyboard': _keyboard2.default
+};
+
+// Default modules
+
+
+// Default blots
+
+
+_quill2.default.PARCHMENT_DEFAULTS = [_block2.default, _break2.default, _cursor2.default, _inline2.default, _scroll2.default, _text2.default];
 
 exports.default = _quill2.default;
 
@@ -9203,7 +9194,7 @@ var _snow2 = _interopRequireDefault(_snow);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_core2.default.register({
+_core2.default.QUILL_DEFAULTS = {
   'attributors/attribute/direction': _direction.DirectionAttribute,
 
   'attributors/class/align': _align.AlignClass,
@@ -9218,10 +9209,8 @@ _core2.default.register({
   'attributors/style/color': _color.ColorStyle,
   'attributors/style/direction': _direction.DirectionStyle,
   'attributors/style/font': _font.FontStyle,
-  'attributors/style/size': _size.SizeStyle
-}, true);
+  'attributors/style/size': _size.SizeStyle,
 
-_core2.default.register({
   'formats/align': _align.AlignClass,
   'formats/direction': _direction.DirectionClass,
   'formats/indent': _indent2.default,
@@ -9261,7 +9250,9 @@ _core2.default.register({
   'ui/icon-picker': _iconPicker2.default,
   'ui/color-picker': _colorPicker2.default,
   'ui/tooltip': _tooltip2.default
-}, true);
+};
+
+_core2.default.QUILL_OVERWRITE = true;
 
 exports.default = _core2.default;
 

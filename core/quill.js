@@ -8,21 +8,6 @@ import Selection, { Range } from './selection';
 import logger from './logger';
 import Theme from './theme';
 
-// Default blots
-import Block, { BlockEmbed } from '../blots/block';
-import Break from '../blots/break';
-import Container from '../blots/container';
-import Cursor from '../blots/cursor';
-import Embed from '../blots/embed';
-import Inline from '../blots/inline';
-import Scroll from '../blots/scroll';
-import TextBlot from '../blots/text';
-
-// Default modules
-import Clipboard from '../modules/clipboard';
-import History from '../modules/history';
-import Keyboard from '../modules/keyboard';
-
 const debug = logger('quill');
 
 class Quill {
@@ -47,22 +32,12 @@ class Quill {
       'core/theme': Theme,
     };
 
-    this.register({
-      'blots/block': Block,
-      'blots/block/embed': BlockEmbed,
-      'blots/break': Break,
-      'blots/container': Container,
-      'blots/cursor': Cursor,
-      'blots/embed': Embed,
-      'blots/inline': Inline,
-      'blots/scroll': Scroll,
-      'blots/text': TextBlot,
+    // Manage configuration settings for 'quill' or 'quill/core'
+    this.register(Quill.QUILL_DEFAULTS, Quill.QUILL_OVERWRITE);
 
-      'modules/clipboard': Clipboard,
-      'modules/history': History,
-      'modules/keyboard': Keyboard,
-    });
-    this.editorRegistry.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
+    if (Quill.PARCHMENT_DEFAULTS) {
+      this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
+    }
 
     this.options = expandConfig(this, container, options);
     this.container = this.options.container;

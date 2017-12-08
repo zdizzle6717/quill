@@ -42,70 +42,64 @@ import Tooltip from './ui/tooltip';
 import BubbleTheme from './themes/bubble';
 import SnowTheme from './themes/snow';
 
-Quill.register(
-  {
-    'attributors/attribute/direction': DirectionAttribute,
+Quill.QUILL_DEFAULTS = {
+  'attributors/attribute/direction': DirectionAttribute,
 
-    'attributors/class/align': AlignClass,
-    'attributors/class/background': BackgroundClass,
-    'attributors/class/color': ColorClass,
-    'attributors/class/direction': DirectionClass,
-    'attributors/class/font': FontClass,
-    'attributors/class/size': SizeClass,
+  'attributors/class/align': AlignClass,
+  'attributors/class/background': BackgroundClass,
+  'attributors/class/color': ColorClass,
+  'attributors/class/direction': DirectionClass,
+  'attributors/class/font': FontClass,
+  'attributors/class/size': SizeClass,
 
-    'attributors/style/align': AlignStyle,
-    'attributors/style/background': BackgroundStyle,
-    'attributors/style/color': ColorStyle,
-    'attributors/style/direction': DirectionStyle,
-    'attributors/style/font': FontStyle,
-    'attributors/style/size': SizeStyle,
-  },
-  true,
-);
+  'attributors/style/align': AlignStyle,
+  'attributors/style/background': BackgroundStyle,
+  'attributors/style/color': ColorStyle,
+  'attributors/style/direction': DirectionStyle,
+  'attributors/style/font': FontStyle,
+  'attributors/style/size': SizeStyle,
 
-Quill.register(
-  {
-    'formats/align': AlignClass,
-    'formats/direction': DirectionClass,
-    'formats/indent': Indent,
+  'formats/align': AlignClass,
+  'formats/direction': DirectionClass,
+  'formats/indent': Indent,
 
-    'formats/background': BackgroundStyle,
-    'formats/color': ColorStyle,
-    'formats/font': FontClass,
-    'formats/size': SizeClass,
+  'formats/background': BackgroundStyle,
+  'formats/color': ColorStyle,
+  'formats/font': FontClass,
+  'formats/size': SizeClass,
 
-    'formats/blockquote': Blockquote,
-    'formats/code-block': CodeBlock,
-    'formats/header': Header,
-    'formats/list': List,
+  'formats/blockquote': Blockquote,
+  'formats/code-block': CodeBlock,
+  'formats/header': Header,
+  'formats/list': List,
 
-    'formats/bold': Bold,
-    'formats/code': InlineCode,
-    'formats/italic': Italic,
-    'formats/link': Link,
-    'formats/script': Script,
-    'formats/strike': Strike,
-    'formats/underline': Underline,
+  'formats/bold': Bold,
+  'formats/code': InlineCode,
+  'formats/italic': Italic,
+  'formats/link': Link,
+  'formats/script': Script,
+  'formats/strike': Strike,
+  'formats/underline': Underline,
 
-    'formats/formula': Formula,
-    'formats/image': Image,
-    'formats/video': Video,
+  'formats/formula': Formula,
+  'formats/image': Image,
+  'formats/video': Video,
 
-    'formats/list/item': ListItem,
+  'formats/list/item': ListItem,
 
-    'modules/syntax': Syntax,
-    'modules/toolbar': Toolbar,
+  'modules/syntax': Syntax,
+  'modules/toolbar': Toolbar,
 
-    'themes/bubble': BubbleTheme,
-    'themes/snow': SnowTheme,
+  'themes/bubble': BubbleTheme,
+  'themes/snow': SnowTheme,
 
-    'ui/icons': Icons,
-    'ui/picker': Picker,
-    'ui/icon-picker': IconPicker,
-    'ui/color-picker': ColorPicker,
-    'ui/tooltip': Tooltip,
-  },
-  true,
-);
+  'ui/icons': Icons,
+  'ui/picker': Picker,
+  'ui/icon-picker': IconPicker,
+  'ui/color-picker': ColorPicker,
+  'ui/tooltip': Tooltip,
+};
+
+Quill.QUILL_OVERWRITE = true;
 
 export default Quill;
