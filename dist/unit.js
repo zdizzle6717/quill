@@ -9444,8 +9444,8 @@ class List extends _container2.default {
     return undefined;
   }
 
-  constructor(domNode) {
-    super(domNode);
+  constructor(editorRegistry, domNode) {
+    super(editorRegistry, domNode);
     const listEventHandler = e => {
       if (e.target.parentNode !== domNode) return;
       const format = this.statics.formats(domNode);
