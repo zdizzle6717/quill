@@ -1354,7 +1354,7 @@ class Quill {
         this.editorRegistry.register(target);
       }
       if (typeof target.register === 'function') {
-        target.register(this.editorRegistry);
+        target.register(this);
       }
     }
   }
@@ -8883,9 +8883,9 @@ CodeToken.blotName = 'code-token';
 CodeToken.className = CODE_TOKEN_CLASS;
 
 class Syntax extends _module2.default {
-  static register(editorRegistry) {
-    editorRegistry.register(CodeToken, true);
-    editorRegistry.register(SyntaxCodeBlock, true);
+  static register(quill) {
+    quill.register(CodeToken, true);
+    quill.register(SyntaxCodeBlock, true);
   }
 
   constructor(quill, options) {
