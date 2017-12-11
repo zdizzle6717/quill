@@ -1,10 +1,10 @@
 import Delta from 'quill-delta';
-import Editor from '../../../core/editor';
+import Quill from '../../../core';
 
 describe('List', function() {
   it('add', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <p>0123</p>
       <p>5678</p>
@@ -17,7 +17,7 @@ describe('List', function() {
         .insert('\n', { list: 'ordered' })
         .insert('0123\n'),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <p>0123</p>
       <ol><li>5678</li></ol>
       <p>0123</p>
@@ -25,8 +25,8 @@ describe('List', function() {
   });
 
   it('checklist', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <p>0123</p>
       <p>5678</p>
@@ -44,7 +44,7 @@ describe('List', function() {
         .insert('\n', { list: 'unchecked' })
         .insert('0123\n'),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ul data-checked="true">
         <li>0123</li>
       </ul>
@@ -56,8 +56,8 @@ describe('List', function() {
   });
 
   it('remove', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <p>0123</p>
       <ol><li>5678</li></ol>
@@ -66,7 +66,7 @@ describe('List', function() {
     );
     editor.formatText(9, 1, { list: null });
     expect(editor.getDelta()).toEqual(new Delta().insert('0123\n5678\n0123\n'));
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <p>0123</p>
       <p>5678</p>
       <p>0123</p>
@@ -74,8 +74,8 @@ describe('List', function() {
   });
 
   it('replace', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <p>0123</p>
       <ol><li>5678</li></ol>
@@ -89,7 +89,7 @@ describe('List', function() {
         .insert('\n', { list: 'bullet' })
         .insert('0123\n'),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <p>0123</p>
       <ul><li>5678</li></ul>
       <p>0123</p>
@@ -97,8 +97,8 @@ describe('List', function() {
   });
 
   it('replace checklist with bullet', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ul data-checked="true">
         <li>0123</li>
@@ -109,14 +109,14 @@ describe('List', function() {
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123').insert('\n', { list: 'bullet' }),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ul><li>0123</li></ul>
     `);
   });
 
   it('replace with attributes', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<ol><li class="ql-align-center">0123</li></ol>',
     );
     editor.formatText(4, 1, { list: 'bullet' });
@@ -125,14 +125,14 @@ describe('List', function() {
         .insert('0123')
         .insert('\n', { align: 'center', list: 'bullet' }),
     );
-    expect(this.container).toEqualHTML(
+    expect(this.container.firstChild).toEqualHTML(
       '<ul><li class="ql-align-center">0123</li></ul>',
     );
   });
 
   it('format merge', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ol><li>0123</li></ol>
       <p>5678</p>
@@ -149,7 +149,7 @@ describe('List', function() {
         .insert('0123')
         .insert('\n', { list: 'ordered' }),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ol>
         <li>0123</li>
         <li>5678</li>
@@ -158,8 +158,8 @@ describe('List', function() {
   });
 
   it('replace merge', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ol><li>0123</li></ol>
       <ul><li>5678</li></ul>
@@ -175,7 +175,7 @@ describe('List', function() {
         .insert('0123')
         .insert('\n', { list: 'ordered' }),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ol>
         <li>0123</li>
         <li>5678</li>
@@ -184,8 +184,8 @@ describe('List', function() {
   });
 
   it('delete merge', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ol><li>0123</li></ol>
       <p>5678</p>
@@ -199,7 +199,7 @@ describe('List', function() {
         .insert('0123')
         .insert('\n', { list: 'ordered' }),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ol>
         <li>0123</li>
         <li>0123</li>
@@ -207,8 +207,8 @@ describe('List', function() {
   });
 
   it('merge checklist', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ul data-checked="true"><li>0123</li></ul>
       <p>5678</p>
@@ -225,7 +225,7 @@ describe('List', function() {
         .insert('0123')
         .insert('\n', { list: 'checked' }),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ul data-checked="true">
         <li>0123</li>
         <li>5678</li>
@@ -234,8 +234,8 @@ describe('List', function() {
   });
 
   it('replace split', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ol>
         <li>0123</li>
@@ -253,15 +253,15 @@ describe('List', function() {
         .insert('0123')
         .insert('\n', { list: 'ordered' }),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ol><li>0123</li></ol>
       <ul><li>5678</li></ul>
       <ol><li>0123</li></ol>`);
   });
 
   it('split checklist', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ul>
         <li>0123</li>
@@ -279,23 +279,23 @@ describe('List', function() {
         .insert('0123')
         .insert('\n', { list: 'bullet' }),
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ul><li>0123</li></ul>
       <ul data-checked="false"><li>5678</li></ul>
       <ul><li>0123</li></ul>`);
   });
 
   it('empty line interop', function() {
-    const editor = this.initialize(Editor, '<ol><li><br></li></ol>');
+    const { editor } = this.initialize(Quill, '<ol><li><br></li></ol>');
     editor.insertText(0, 'Test');
-    expect(this.container).toEqualHTML('<ol><li>Test</li></ol>');
+    expect(this.container.firstChild).toEqualHTML('<ol><li>Test</li></ol>');
     editor.deleteText(0, 4);
-    expect(this.container).toEqualHTML('<ol><li><br></li></ol>');
+    expect(this.container.firstChild).toEqualHTML('<ol><li><br></li></ol>');
   });
 
   it('delete multiple items', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ol>
         <li>0123</li>
@@ -304,7 +304,7 @@ describe('List', function() {
       </ol>`,
     );
     editor.deleteText(2, 5);
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ol>
         <li>0178</li>
         <li>0123</li>
@@ -312,25 +312,25 @@ describe('List', function() {
   });
 
   it('delete across last item', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ol><li>0123</li></ol>
       <p>5678</p>`,
     );
     editor.deleteText(2, 5);
-    expect(this.container).toEqualHTML('<p>0178</p>');
+    expect(this.container.firstChild).toEqualHTML('<p>0178</p>');
   });
 
   it('delete partial', function() {
-    const editor = this.initialize(Editor, '<p>0123</p><ul><li>5678</li></ul>');
+    const { editor } = this.initialize(Quill, '<p>0123</p><ul><li>5678</li></ul>');
     editor.deleteText(2, 5);
-    expect(this.container).toEqualHTML('<ul><li>0178</li></ul>');
+    expect(this.container.firstChild).toEqualHTML('<ul><li>0178</li></ul>');
   });
 
   it('nested list replacement', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <ol>
         <li>One</li>
@@ -340,7 +340,7 @@ describe('List', function() {
     `,
     );
     editor.formatLine(1, 10, { list: 'bullet' });
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ul>
         <li>One</li>
         <li class='ql-indent-1'>Alpha</li>
@@ -350,24 +350,24 @@ describe('List', function() {
   });
 
   it('copy atttributes', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p class="ql-align-center">Test</p>',
     );
     editor.formatLine(4, 1, { list: 'bullet' });
-    expect(this.container).toEqualHTML(
+    expect(this.container.firstChild).toEqualHTML(
       '<ul><li class="ql-align-center">Test</li></ul>',
     );
   });
 
   it('insert block embed', function() {
-    const editor = this.initialize(Editor, '<ol><li>Test</li></ol>');
+    const { editor } = this.initialize(Quill, '<ol><li>Test</li></ol>');
     editor.insertEmbed(
       2,
       'video',
       'https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0',
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ol><li>Te</li></ol>
       <iframe class="ql-video" frameborder="0" allowfullscreen="true" src="https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0"></iframe>
       <ol><li>st</li></ol>
@@ -375,26 +375,26 @@ describe('List', function() {
   });
 
   it('insert block embed at beginning', function() {
-    const editor = this.initialize(Editor, '<ol><li>Test</li></ol>');
+    const { editor } = this.initialize(Quill, '<ol><li>Test</li></ol>');
     editor.insertEmbed(
       0,
       'video',
       'https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0',
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <iframe class="ql-video" frameborder="0" allowfullscreen="true" src="https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0"></iframe>
       <ol><li>Test</li></ol>
     `);
   });
 
   it('insert block embed at end', function() {
-    const editor = this.initialize(Editor, '<ol><li>Test</li></ol>');
+    const { editor } = this.initialize(Quill, '<ol><li>Test</li></ol>');
     editor.insertEmbed(
       4,
       'video',
       'https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0',
     );
-    expect(this.container).toEqualHTML(`
+    expect(this.container.firstChild).toEqualHTML(`
       <ol><li>Test</li></ol>
       <iframe class="ql-video" frameborder="0" allowfullscreen="true" src="https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0"></iframe>
       <ol><li><br></li></ol>

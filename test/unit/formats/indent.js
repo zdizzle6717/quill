@@ -1,9 +1,9 @@
 import Delta from 'quill-delta';
-import Editor from '../../../core/editor';
+import Quill from '../../../core';
 
 describe('Indent', function() {
   it('+1', function() {
-    const editor = this.initialize(Editor, '<ul><li>0123</li></ul>');
+    const { editor } = this.initialize(Quill, '<ul><li>0123</li></ul>');
     editor.formatText(4, 1, { indent: '+1' });
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123').insert('\n', { list: 'bullet', indent: 1 }),
@@ -14,8 +14,8 @@ describe('Indent', function() {
   });
 
   it('-1', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<ul><li class="ql-indent-1">0123</li></ul>',
     );
     editor.formatText(4, 1, { indent: '-1' });

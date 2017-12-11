@@ -1,10 +1,10 @@
 import Delta from 'quill-delta';
-import Editor from '../../../core/editor';
+import Quill from '../../../core';
 
 describe('Code', function() {
   it('newline', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <pre></pre>
       <p><br></p>
@@ -25,7 +25,7 @@ describe('Code', function() {
   });
 
   it('default child', function() {
-    const editor = this.initialize(Editor, '<p><br></p>');
+    const { editor } = this.initialize(Quill, '<p><br></p>');
     editor.formatLine(0, 1, { 'code-block': true });
     expect(editor.scroll.domNode.innerHTML).toEqual(
       '<pre spellcheck="false">\n</pre>',
@@ -33,8 +33,8 @@ describe('Code', function() {
   });
 
   it('merge', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <pre>0</pre>
       <pre>0</pre>
@@ -89,8 +89,8 @@ describe('Code', function() {
   });
 
   it('merge multiple', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       `
       <pre>0</pre>
       <pre>1</pre>
@@ -105,7 +105,7 @@ describe('Code', function() {
   });
 
   it('add', function() {
-    const editor = this.initialize(Editor, '<p><em>0123</em></p><p>5678</p>');
+    const { editor } = this.initialize(Quill, '<p><em>0123</em></p><p>5678</p>');
     editor.formatLine(2, 5, { 'code-block': true });
     expect(editor.getDelta()).toEqual(
       new Delta()
@@ -120,14 +120,14 @@ describe('Code', function() {
   });
 
   it('remove', function() {
-    const editor = this.initialize(Editor, { html: '<pre>0123\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>0123\n</pre>' });
     editor.formatText(4, 1, { 'code-block': false });
     expect(editor.getDelta()).toEqual(new Delta().insert('0123\n'));
     expect(editor.scroll.domNode).toEqualHTML('<p>0123</p>');
   });
 
   it('delete last', function() {
-    const editor = this.initialize(Editor, {
+    const { editor } = this.initialize(Quill, {
       html: '<p>0123</p><pre>\n</pre><p>5678</p>',
     });
     editor.deleteText(4, 1);
@@ -141,7 +141,7 @@ describe('Code', function() {
   });
 
   it('delete merge before', function() {
-    const editor = this.initialize(Editor, {
+    const { editor } = this.initialize(Quill, {
       html: '<h1>0123</h1><pre>4567\n</pre>',
     });
     editor.deleteText(4, 1);
@@ -152,7 +152,7 @@ describe('Code', function() {
   });
 
   it('delete merge after', function() {
-    const editor = this.initialize(Editor, {
+    const { editor } = this.initialize(Quill, {
       html: '<pre>0123\n</pre><h1>4567</h1>',
     });
     editor.deleteText(4, 1);
@@ -163,7 +163,7 @@ describe('Code', function() {
   });
 
   it('delete across before partial merge', function() {
-    const editor = this.initialize(Editor, {
+    const { editor } = this.initialize(Quill, {
       html: '<pre>01\n34\n67\n</pre><h1>90</h1>',
     });
     editor.deleteText(7, 3);
@@ -182,7 +182,7 @@ describe('Code', function() {
   });
 
   it('delete across before no merge', function() {
-    const editor = this.initialize(Editor, {
+    const { editor } = this.initialize(Quill, {
       html: '<pre>01\n34\n</pre><h1>6789</h1>',
     });
     editor.deleteText(3, 5);
@@ -199,7 +199,7 @@ describe('Code', function() {
   });
 
   it('delete across after', function() {
-    const editor = this.initialize(Editor, {
+    const { editor } = this.initialize(Quill, {
       html: '<h1>0123</h1><pre>56\n89\n</pre>',
     });
     editor.deleteText(2, 4);
@@ -214,7 +214,7 @@ describe('Code', function() {
   });
 
   it('replace', function() {
-    const editor = this.initialize(Editor, { html: '<pre>0123\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>0123\n</pre>' });
     editor.formatText(4, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123').insert('\n', { header: 1 }),
@@ -223,7 +223,7 @@ describe('Code', function() {
   });
 
   it('replace multiple', function() {
-    const editor = this.initialize(Editor, { html: '<pre>01\n23\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>01\n23\n</pre>' });
     editor.formatText(0, 6, { header: 1 });
     expect(editor.getDelta()).toEqual(
       new Delta()
@@ -236,7 +236,7 @@ describe('Code', function() {
   });
 
   it('format interior line', function() {
-    const editor = this.initialize(Editor, { html: '<pre>01\n23\n45\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>01\n23\n45\n</pre>' });
     editor.formatText(5, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(
       new Delta()
@@ -253,7 +253,7 @@ describe('Code', function() {
   });
 
   it('format imprecise bounds', function() {
-    const editor = this.initialize(Editor, { html: '<pre>01\n23\n45\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>01\n23\n45\n</pre>' });
     editor.formatText(1, 6, { header: 1 });
     expect(editor.getDelta()).toEqual(
       new Delta()
@@ -270,7 +270,7 @@ describe('Code', function() {
   });
 
   it('format without newline', function() {
-    const editor = this.initialize(Editor, { html: '<pre>01\n23\n45\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>01\n23\n45\n</pre>' });
     editor.formatText(3, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(
       new Delta()
@@ -285,7 +285,7 @@ describe('Code', function() {
   });
 
   it('format line', function() {
-    const editor = this.initialize(Editor, { html: '<pre>01\n23\n45\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>01\n23\n45\n</pre>' });
     editor.formatLine(3, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(
       new Delta()
@@ -302,7 +302,7 @@ describe('Code', function() {
   });
 
   it('ignore formatAt', function() {
-    const editor = this.initialize(Editor, '<pre>0123</pre>');
+    const { editor } = this.initialize(Quill, '<pre>0123</pre>');
     editor.formatText(1, 1, { bold: true });
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123').insert('\n', { 'code-block': true }),
@@ -311,7 +311,7 @@ describe('Code', function() {
   });
 
   it('partial block modification applyDelta', function() {
-    const editor = this.initialize(Editor, { html: '<pre>a\nb\n\n</pre>' });
+    const { editor } = this.initialize(Quill, { html: '<pre>a\nb\n\n</pre>' });
     const delta = new Delta()
       .retain(3)
       .insert('\n', { 'code-block': true })

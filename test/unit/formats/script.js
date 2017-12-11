@@ -1,9 +1,9 @@
-import Editor from '../../../core/editor';
+import Quill from '../../../core';
 
 describe('Script', function() {
   it('add', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p>a<sup>2</sup> + b2 = c<sup>2</sup></p>',
     );
     editor.formatText(6, 1, { script: 'super' });
@@ -13,8 +13,8 @@ describe('Script', function() {
   });
 
   it('remove', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p>a<sup>2</sup> + b<sup>2</sup></p>',
     );
     editor.formatText(1, 1, { script: false });
@@ -22,8 +22,8 @@ describe('Script', function() {
   });
 
   it('replace', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p>a<sup>2</sup> + b<sup>2</sup></p>',
     );
     editor.formatText(1, 1, { script: 'sub' });

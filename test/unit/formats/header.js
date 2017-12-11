@@ -1,9 +1,9 @@
 import Delta from 'quill-delta';
-import Editor from '../../../core/editor';
+import Quill from '../../../core';
 
 describe('Header', function() {
   it('add', function() {
-    const editor = this.initialize(Editor, '<p><em>0123</em></p>');
+    const { editor } = this.initialize(Quill, '<p><em>0123</em></p>');
     editor.formatText(4, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123', { italic: true }).insert('\n', { header: 1 }),
@@ -12,7 +12,7 @@ describe('Header', function() {
   });
 
   it('remove', function() {
-    const editor = this.initialize(Editor, '<h1><em>0123</em></h1>');
+    const { editor } = this.initialize(Quill, '<h1><em>0123</em></h1>');
     editor.formatText(4, 1, { header: false });
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123', { italic: true }).insert('\n'),
@@ -21,7 +21,7 @@ describe('Header', function() {
   });
 
   it('change', function() {
-    const editor = this.initialize(Editor, '<h1><em>0123</em></h1>');
+    const { editor } = this.initialize(Quill, '<h1><em>0123</em></h1>');
     editor.formatText(4, 1, { header: 2 });
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123', { italic: true }).insert('\n', { header: 2 }),

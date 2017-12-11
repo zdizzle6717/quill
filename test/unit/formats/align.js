@@ -1,9 +1,9 @@
 import Delta from 'quill-delta';
-import Editor from '../../../core/editor';
+import Quill from '../../../core';
 
 describe('Align', function() {
   it('add', function() {
-    const editor = this.initialize(Editor, '<p>0123</p>');
+    const { editor } = this.initialize(Quill, '<p>0123</p>');
     editor.formatText(4, 1, { align: 'center' });
     expect(editor.getDelta()).toEqual(
       new Delta().insert('0123').insert('\n', { align: 'center' }),
@@ -14,8 +14,8 @@ describe('Align', function() {
   });
 
   it('remove', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p class="ql-align-center">0123</p>',
     );
     editor.formatText(4, 1, { align: false });
@@ -24,8 +24,8 @@ describe('Align', function() {
   });
 
   it('whitelist', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p class="ql-align-center">0123</p>',
     );
     const initial = editor.scroll.domNode.innerHTML;
@@ -37,7 +37,7 @@ describe('Align', function() {
   });
 
   it('invalid scope', function() {
-    const editor = this.initialize(Editor, '<p>0123</p>');
+    const { editor } = this.initialize(Quill, '<p>0123</p>');
     const initial = editor.scroll.domNode.innerHTML;
     editor.formatText(1, 2, { align: 'center' });
     expect(editor.getDelta()).toEqual(new Delta().insert('0123\n'));

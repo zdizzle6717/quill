@@ -3,7 +3,7 @@ import { EditorRegistry } from 'parchment';
 import Quill from '../../../core';
 import { getLastChangeIndex } from '../../../modules/history';
 
-fdescribe('History', function() {
+describe('History', function() {
   beforeEach(function() {
     this.mockEditorRegistry = new EditorRegistry();
     this.quill = this.initialize(Quill, '', undefined, this.mockEditorRegistry);

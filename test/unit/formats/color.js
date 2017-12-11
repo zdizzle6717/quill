@@ -1,9 +1,9 @@
 import Delta from 'quill-delta';
-import Editor from '../../../core/editor';
+import Quill from '../../../core';
 
 describe('Color', function() {
   it('add', function() {
-    const editor = this.initialize(Editor, '<p>0123</p>');
+    const { editor } = this.initialize(Quill, '<p>0123</p>');
     editor.formatText(1, 2, { color: 'red' });
     expect(editor.getDelta()).toEqual(
       new Delta()
@@ -17,8 +17,8 @@ describe('Color', function() {
   });
 
   it('remove', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p>0<strong style="color: red;">12</strong>3</p>',
     );
     editor.formatText(1, 2, { color: false });
@@ -31,8 +31,8 @@ describe('Color', function() {
   });
 
   it('remove unwrap', function() {
-    const editor = this.initialize(
-      Editor,
+    const { editor } = this.initialize(
+      Quill,
       '<p>0<span style="color: red;">12</span>3</p>',
     );
     editor.formatText(1, 2, { color: false });
@@ -41,7 +41,7 @@ describe('Color', function() {
   });
 
   it('invalid scope', function() {
-    const editor = this.initialize(Editor, '<p>0123</p>');
+    const { editor } = this.initialize(Quill, '<p>0123</p>');
     const initial = editor.scroll.domNode.innerHTML;
     editor.formatText(4, 1, { color: 'red' });
     expect(editor.getDelta()).toEqual(new Delta().insert('0123\n'));
