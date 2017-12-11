@@ -52,8 +52,8 @@ CodeToken.className = CODE_TOKEN_CLASS;
 
 class Syntax extends Module {
   static register(editorRegistry) {
-    editorRegistry(CodeToken, true);
-    editorRegistry(SyntaxCodeBlock, true);
+    editorRegistry.register(CodeToken, true);
+    editorRegistry.register(SyntaxCodeBlock, true);
   }
 
   constructor(quill, options) {

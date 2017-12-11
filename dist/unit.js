@@ -8884,8 +8884,8 @@ CodeToken.className = CODE_TOKEN_CLASS;
 
 class Syntax extends _module2.default {
   static register(editorRegistry) {
-    editorRegistry(CodeToken, true);
-    editorRegistry(SyntaxCodeBlock, true);
+    editorRegistry.register(CodeToken, true);
+    editorRegistry.register(SyntaxCodeBlock, true);
   }
 
   constructor(quill, options) {
