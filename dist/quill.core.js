@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 105);
+/******/ 	return __webpack_require__(__webpack_require__.s = 106);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1039,12 +1039,15 @@ class Quill {
       'core/theme': _theme2.default
     };
 
-    // Manage configuration settings for 'quill' or 'quill/core'
-    this.register(Quill.QUILL_DEFAULTS, Quill.QUILL_OVERWRITE);
+    // Register default configuration settings for /core.js'
+    this.register(Quill.QUILL_CORE_DEFAULTS);
 
-    if (Quill.PARCHMENT_DEFAULTS) {
-      this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
+    // Extend configuration settings by adding from '/quill.js'
+    if (Quill.QUILL_EXTRA_DEFAULTS) {
+      this.register(Quill.QUILL_EXTRA_DEFAULTS, true);
     }
+
+    this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
 
     this.options = expandConfig(this, container, options);
     this.container = this.options.container;
@@ -4269,7 +4272,7 @@ var _keyboard2 = _interopRequireDefault(_keyboard);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_quill2.default.QUILL_DEFAULTS = {
+_quill2.default.QUILL_CORE_DEFAULTS = {
   'blots/block': _block2.default,
   'blots/block/embed': _block.BlockEmbed,
   'blots/break': _break2.default,
@@ -7731,7 +7734,8 @@ exports.matchText = matchText;
 /* 102 */,
 /* 103 */,
 /* 104 */,
-/* 105 */
+/* 105 */,
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(29);

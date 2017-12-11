@@ -3,7 +3,11 @@
 import Quill from '../quill.js';
 import CodeBlock from '../formats/code';
 
-Quill.register(CodeBlock, true); // Syntax version will otherwise be registered
+// TODO: Determine whether this is still necessary
+// Quill.register(CodeBlock, true); // Syntax version will otherwise be registered
+Quill.QUILL_EXTRA_DEFAULTS = Object.assign(Quill.QUILL_EXTRA_DEFAULTS, {
+  'formats/code-block': CodeBlock
+});
 
 import './helpers/unit';
 

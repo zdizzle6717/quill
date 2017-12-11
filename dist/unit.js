@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 109);
+/******/ 	return __webpack_require__(__webpack_require__.s = 104);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1039,12 +1039,15 @@ class Quill {
       'core/theme': _theme2.default
     };
 
-    // Manage configuration settings for 'quill' or 'quill/core'
-    this.register(Quill.QUILL_DEFAULTS, Quill.QUILL_OVERWRITE);
+    // Register default configuration settings for /core.js'
+    this.register(Quill.QUILL_CORE_DEFAULTS);
 
-    if (Quill.PARCHMENT_DEFAULTS) {
-      this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
+    // Extend configuration settings by adding from '/quill.js'
+    if (Quill.QUILL_EXTRA_DEFAULTS) {
+      this.register(Quill.QUILL_EXTRA_DEFAULTS, true);
     }
+
+    this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
 
     this.options = expandConfig(this, container, options);
     this.container = this.options.container;
@@ -4451,7 +4454,7 @@ var _keyboard2 = _interopRequireDefault(_keyboard);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_quill2.default.QUILL_DEFAULTS = {
+_quill2.default.QUILL_CORE_DEFAULTS = {
   'blots/block': _block2.default,
   'blots/block/embed': _block.BlockEmbed,
   'blots/break': _break2.default,
@@ -9194,7 +9197,7 @@ var _snow2 = _interopRequireDefault(_snow);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_core2.default.QUILL_DEFAULTS = {
+_core2.default.QUILL_EXTRA_DEFAULTS = {
   'attributors/attribute/direction': _direction.DirectionAttribute,
 
   'attributors/class/align': _align.AlignClass,
@@ -9251,8 +9254,6 @@ _core2.default.QUILL_DEFAULTS = {
   'ui/color-picker': _colorPicker2.default,
   'ui/tooltip': _tooltip2.default
 };
-
-_core2.default.QUILL_OVERWRITE = true;
 
 exports.default = _core2.default;
 
@@ -10101,12 +10102,7 @@ exports.BubbleTooltip = BubbleTooltip;
 exports.default = BubbleTheme;
 
 /***/ }),
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10174,13 +10170,22 @@ __webpack_require__(311);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// TODO: Determine whether this is still necessary
+// Quill.register(CodeBlock, true); // Syntax version will otherwise be registered
 /* eslint-disable */
 
-_quill2.default.register(_code2.default, true); // Syntax version will otherwise be registered
+_quill2.default.QUILL_EXTRA_DEFAULTS = Object.assign(_quill2.default.QUILL_EXTRA_DEFAULTS, {
+  'formats/code-block': _code2.default
+});
 
 exports.default = _quill2.default;
 
 /***/ }),
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
 /* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10481,15 +10486,35 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
+var _unit = __webpack_require__(104);
+
+var _unit2 = _interopRequireDefault(_unit);
+
 var _scroll = __webpack_require__(22);
 
 var _scroll2 = _interopRequireDefault(_scroll);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-describe('Block', function () {
-  it('childless', function () {
-    const block = _parchment2.default.create('block');
+fdescribe('Block', function () {
+  let editorRegistry = null;
+  let mockContainer = null;
+  let quillInstance = null; // eslint-disable-line no-unused-vars
+
+  beforeEach(function () {
+    editorRegistry = new _parchment.EditorRegistry();
+    mockContainer = document.createElement('div');
+    quillInstance = new _unit2.default(mockContainer, {}, editorRegistry);
+  });
+
+  afterEach(function () {
+    editorRegistry = null;
+    mockContainer = null;
+    quillInstance = null;
+  });
+
+  fit('childless', function () {
+    const block = editorRegistry.create('block');
     block.optimize();
     expect(block.domNode).toEqualHTML('<br>');
   });

@@ -42,7 +42,7 @@ import Tooltip from './ui/tooltip';
 import BubbleTheme from './themes/bubble';
 import SnowTheme from './themes/snow';
 
-Quill.QUILL_DEFAULTS = {
+Quill.QUILL_EXTRA_DEFAULTS = {
   'attributors/attribute/direction': DirectionAttribute,
 
   'attributors/class/align': AlignClass,
@@ -99,7 +99,5 @@ Quill.QUILL_DEFAULTS = {
   'ui/color-picker': ColorPicker,
   'ui/tooltip': Tooltip,
 };
-
-Quill.QUILL_OVERWRITE = true;
 
 export default Quill;

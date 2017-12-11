@@ -15,7 +15,7 @@ import Clipboard from './modules/clipboard';
 import History from './modules/history';
 import Keyboard from './modules/keyboard';
 
-Quill.QUILL_DEFAULTS = {
+Quill.QUILL_CORE_DEFAULTS = {
   'blots/block': Block,
   'blots/block/embed': BlockEmbed,
   'blots/break': Break,

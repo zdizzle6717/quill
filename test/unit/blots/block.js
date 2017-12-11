@@ -1,9 +1,26 @@
-import Parchment from 'parchment';
+import Parchment, { EditorRegistry } from 'parchment';
+import Quill from '../../unit';
 import Scroll from '../../../blots/scroll';
 
-describe('Block', function() {
-  it('childless', function() {
-    const block = Parchment.create('block');
+fdescribe('Block', function() {
+  let editorRegistry = null;
+  let mockContainer = null;
+  let quillInstance = null; // eslint-disable-line no-unused-vars
+
+  beforeEach(function() {
+    editorRegistry = new EditorRegistry();
+    mockContainer = document.createElement('div');
+    quillInstance = new Quill(mockContainer, {}, editorRegistry);
+  });
+
+  afterEach(function() {
+    editorRegistry = null;
+    mockContainer = null;
+    quillInstance = null;
+  });
+
+  fit('childless', function() {
+    const block = editorRegistry.create('block');
     block.optimize();
     expect(block.domNode).toEqualHTML('<br>');
   });

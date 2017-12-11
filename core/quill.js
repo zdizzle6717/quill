@@ -32,12 +32,15 @@ class Quill {
       'core/theme': Theme,
     };
 
-    // Manage configuration settings for 'quill' or 'quill/core'
-    this.register(Quill.QUILL_DEFAULTS, Quill.QUILL_OVERWRITE);
+    // Register default configuration settings for /core.js'
+    this.register(Quill.QUILL_CORE_DEFAULTS);
 
-    if (Quill.PARCHMENT_DEFAULTS) {
-      this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
+    // Extend configuration settings by adding from '/quill.js'
+    if (Quill.QUILL_EXTRA_DEFAULTS) {
+      this.register(Quill.QUILL_EXTRA_DEFAULTS, true);
     }
+
+    this.editorRegistry.register(...Quill.PARCHMENT_DEFAULTS);
 
     this.options = expandConfig(this, container, options);
     this.container = this.options.container;
