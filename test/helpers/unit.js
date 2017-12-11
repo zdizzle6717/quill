@@ -23,7 +23,7 @@ beforeEach(function() {
   div.innerHTML = '<div></div>';
   this.container = div.firstChild;
   this.editorRegistry = new EditorRegistry();
-  this.initialize = initialize.bind(this, this.editorRegistry);
+  this.initialize = initialize.bind(this);
 });
 
 function compareApproximately(actual, expected, tolerance) {
@@ -102,7 +102,7 @@ function compareNodes(node1, node2, ignoredAttributes = []) {
   return null;
 }
 
-function initialize(editorRegistry = this.editorRegistry, klass, html, container = this.container) {
+function initialize(klass, html, container = this.container, editorRegistry = this.editorRegistry) {
   if (typeof html === 'object') {
     container.innerHTML = html.html;
   } else {

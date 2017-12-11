@@ -1,12 +1,18 @@
 import Delta from 'quill-delta';
+import { EditorRegistry } from 'parchment';
 import Quill from '../../../core';
 import { getLastChangeIndex } from '../../../modules/history';
 
-describe('History', function() {
+fdescribe('History', function() {
+  beforeEach(function() {
+    this.mockEditorRegistry = new EditorRegistry();
+    this.quill = this.initialize(Quill, '', undefined, this.mockEditorRegistry);
+  });
+
   describe('getLastChangeIndex', function() {
     it('delete', function() {
       const delta = new Delta().retain(4).delete(2);
-      expect(getLastChangeIndex(delta)).toEqual(4);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(4);
     });
 
     it('delete with inserts', function() {
@@ -14,17 +20,17 @@ describe('History', function() {
         .retain(4)
         .insert('test')
         .delete(2);
-      expect(getLastChangeIndex(delta)).toEqual(8);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(8);
     });
 
     it('insert text', function() {
       const delta = new Delta().retain(4).insert('testing');
-      expect(getLastChangeIndex(delta)).toEqual(11);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(11);
     });
 
     it('insert embed', function() {
       const delta = new Delta().retain(4).insert({ image: true });
-      expect(getLastChangeIndex(delta)).toEqual(5);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(5);
     });
 
     it('insert with deletes', function() {
@@ -32,34 +38,34 @@ describe('History', function() {
         .retain(4)
         .delete(3)
         .insert('!');
-      expect(getLastChangeIndex(delta)).toEqual(5);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(5);
     });
 
     it('format', function() {
       const delta = new Delta().retain(4).retain(3, { bold: true });
-      expect(getLastChangeIndex(delta)).toEqual(7);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(7);
     });
 
     it('format newline', function() {
       const delta = new Delta().retain(4).retain(1, { align: 'left' });
-      expect(getLastChangeIndex(delta)).toEqual(4);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(4);
     });
 
     it('format mixed', function() {
       const delta = new Delta()
         .retain(4)
         .retain(1, { align: 'left', bold: true });
-      expect(getLastChangeIndex(delta)).toEqual(4);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(4);
     });
 
     it('insert newline', function() {
       const delta = new Delta().retain(4).insert('a\n');
-      expect(getLastChangeIndex(delta)).toEqual(5);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(5);
     });
 
     it('mutliple newline inserts', function() {
       const delta = new Delta().retain(4).insert('ab\n\n');
-      expect(getLastChangeIndex(delta)).toEqual(7);
+      expect(getLastChangeIndex(delta, this.mockEditorRegistry)).toEqual(7);
     });
   });
 

@@ -10227,7 +10227,7 @@ beforeEach(function () {
   div.innerHTML = '<div></div>';
   this.container = div.firstChild;
   this.editorRegistry = new _parchment.EditorRegistry();
-  this.initialize = initialize.bind(this, this.editorRegistry);
+  this.initialize = initialize.bind(this);
 });
 
 function compareApproximately(actual, expected, tolerance) {
@@ -10307,7 +10307,7 @@ function compareNodes(node1, node2, ignoredAttributes = []) {
   return null;
 }
 
-function initialize(editorRegistry = this.editorRegistry, klass, html, container = this.container) {
+function initialize(klass, html, container = this.container, editorRegistry = this.editorRegistry) {
   if (typeof html === 'object') {
     container.innerHTML = html.html;
   } else {
@@ -13810,6 +13810,8 @@ var _quillDelta = __webpack_require__(1);
 
 var _quillDelta2 = _interopRequireDefault(_quillDelta);
 
+var _parchment = __webpack_require__(0);
+
 var _core = __webpack_require__(28);
 
 var _core2 = _interopRequireDefault(_core);
@@ -13818,56 +13820,61 @@ var _history = __webpack_require__(41);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-describe('History', function () {
+fdescribe('History', function () {
+  beforeEach(function () {
+    this.mockEditorRegistry = new _parchment.EditorRegistry();
+    this.quill = this.initialize(_core2.default, '', undefined, this.mockEditorRegistry);
+  });
+
   describe('getLastChangeIndex', function () {
     it('delete', function () {
       const delta = new _quillDelta2.default().retain(4).delete(2);
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(4);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(4);
     });
 
     it('delete with inserts', function () {
       const delta = new _quillDelta2.default().retain(4).insert('test').delete(2);
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(8);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(8);
     });
 
     it('insert text', function () {
       const delta = new _quillDelta2.default().retain(4).insert('testing');
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(11);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(11);
     });
 
     it('insert embed', function () {
       const delta = new _quillDelta2.default().retain(4).insert({ image: true });
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(5);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(5);
     });
 
     it('insert with deletes', function () {
       const delta = new _quillDelta2.default().retain(4).delete(3).insert('!');
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(5);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(5);
     });
 
     it('format', function () {
       const delta = new _quillDelta2.default().retain(4).retain(3, { bold: true });
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(7);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(7);
     });
 
     it('format newline', function () {
       const delta = new _quillDelta2.default().retain(4).retain(1, { align: 'left' });
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(4);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(4);
     });
 
     it('format mixed', function () {
       const delta = new _quillDelta2.default().retain(4).retain(1, { align: 'left', bold: true });
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(4);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(4);
     });
 
     it('insert newline', function () {
       const delta = new _quillDelta2.default().retain(4).insert('a\n');
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(5);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(5);
     });
 
     it('mutliple newline inserts', function () {
       const delta = new _quillDelta2.default().retain(4).insert('ab\n\n');
-      expect((0, _history.getLastChangeIndex)(delta)).toEqual(7);
+      expect((0, _history.getLastChangeIndex)(delta, this.mockEditorRegistry)).toEqual(7);
     });
   });
 
