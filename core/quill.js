@@ -355,7 +355,7 @@ class Quill {
         this.editorRegistry.register(target);
       }
       if (typeof target.register === 'function') {
-        target.register();
+        target.register(this.quill.editorRegistry);
       }
     }
   }
