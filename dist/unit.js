@@ -8868,9 +8868,9 @@ class SyntaxCodeBlock extends _code2.default {
 SyntaxCodeBlock.className = 'ql-syntax';
 
 class CodeToken extends _inline2.default {
-  static formats(node) {
+  static formats(node, editorRegistry) {
     while (node != null) {
-      const parent = _quill2.default.find(node, this.editorRegistry);
+      const parent = _quill2.default.find(node, editorRegistry);
       if (parent instanceof SyntaxCodeBlock) {
         return true;
       }
@@ -14143,10 +14143,6 @@ var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
-var _code = __webpack_require__(13);
-
-var _code2 = _interopRequireDefault(_code);
-
 var _syntax = __webpack_require__(60);
 
 var _syntax2 = _interopRequireDefault(_syntax);
@@ -14160,7 +14156,6 @@ describe('Syntax', function () {
     const container = this.initialize(HTMLElement, {
       html: '<pre>var test = 1;\nvar bugz = 0;\n</pre><p><br></p>'
     });
-    _syntax2.default.register();
     this.quill = new _quill2.default(container, {
       modules: {
         syntax: {
@@ -14174,10 +14169,7 @@ describe('Syntax', function () {
         }
       }
     });
-  });
-
-  afterEach(function () {
-    _quill2.default.register(_code2.default, true);
+    _syntax2.default.register(this.quill);
   });
 
   describe('highlighting', function () {

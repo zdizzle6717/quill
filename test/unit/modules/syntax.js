@@ -1,7 +1,6 @@
 import hljs from 'highlight.js';
 import Delta from 'quill-delta';
 import Quill from '../../../core/quill';
-import CodeBlock from '../../../formats/code';
 import Syntax from '../../../modules/syntax';
 
 const HIGHLIGHT_INTERVAL = 10;
@@ -11,7 +10,6 @@ describe('Syntax', function() {
     const container = this.initialize(HTMLElement, {
       html: '<pre>var test = 1;\nvar bugz = 0;\n</pre><p><br></p>',
     });
-    Syntax.register();
     this.quill = new Quill(container, {
       modules: {
         syntax: {
@@ -25,10 +23,7 @@ describe('Syntax', function() {
         },
       },
     });
-  });
-
-  afterEach(function() {
-    Quill.register(CodeBlock, true);
+    Syntax.register(this.quill);
   });
 
   describe('highlighting', function() {

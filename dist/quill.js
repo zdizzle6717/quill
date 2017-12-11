@@ -8868,9 +8868,9 @@ class SyntaxCodeBlock extends _code2.default {
 SyntaxCodeBlock.className = 'ql-syntax';
 
 class CodeToken extends _inline2.default {
-  static formats(node) {
+  static formats(node, editorRegistry) {
     while (node != null) {
-      const parent = _quill2.default.find(node, this.editorRegistry);
+      const parent = _quill2.default.find(node, editorRegistry);
       if (parent instanceof SyntaxCodeBlock) {
         return true;
       }
