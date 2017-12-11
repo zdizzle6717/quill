@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 106);
+/******/ 	return __webpack_require__(__webpack_require__.s = 105);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -95,9 +95,9 @@ var block_1 = __webpack_require__(50);
 var embed_1 = __webpack_require__(51);
 var text_1 = __webpack_require__(52);
 var attributor_1 = __webpack_require__(12);
-var class_1 = __webpack_require__(32);
-var style_1 = __webpack_require__(33);
-var store_1 = __webpack_require__(31);
+var class_1 = __webpack_require__(31);
+var style_1 = __webpack_require__(32);
+var store_1 = __webpack_require__(30);
 var registry_1 = __webpack_require__(2);
 exports.EditorRegistry = registry_1.default;
 var Parchment = {
@@ -707,272 +707,6 @@ module.exports = function extend() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = exports.BlockEmbed = exports.bubbleFormats = undefined;
-
-var _extend = __webpack_require__(3);
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _quillDelta = __webpack_require__(1);
-
-var _quillDelta2 = _interopRequireDefault(_quillDelta);
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _break = __webpack_require__(16);
-
-var _break2 = _interopRequireDefault(_break);
-
-var _inline = __webpack_require__(5);
-
-var _inline2 = _interopRequireDefault(_inline);
-
-var _text = __webpack_require__(7);
-
-var _text2 = _interopRequireDefault(_text);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const NEWLINE_LENGTH = 1;
-
-class Block extends _parchment2.default.Block {
-  constructor(editorRegistry, domNode) {
-    super(editorRegistry, domNode);
-    this.cache = {};
-  }
-
-  delta() {
-    if (this.cache.delta == null) {
-      this.cache.delta = this.descendants(_parchment2.default.Leaf).reduce((delta, leaf) => {
-        if (leaf.length() === 0) {
-          return delta;
-        }
-        return delta.insert(leaf.value(), bubbleFormats(leaf));
-      }, new _quillDelta2.default()).insert('\n', bubbleFormats(this));
-    }
-    return this.cache.delta;
-  }
-
-  deleteAt(index, length) {
-    super.deleteAt(index, length);
-    this.cache = {};
-  }
-
-  formatAt(index, length, name, value) {
-    if (length <= 0) return;
-    if (this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK)) {
-      if (index + length === this.length()) {
-        this.format(name, value);
-      }
-    } else {
-      super.formatAt(index, Math.min(length, this.length() - index - 1), name, value);
-    }
-    this.cache = {};
-  }
-
-  insertAt(index, value, def) {
-    if (def != null) {
-      super.insertAt(index, value, def);
-      return;
-    }
-    if (value.length === 0) return;
-    const lines = value.split('\n');
-    const text = lines.shift();
-    if (text.length > 0) {
-      if (index < this.length() - 1 || this.children.tail == null) {
-        super.insertAt(Math.min(index, this.length() - 1), text);
-      } else {
-        this.children.tail.insertAt(this.children.tail.length(), text);
-      }
-      this.cache = {};
-    }
-    let block = this;
-    lines.reduce((lineIndex, line) => {
-      block = block.split(lineIndex, true);
-      block.insertAt(0, line);
-      return line.length;
-    }, index + text.length);
-  }
-
-  insertBefore(blot, ref) {
-    const head = this.children.head;
-
-    super.insertBefore(blot, ref);
-    if (head instanceof _break2.default) {
-      head.remove();
-    }
-    this.cache = {};
-  }
-
-  length() {
-    if (this.cache.length == null) {
-      this.cache.length = super.length() + NEWLINE_LENGTH;
-    }
-    return this.cache.length;
-  }
-
-  moveChildren(target, ref) {
-    super.moveChildren(target, ref);
-    this.cache = {};
-  }
-
-  optimize(context) {
-    super.optimize(context);
-    this.cache = {};
-  }
-
-  path(index) {
-    return super.path(index, true);
-  }
-
-  removeChild(child) {
-    super.removeChild(child);
-    this.cache = {};
-  }
-
-  split(index, force = false) {
-    if (force && (index === 0 || index >= this.length() - NEWLINE_LENGTH)) {
-      const clone = this.clone();
-      if (index === 0) {
-        this.parent.insertBefore(clone, this);
-        return this;
-      }
-      this.parent.insertBefore(clone, this.next);
-      return clone;
-    }
-    const next = super.split(index, force);
-    this.cache = {};
-    return next;
-  }
-}
-Block.blotName = 'block';
-Block.tagName = 'P';
-Block.defaultChild = 'break';
-Block.allowedChildren = [_inline2.default, _parchment2.default.Embed, _text2.default];
-
-class BlockEmbed extends _parchment2.default.Embed {
-  attach() {
-    super.attach();
-    this.attributes = new _parchment2.default.Attributor.Store(this.editorRegistry, this.domNode);
-  }
-
-  delta() {
-    return new _quillDelta2.default().insert(this.value(), (0, _extend2.default)(this.formats(), this.attributes.values()));
-  }
-
-  format(name, value) {
-    const attribute = this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK_ATTRIBUTE);
-    if (attribute != null) {
-      this.attributes.attribute(attribute, value);
-    }
-  }
-
-  formatAt(index, length, name, value) {
-    this.format(name, value);
-  }
-
-  insertAt(index, value, def) {
-    if (typeof value === 'string' && value.endsWith('\n')) {
-      const block = this.editorRegistry.create(Block.blotName);
-      this.parent.insertBefore(block, index === 0 ? this : this.next);
-      block.insertAt(0, value.slice(0, -1));
-    } else {
-      super.insertAt(index, value, def);
-    }
-  }
-}
-BlockEmbed.scope = _parchment2.default.Scope.BLOCK_BLOT;
-// It is important for cursor behavior BlockEmbeds use tags that are block level elements
-
-function bubbleFormats(blot, formats = {}) {
-  if (blot == null) return formats;
-  if (typeof blot.formats === 'function') {
-    formats = (0, _extend2.default)(formats, blot.formats());
-  }
-  if (blot.parent == null || blot.parent.blotName === 'scroll' || blot.parent.statics.scope !== blot.statics.scope) {
-    return formats;
-  }
-  return bubbleFormats(blot.parent, formats);
-}
-
-exports.bubbleFormats = bubbleFormats;
-exports.BlockEmbed = BlockEmbed;
-exports.default = Block;
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _text = __webpack_require__(7);
-
-var _text2 = _interopRequireDefault(_text);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class Inline extends _parchment2.default.Inline {
-  static compare(self, other) {
-    const selfIndex = Inline.order.indexOf(self);
-    const otherIndex = Inline.order.indexOf(other);
-    if (selfIndex >= 0 || otherIndex >= 0) {
-      return selfIndex - otherIndex;
-    } else if (self === other) {
-      return 0;
-    } else if (self < other) {
-      return -1;
-    }
-    return 1;
-  }
-
-  formatAt(index, length, name, value) {
-    if (Inline.compare(this.statics.blotName, name) < 0 && this.editorRegistry.query(name, _parchment2.default.Scope.BLOT)) {
-      const blot = this.isolate(index, length);
-      if (value) {
-        blot.wrap(name, value);
-      }
-    } else {
-      super.formatAt(index, length, name, value);
-    }
-  }
-
-  optimize(context) {
-    super.optimize(context);
-    if (this.parent instanceof Inline && Inline.compare(this.statics.blotName, this.parent.statics.blotName) > 0) {
-      const parent = this.parent.isolate(this.offset(), this.length());
-      this.moveChildren(parent);
-      parent.wrap(this);
-    }
-  }
-}
-Inline.allowedChildren = [Inline, _parchment2.default.Embed, _text2.default];
-// Lower index means deeper in the DOM tree, since not found (-1) is for embeds
-Inline.order = ['cursor', 'inline', // Must be lower
-'underline', 'strike', 'italic', 'bold', 'script', 'link', 'code'];
-
-exports.default = Inline;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.default = exports.overload = exports.expandConfig = undefined;
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -1001,7 +735,7 @@ var _module = __webpack_require__(11);
 
 var _module2 = _interopRequireDefault(_module);
 
-var _selection = __webpack_require__(15);
+var _selection = __webpack_require__(16);
 
 var _selection2 = _interopRequireDefault(_selection);
 
@@ -1009,7 +743,7 @@ var _logger = __webpack_require__(9);
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _theme = __webpack_require__(34);
+var _theme = __webpack_require__(33);
 
 var _theme2 = _interopRequireDefault(_theme);
 
@@ -1599,6 +1333,272 @@ exports.overload = overload;
 exports.default = Quill;
 
 /***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.BlockEmbed = exports.bubbleFormats = undefined;
+
+var _extend = __webpack_require__(3);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _quillDelta = __webpack_require__(1);
+
+var _quillDelta2 = _interopRequireDefault(_quillDelta);
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _break = __webpack_require__(15);
+
+var _break2 = _interopRequireDefault(_break);
+
+var _inline = __webpack_require__(6);
+
+var _inline2 = _interopRequireDefault(_inline);
+
+var _text = __webpack_require__(7);
+
+var _text2 = _interopRequireDefault(_text);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const NEWLINE_LENGTH = 1;
+
+class Block extends _parchment2.default.Block {
+  constructor(editorRegistry, domNode) {
+    super(editorRegistry, domNode);
+    this.cache = {};
+  }
+
+  delta() {
+    if (this.cache.delta == null) {
+      this.cache.delta = this.descendants(_parchment2.default.Leaf).reduce((delta, leaf) => {
+        if (leaf.length() === 0) {
+          return delta;
+        }
+        return delta.insert(leaf.value(), bubbleFormats(leaf));
+      }, new _quillDelta2.default()).insert('\n', bubbleFormats(this));
+    }
+    return this.cache.delta;
+  }
+
+  deleteAt(index, length) {
+    super.deleteAt(index, length);
+    this.cache = {};
+  }
+
+  formatAt(index, length, name, value) {
+    if (length <= 0) return;
+    if (this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK)) {
+      if (index + length === this.length()) {
+        this.format(name, value);
+      }
+    } else {
+      super.formatAt(index, Math.min(length, this.length() - index - 1), name, value);
+    }
+    this.cache = {};
+  }
+
+  insertAt(index, value, def) {
+    if (def != null) {
+      super.insertAt(index, value, def);
+      return;
+    }
+    if (value.length === 0) return;
+    const lines = value.split('\n');
+    const text = lines.shift();
+    if (text.length > 0) {
+      if (index < this.length() - 1 || this.children.tail == null) {
+        super.insertAt(Math.min(index, this.length() - 1), text);
+      } else {
+        this.children.tail.insertAt(this.children.tail.length(), text);
+      }
+      this.cache = {};
+    }
+    let block = this;
+    lines.reduce((lineIndex, line) => {
+      block = block.split(lineIndex, true);
+      block.insertAt(0, line);
+      return line.length;
+    }, index + text.length);
+  }
+
+  insertBefore(blot, ref) {
+    const head = this.children.head;
+
+    super.insertBefore(blot, ref);
+    if (head instanceof _break2.default) {
+      head.remove();
+    }
+    this.cache = {};
+  }
+
+  length() {
+    if (this.cache.length == null) {
+      this.cache.length = super.length() + NEWLINE_LENGTH;
+    }
+    return this.cache.length;
+  }
+
+  moveChildren(target, ref) {
+    super.moveChildren(target, ref);
+    this.cache = {};
+  }
+
+  optimize(context) {
+    super.optimize(context);
+    this.cache = {};
+  }
+
+  path(index) {
+    return super.path(index, true);
+  }
+
+  removeChild(child) {
+    super.removeChild(child);
+    this.cache = {};
+  }
+
+  split(index, force = false) {
+    if (force && (index === 0 || index >= this.length() - NEWLINE_LENGTH)) {
+      const clone = this.clone();
+      if (index === 0) {
+        this.parent.insertBefore(clone, this);
+        return this;
+      }
+      this.parent.insertBefore(clone, this.next);
+      return clone;
+    }
+    const next = super.split(index, force);
+    this.cache = {};
+    return next;
+  }
+}
+Block.blotName = 'block';
+Block.tagName = 'P';
+Block.defaultChild = 'break';
+Block.allowedChildren = [_inline2.default, _parchment2.default.Embed, _text2.default];
+
+class BlockEmbed extends _parchment2.default.Embed {
+  attach() {
+    super.attach();
+    this.attributes = new _parchment2.default.Attributor.Store(this.editorRegistry, this.domNode);
+  }
+
+  delta() {
+    return new _quillDelta2.default().insert(this.value(), (0, _extend2.default)(this.formats(), this.attributes.values()));
+  }
+
+  format(name, value) {
+    const attribute = this.editorRegistry.query(name, _parchment2.default.Scope.BLOCK_ATTRIBUTE);
+    if (attribute != null) {
+      this.attributes.attribute(attribute, value);
+    }
+  }
+
+  formatAt(index, length, name, value) {
+    this.format(name, value);
+  }
+
+  insertAt(index, value, def) {
+    if (typeof value === 'string' && value.endsWith('\n')) {
+      const block = this.editorRegistry.create(Block.blotName);
+      this.parent.insertBefore(block, index === 0 ? this : this.next);
+      block.insertAt(0, value.slice(0, -1));
+    } else {
+      super.insertAt(index, value, def);
+    }
+  }
+}
+BlockEmbed.scope = _parchment2.default.Scope.BLOCK_BLOT;
+// It is important for cursor behavior BlockEmbeds use tags that are block level elements
+
+function bubbleFormats(blot, formats = {}) {
+  if (blot == null) return formats;
+  if (typeof blot.formats === 'function') {
+    formats = (0, _extend2.default)(formats, blot.formats());
+  }
+  if (blot.parent == null || blot.parent.blotName === 'scroll' || blot.parent.statics.scope !== blot.statics.scope) {
+    return formats;
+  }
+  return bubbleFormats(blot.parent, formats);
+}
+
+exports.bubbleFormats = bubbleFormats;
+exports.BlockEmbed = BlockEmbed;
+exports.default = Block;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _text = __webpack_require__(7);
+
+var _text2 = _interopRequireDefault(_text);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class Inline extends _parchment2.default.Inline {
+  static compare(self, other) {
+    const selfIndex = Inline.order.indexOf(self);
+    const otherIndex = Inline.order.indexOf(other);
+    if (selfIndex >= 0 || otherIndex >= 0) {
+      return selfIndex - otherIndex;
+    } else if (self === other) {
+      return 0;
+    } else if (self < other) {
+      return -1;
+    }
+    return 1;
+  }
+
+  formatAt(index, length, name, value) {
+    if (Inline.compare(this.statics.blotName, name) < 0 && this.editorRegistry.query(name, _parchment2.default.Scope.BLOT)) {
+      const blot = this.isolate(index, length);
+      if (value) {
+        blot.wrap(name, value);
+      }
+    } else {
+      super.formatAt(index, length, name, value);
+    }
+  }
+
+  optimize(context) {
+    super.optimize(context);
+    if (this.parent instanceof Inline && Inline.compare(this.statics.blotName, this.parent.statics.blotName) > 0) {
+      const parent = this.parent.isolate(this.offset(), this.length());
+      this.moveChildren(parent);
+      parent.wrap(this);
+    }
+  }
+}
+Inline.allowedChildren = [Inline, _parchment2.default.Embed, _text2.default];
+// Lower index means deeper in the DOM tree, since not found (-1) is for embeds
+Inline.order = ['cursor', 'inline', // Must be lower
+'underline', 'strike', 'italic', 'bold', 'script', 'link', 'code'];
+
+exports.default = Inline;
+
+/***/ }),
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1935,11 +1935,11 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(5);
 
 var _block2 = _interopRequireDefault(_block);
 
-var _inline = __webpack_require__(5);
+var _inline = __webpack_require__(6);
 
 var _inline2 = _interopRequireDefault(_inline);
 
@@ -2112,15 +2112,15 @@ var _code = __webpack_require__(13);
 
 var _code2 = _interopRequireDefault(_code);
 
-var _cursor = __webpack_require__(23);
+var _cursor = __webpack_require__(22);
 
 var _cursor2 = _interopRequireDefault(_cursor);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(5);
 
 var _block2 = _interopRequireDefault(_block);
 
-var _break = __webpack_require__(16);
+var _break = __webpack_require__(15);
 
 var _break2 = _interopRequireDefault(_break);
 
@@ -2395,6 +2395,49 @@ exports.default = Editor;
 
 /***/ }),
 /* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class Break extends _parchment2.default.Embed {
+  static value() {
+    return undefined;
+  }
+
+  insertInto(parent, ref) {
+    if (parent.children.length === 0) {
+      super.insertInto(parent, ref);
+    } else {
+      this.remove();
+    }
+  }
+
+  length() {
+    return 0;
+  }
+
+  value() {
+    return '';
+  }
+}
+Break.blotName = 'break';
+Break.tagName = 'BR';
+
+exports.default = Break;
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2846,49 +2889,6 @@ exports.Range = Range;
 exports.default = Selection;
 
 /***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class Break extends _parchment2.default.Embed {
-  static value() {
-    return undefined;
-  }
-
-  insertInto(parent, ref) {
-    if (parent.children.length === 0) {
-      super.insertInto(parent, ref);
-    } else {
-      this.remove();
-    }
-  }
-
-  length() {
-    return 0;
-  }
-
-  value() {
-    return '';
-  }
-}
-Break.blotName = 'break';
-Break.tagName = 'BR';
-
-exports.default = Break;
-
-/***/ }),
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3051,7 +3051,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var linked_list_1 = __webpack_require__(47);
-var shadow_1 = __webpack_require__(30);
+var shadow_1 = __webpack_require__(29);
 var Registry = __webpack_require__(2);
 var ContainerBlot = /** @class */ (function (_super) {
     __extends(ContainerBlot, _super);
@@ -3312,7 +3312,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var attributor_1 = __webpack_require__(12);
-var store_1 = __webpack_require__(31);
+var store_1 = __webpack_require__(30);
 var container_1 = __webpack_require__(18);
 var FormatBlot = /** @class */ (function (_super) {
     __extends(FormatBlot, _super);
@@ -3393,7 +3393,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var shadow_1 = __webpack_require__(30);
+var shadow_1 = __webpack_require__(29);
 var Registry = __webpack_require__(2);
 var LeafBlot = /** @class */ (function (_super) {
     __extends(LeafBlot, _super);
@@ -3700,15 +3700,970 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
+var _text = __webpack_require__(7);
+
+var _text2 = _interopRequireDefault(_text);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class Cursor extends _parchment2.default.Embed {
+  static value() {
+    return undefined;
+  }
+
+  constructor(editorRegistry, domNode, selection) {
+    super(editorRegistry, domNode);
+    this.selection = selection;
+    this.textNode = document.createTextNode(Cursor.CONTENTS);
+    this.domNode.appendChild(this.textNode);
+    this.savedLength = 0;
+  }
+
+  detach() {
+    // super.detach() will also clear domNode.__blot
+    if (this.parent != null) this.parent.removeChild(this);
+  }
+
+  format(name, value) {
+    if (this.savedLength !== 0) {
+      super.format(name, value);
+      return;
+    }
+    let target = this;
+    let index = 0;
+    while (target != null && target.statics.scope !== _parchment2.default.Scope.BLOCK_BLOT) {
+      index += target.offset(target.parent);
+      target = target.parent;
+    }
+    if (target != null) {
+      this.savedLength = Cursor.CONTENTS.length;
+      target.optimize();
+      target.formatAt(index, Cursor.CONTENTS.length, name, value);
+      this.savedLength = 0;
+    }
+  }
+
+  index(node, offset) {
+    if (node === this.textNode) return 0;
+    return super.index(node, offset);
+  }
+
+  length() {
+    return this.savedLength;
+  }
+
+  position() {
+    return [this.textNode, this.textNode.data.length];
+  }
+
+  remove() {
+    super.remove();
+    this.parent = null;
+  }
+
+  restore() {
+    if (this.selection.composing || this.parent == null) return null;
+    const range = this.selection.getNativeRange();
+    let restoreText;
+    let start;
+    let end;
+    if (range != null && range.start.node === this.textNode && range.end.node === this.textNode) {
+      var _ref = [this.textNode, range.start.offset, range.end.offset];
+      restoreText = _ref[0];
+      start = _ref[1];
+      end = _ref[2];
+    }
+    // Link format will insert text outside of anchor tag
+    while (this.domNode.lastChild != null && this.domNode.lastChild !== this.textNode) {
+      this.domNode.parentNode.insertBefore(this.domNode.lastChild, this.domNode);
+    }
+    if (this.textNode.data !== Cursor.CONTENTS) {
+      const text = this.textNode.data.split(Cursor.CONTENTS).join('');
+      if (this.next instanceof _text2.default) {
+        restoreText = this.next.domNode;
+        this.next.insertAt(0, text);
+        this.textNode.data = Cursor.CONTENTS;
+      } else {
+        this.textNode.data = text;
+        this.parent.insertBefore(this.editorRegistry.create(this.textNode), this);
+        this.textNode = document.createTextNode(Cursor.CONTENTS);
+        this.domNode.appendChild(this.textNode);
+      }
+    }
+    this.remove();
+    if (start != null) {
+      var _map = [start, end].map(offset => {
+        return Math.max(0, Math.min(restoreText.data.length, offset - 1));
+      });
+
+      var _map2 = _slicedToArray(_map, 2);
+
+      start = _map2[0];
+      end = _map2[1];
+
+      return {
+        startNode: restoreText,
+        startOffset: start,
+        endNode: restoreText,
+        endOffset: end
+      };
+    }
+    return null;
+  }
+
+  update(mutations, context) {
+    if (mutations.some(mutation => {
+      return mutation.type === 'characterData' && mutation.target === this.textNode;
+    })) {
+      const range = this.restore();
+      if (range) context.range = range;
+    }
+  }
+
+  value() {
+    return '';
+  }
+}
+Cursor.blotName = 'cursor';
+Cursor.className = 'ql-cursor';
+Cursor.tagName = 'span';
+Cursor.CONTENTS = '\uFEFF'; // Zero width no break space
+
+exports.default = Cursor;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _block = __webpack_require__(5);
+
+var _block2 = _interopRequireDefault(_block);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class Container extends _parchment2.default.Container {}
+Container.allowedChildren = [_block2.default, _block.BlockEmbed, Container];
+
+exports.default = Container;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _text = __webpack_require__(7);
+
+var _text2 = _interopRequireDefault(_text);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const GUARD_TEXT = '\uFEFF';
+
+class Embed extends _parchment2.default.Embed {
+  constructor(editorRegistry, node) {
+    super(editorRegistry, node);
+    this.contentNode = document.createElement('span');
+    this.contentNode.setAttribute('contenteditable', false);
+    [].slice.call(this.domNode.childNodes).forEach(childNode => {
+      this.contentNode.appendChild(childNode);
+    });
+    this.leftGuard = document.createTextNode(GUARD_TEXT);
+    this.rightGuard = document.createTextNode(GUARD_TEXT);
+    this.domNode.appendChild(this.leftGuard);
+    this.domNode.appendChild(this.contentNode);
+    this.domNode.appendChild(this.rightGuard);
+  }
+
+  index(node, offset) {
+    if (node === this.leftGuard) return 0;
+    if (node === this.rightGuard) return 1;
+    return super.index(node, offset);
+  }
+
+  restore(node) {
+    let range;
+    let textNode;
+    const text = node.data.split(GUARD_TEXT).join('');
+    if (node === this.leftGuard) {
+      if (this.prev instanceof _text2.default) {
+        const prevLength = this.prev.length();
+        this.prev.insertAt(prevLength, text);
+        range = {
+          startNode: this.prev.domNode,
+          startOffset: prevLength + text.length
+        };
+      } else {
+        textNode = document.createTextNode(text);
+        this.parent.insertBefore(this.editorRegistry.create(textNode), this);
+        range = {
+          startNode: textNode,
+          startOffset: text.length
+        };
+      }
+    } else if (node === this.rightGuard) {
+      if (this.next instanceof _text2.default) {
+        this.next.insertAt(0, text);
+        range = {
+          startNode: this.next.domNode,
+          startOffset: text.length
+        };
+      } else {
+        textNode = document.createTextNode(text);
+        this.parent.insertBefore(this.editorRegistry.create(textNode), this.next);
+        range = {
+          startNode: textNode,
+          startOffset: text.length
+        };
+      }
+    }
+    node.data = GUARD_TEXT;
+    return range;
+  }
+
+  update(mutations, context) {
+    mutations.forEach(mutation => {
+      if (mutation.type === 'characterData' && (mutation.target === this.leftGuard || mutation.target === this.rightGuard)) {
+        const range = this.restore(mutation.target);
+        if (range) context.range = range;
+      }
+    });
+  }
+}
+
+exports.default = Embed;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ColorStyle = exports.ColorClass = exports.ColorAttributor = undefined;
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class ColorAttributor extends _parchment2.default.Attributor.Style {
+  value(domNode) {
+    let value = super.value(domNode);
+    if (!value.startsWith('rgb(')) return value;
+    value = value.replace(/^[^\d]+/, '').replace(/[^\d]+$/, '');
+    const hex = value.split(',').map(component => `00${parseInt(component, 10).toString(16)}`.slice(-2)).join('');
+    return `#${hex}`;
+  }
+}
+
+const ColorClass = new _parchment2.default.Attributor.Class('color', 'ql-color', {
+  scope: _parchment2.default.Scope.INLINE
+});
+const ColorStyle = new ColorAttributor('color', 'color', {
+  scope: _parchment2.default.Scope.INLINE
+});
+
+exports.ColorAttributor = ColorAttributor;
+exports.ColorClass = ColorClass;
+exports.ColorStyle = ColorStyle;
+
+/***/ }),
+/* 26 */,
+/* 27 */,
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _quill = __webpack_require__(4);
+
+var _quill2 = _interopRequireDefault(_quill);
+
+var _block = __webpack_require__(5);
+
+var _block2 = _interopRequireDefault(_block);
+
+var _break = __webpack_require__(15);
+
+var _break2 = _interopRequireDefault(_break);
+
+var _container = __webpack_require__(23);
+
+var _container2 = _interopRequireDefault(_container);
+
+var _cursor = __webpack_require__(22);
+
+var _cursor2 = _interopRequireDefault(_cursor);
+
+var _embed = __webpack_require__(24);
+
+var _embed2 = _interopRequireDefault(_embed);
+
+var _inline = __webpack_require__(6);
+
+var _inline2 = _interopRequireDefault(_inline);
+
+var _scroll = __webpack_require__(40);
+
+var _scroll2 = _interopRequireDefault(_scroll);
+
+var _text = __webpack_require__(7);
+
+var _text2 = _interopRequireDefault(_text);
+
+var _clipboard = __webpack_require__(54);
+
+var _clipboard2 = _interopRequireDefault(_clipboard);
+
+var _history = __webpack_require__(41);
+
+var _history2 = _interopRequireDefault(_history);
+
+var _keyboard = __webpack_require__(42);
+
+var _keyboard2 = _interopRequireDefault(_keyboard);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_quill2.default.QUILL_CORE_DEFAULTS = {
+  'blots/block': _block2.default,
+  'blots/block/embed': _block.BlockEmbed,
+  'blots/break': _break2.default,
+  'blots/container': _container2.default,
+  'blots/cursor': _cursor2.default,
+  'blots/embed': _embed2.default,
+  'blots/inline': _inline2.default,
+  'blots/scroll': _scroll2.default,
+  'blots/text': _text2.default,
+
+  'modules/clipboard': _clipboard2.default,
+  'modules/history': _history2.default,
+  'modules/keyboard': _keyboard2.default
+};
+
+// Default modules
+
+
+// Default blots
+
+
+_quill2.default.PARCHMENT_DEFAULTS = [_block2.default, _break2.default, _cursor2.default, _inline2.default, _scroll2.default, _text2.default];
+
+exports.default = _quill2.default;
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Registry = __webpack_require__(2);
+var ShadowBlot = /** @class */ (function () {
+    function ShadowBlot(editorRegistry, domNode) {
+        this.editorRegistry = editorRegistry;
+        this.domNode = domNode;
+        this.domNode[Registry.DATA_KEY] = { blot: this };
+    }
+    Object.defineProperty(ShadowBlot.prototype, "statics", {
+        // Hack for accessing inherited static methods
+        get: function () {
+            return this.constructor;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ShadowBlot.create = function (value) {
+        if (this.tagName == null) {
+            throw new Registry.ParchmentError('Blot definition missing tagName');
+        }
+        var node;
+        if (Array.isArray(this.tagName)) {
+            if (typeof value === 'string') {
+                value = value.toUpperCase();
+                if (parseInt(value).toString() === value) {
+                    value = parseInt(value);
+                }
+            }
+            if (typeof value === 'number') {
+                node = document.createElement(this.tagName[value - 1]);
+            }
+            else if (this.tagName.indexOf(value) > -1) {
+                node = document.createElement(value);
+            }
+            else {
+                node = document.createElement(this.tagName[0]);
+            }
+        }
+        else {
+            node = document.createElement(this.tagName);
+        }
+        if (this.className) {
+            node.classList.add(this.className);
+        }
+        return node;
+    };
+    ShadowBlot.prototype.attach = function () {
+        if (this.parent != null) {
+            this.scroll = this.parent.scroll;
+        }
+    };
+    ShadowBlot.prototype.clone = function () {
+        var domNode = this.domNode.cloneNode(false);
+        return this.editorRegistry.create(domNode);
+    };
+    ShadowBlot.prototype.detach = function () {
+        if (this.parent != null)
+            this.parent.removeChild(this);
+        delete this.domNode[Registry.DATA_KEY];
+    };
+    ShadowBlot.prototype.deleteAt = function (index, length) {
+        var blot = this.isolate(index, length);
+        blot.remove();
+    };
+    ShadowBlot.prototype.formatAt = function (index, length, name, value) {
+        var blot = this.isolate(index, length);
+        if (this.editorRegistry.query(name, Registry.Scope.BLOT) != null && value) {
+            blot.wrap(name, value);
+        }
+        else if (this.editorRegistry.query(name, Registry.Scope.ATTRIBUTE) != null) {
+            var parent = this.editorRegistry.create(this.statics.scope);
+            blot.wrap(parent);
+            parent.format(name, value);
+        }
+    };
+    ShadowBlot.prototype.insertAt = function (index, value, def) {
+        var blot = def == null ? this.editorRegistry.create('text', value) : this.editorRegistry.create(value, def);
+        var ref = this.split(index);
+        this.parent.insertBefore(blot, ref);
+    };
+    ShadowBlot.prototype.insertInto = function (parentBlot, refBlot) {
+        if (this.parent != null) {
+            this.parent.children.remove(this);
+        }
+        parentBlot.children.insertBefore(this, refBlot);
+        if (refBlot != null) {
+            var refDomNode = refBlot.domNode;
+        }
+        if (this.next == null || this.domNode.nextSibling != refDomNode) {
+            parentBlot.domNode.insertBefore(this.domNode, typeof refDomNode !== 'undefined' ? refDomNode : null);
+        }
+        this.parent = parentBlot;
+        this.attach();
+    };
+    ShadowBlot.prototype.isolate = function (index, length) {
+        var target = this.split(index);
+        target.split(length);
+        return target;
+    };
+    ShadowBlot.prototype.length = function () {
+        return 1;
+    };
+    ShadowBlot.prototype.offset = function (root) {
+        if (root === void 0) { root = this.parent; }
+        if (this.parent == null || this == root)
+            return 0;
+        return this.parent.children.offset(this) + this.parent.offset(root);
+    };
+    ShadowBlot.prototype.optimize = function (context) {
+        // TODO clean up once we use WeakMap
+        if (this.domNode[Registry.DATA_KEY] != null) {
+            delete this.domNode[Registry.DATA_KEY].mutations;
+        }
+    };
+    ShadowBlot.prototype.remove = function () {
+        if (this.domNode.parentNode != null) {
+            this.domNode.parentNode.removeChild(this.domNode);
+        }
+        this.detach();
+    };
+    ShadowBlot.prototype.replace = function (target) {
+        if (target.parent == null)
+            return;
+        target.parent.insertBefore(this, target.next);
+        target.remove();
+    };
+    ShadowBlot.prototype.replaceWith = function (name, value) {
+        var replacement = typeof name === 'string' ? this.editorRegistry.create(name, value) : name;
+        replacement.replace(this);
+        return replacement;
+    };
+    ShadowBlot.prototype.split = function (index, force) {
+        return index === 0 ? this : this.next;
+    };
+    ShadowBlot.prototype.update = function (mutations, context) {
+        // Nothing to do by default
+    };
+    ShadowBlot.prototype.wrap = function (name, value) {
+        var wrapper = typeof name === 'string' ? this.editorRegistry.create(name, value) : name;
+        if (this.parent != null) {
+            this.parent.insertBefore(wrapper, this.next);
+        }
+        wrapper.appendChild(this);
+        return wrapper;
+    };
+    ShadowBlot.blotName = 'abstract';
+    return ShadowBlot;
+}());
+exports.default = ShadowBlot;
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var attributor_1 = __webpack_require__(12);
+var class_1 = __webpack_require__(31);
+var style_1 = __webpack_require__(32);
+var Registry = __webpack_require__(2);
+var AttributorStore = /** @class */ (function () {
+    function AttributorStore(editorRegistry, domNode) {
+        this.attributes = {};
+        this.domNode = domNode;
+        this.editorRegistry = editorRegistry;
+        this.build();
+    }
+    AttributorStore.prototype.attribute = function (attribute, value) {
+        // verb
+        if (value) {
+            if (attribute.add(this.domNode, value, this.editorRegistry)) {
+                if (attribute.value(this.domNode, this.editorRegistry) != null) {
+                    this.attributes[attribute.attrName] = attribute;
+                }
+                else {
+                    delete this.attributes[attribute.attrName];
+                }
+            }
+        }
+        else {
+            attribute.remove(this.domNode);
+            delete this.attributes[attribute.attrName];
+        }
+    };
+    AttributorStore.prototype.build = function () {
+        var _this = this;
+        this.attributes = {};
+        var attributes = attributor_1.default.keys(this.domNode);
+        var classes = class_1.default.keys(this.domNode);
+        var styles = style_1.default.keys(this.domNode);
+        attributes
+            .concat(classes)
+            .concat(styles)
+            .forEach(function (name) {
+            var attr = _this.editorRegistry.query(name, Registry.Scope.ATTRIBUTE);
+            if (attr instanceof attributor_1.default) {
+                _this.attributes[attr.attrName] = attr;
+            }
+        });
+    };
+    AttributorStore.prototype.copy = function (target) {
+        var _this = this;
+        Object.keys(this.attributes).forEach(function (key) {
+            var value = _this.attributes[key].value(_this.domNode, _this.editorRegistry);
+            target.format(key, value);
+        });
+    };
+    AttributorStore.prototype.move = function (target) {
+        var _this = this;
+        this.copy(target);
+        Object.keys(this.attributes).forEach(function (key) {
+            _this.attributes[key].remove(_this.domNode);
+        });
+        this.attributes = {};
+    };
+    AttributorStore.prototype.values = function () {
+        var _this = this;
+        return Object.keys(this.attributes).reduce(function (attributes, name) {
+            attributes[name] = _this.attributes[name].value(_this.domNode, _this.editorRegistry);
+            return attributes;
+        }, {});
+    };
+    return AttributorStore;
+}());
+exports.default = AttributorStore;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var attributor_1 = __webpack_require__(12);
+function match(node, prefix) {
+    var className = node.getAttribute('class') || '';
+    return className.split(/\s+/).filter(function (name) {
+        return name.indexOf(prefix + "-") === 0;
+    });
+}
+var ClassAttributor = /** @class */ (function (_super) {
+    __extends(ClassAttributor, _super);
+    function ClassAttributor() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ClassAttributor.keys = function (node) {
+        return (node.getAttribute('class') || '').split(/\s+/).map(function (name) {
+            return name
+                .split('-')
+                .slice(0, -1)
+                .join('-');
+        });
+    };
+    ClassAttributor.prototype.add = function (node, value, editorRegistry) {
+        if (!this.canAdd(node, value, editorRegistry))
+            return false;
+        this.remove(node);
+        node.classList.add(this.keyName + "-" + value);
+        return true;
+    };
+    ClassAttributor.prototype.remove = function (node) {
+        var matches = match(node, this.keyName);
+        matches.forEach(function (name) {
+            node.classList.remove(name);
+        });
+        if (node.classList.length === 0) {
+            node.removeAttribute('class');
+        }
+    };
+    ClassAttributor.prototype.value = function (node, editorRegistry) {
+        var result = match(node, this.keyName)[0] || '';
+        var value = result.slice(this.keyName.length + 1); // +1 for hyphen
+        return this.canAdd(node, value, editorRegistry) ? value : '';
+    };
+    return ClassAttributor;
+}(attributor_1.default));
+exports.default = ClassAttributor;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var attributor_1 = __webpack_require__(12);
+function camelize(name) {
+    var parts = name.split('-');
+    var rest = parts
+        .slice(1)
+        .map(function (part) {
+        return part[0].toUpperCase() + part.slice(1);
+    })
+        .join('');
+    return parts[0] + rest;
+}
+var StyleAttributor = /** @class */ (function (_super) {
+    __extends(StyleAttributor, _super);
+    function StyleAttributor() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    StyleAttributor.keys = function (node) {
+        return (node.getAttribute('style') || '').split(';').map(function (value) {
+            var arr = value.split(':');
+            return arr[0].trim();
+        });
+    };
+    StyleAttributor.prototype.add = function (node, value, editorRegistry) {
+        if (!this.canAdd(node, value, editorRegistry))
+            return false;
+        node.style[camelize(this.keyName)] = value;
+        return true;
+    };
+    StyleAttributor.prototype.remove = function (node) {
+        node.style[camelize(this.keyName)] = '';
+        if (!node.getAttribute('style')) {
+            node.removeAttribute('style');
+        }
+    };
+    StyleAttributor.prototype.value = function (node, editorRegistry) {
+        var value = node.style[camelize(this.keyName)];
+        return this.canAdd(node, value, editorRegistry) ? value : '';
+    };
+    return StyleAttributor;
+}(attributor_1.default));
+exports.default = StyleAttributor;
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+class Theme {
+  constructor(quill, options) {
+    this.quill = quill;
+    this.options = options;
+    this.modules = {};
+  }
+
+  init() {
+    Object.keys(this.options.modules).forEach(name => {
+      if (this.modules[name] == null) {
+        this.addModule(name);
+      }
+    });
+  }
+
+  addModule(name) {
+    const ModuleClass = this.quill.import(`modules/${name}`);
+    this.modules[name] = new ModuleClass(this.quill, this.options.modules[name] || {});
+    return this.modules[name];
+  }
+}
+Theme.DEFAULTS = {
+  modules: {}
+};
+Theme.themes = {
+  default: Theme
+};
+
+exports.default = Theme;
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.AlignStyle = exports.AlignClass = exports.AlignAttribute = undefined;
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const config = {
+  scope: _parchment2.default.Scope.BLOCK,
+  whitelist: ['right', 'center', 'justify']
+};
+
+const AlignAttribute = new _parchment2.default.Attributor.Attribute('align', 'align', config);
+const AlignClass = new _parchment2.default.Attributor.Class('align', 'ql-align', config);
+const AlignStyle = new _parchment2.default.Attributor.Style('align', 'text-align', config);
+
+exports.AlignAttribute = AlignAttribute;
+exports.AlignClass = AlignClass;
+exports.AlignStyle = AlignStyle;
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BackgroundStyle = exports.BackgroundClass = undefined;
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _color = __webpack_require__(25);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const BackgroundClass = new _parchment2.default.Attributor.Class('background', 'ql-bg', {
+  scope: _parchment2.default.Scope.INLINE
+});
+const BackgroundStyle = new _color.ColorAttributor('background', 'background-color', {
+  scope: _parchment2.default.Scope.INLINE
+});
+
+exports.BackgroundClass = BackgroundClass;
+exports.BackgroundStyle = BackgroundStyle;
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DirectionStyle = exports.DirectionClass = exports.DirectionAttribute = undefined;
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const config = {
+  scope: _parchment2.default.Scope.BLOCK,
+  whitelist: ['rtl']
+};
+
+const DirectionAttribute = new _parchment2.default.Attributor.Attribute('direction', 'dir', config);
+const DirectionClass = new _parchment2.default.Attributor.Class('direction', 'ql-direction', config);
+const DirectionStyle = new _parchment2.default.Attributor.Style('direction', 'direction', config);
+
+exports.DirectionAttribute = DirectionAttribute;
+exports.DirectionClass = DirectionClass;
+exports.DirectionStyle = DirectionStyle;
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FontClass = exports.FontStyle = undefined;
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const config = {
+  scope: _parchment2.default.Scope.INLINE,
+  whitelist: ['serif', 'monospace']
+};
+
+const FontClass = new _parchment2.default.Attributor.Class('font', 'ql-font', config);
+
+class FontStyleAttributor extends _parchment2.default.Attributor.Style {
+  value(node) {
+    return super.value(node).replace(/["']/g, '');
+  }
+}
+
+const FontStyle = new FontStyleAttributor('font', 'font-family', config);
+
+exports.FontStyle = FontStyle;
+exports.FontClass = FontClass;
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SizeStyle = exports.SizeClass = undefined;
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const SizeClass = new _parchment2.default.Attributor.Class('size', 'ql-size', {
+  scope: _parchment2.default.Scope.INLINE,
+  whitelist: ['small', 'large', 'huge']
+});
+const SizeStyle = new _parchment2.default.Attributor.Style('size', 'font-size', {
+  scope: _parchment2.default.Scope.INLINE,
+  whitelist: ['10px', '18px', '32px']
+});
+
+exports.SizeClass = SizeClass;
+exports.SizeStyle = SizeStyle;
+
+/***/ }),
+/* 39 */,
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
 var _emitter = __webpack_require__(8);
 
 var _emitter2 = _interopRequireDefault(_emitter);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(5);
 
 var _block2 = _interopRequireDefault(_block);
 
-var _break = __webpack_require__(16);
+var _break = __webpack_require__(15);
 
 var _break2 = _interopRequireDefault(_break);
 
@@ -3716,7 +4671,7 @@ var _code = __webpack_require__(13);
 
 var _code2 = _interopRequireDefault(_code);
 
-var _container = __webpack_require__(24);
+var _container = __webpack_require__(23);
 
 var _container2 = _interopRequireDefault(_container);
 
@@ -3901,961 +4856,6 @@ Scroll.allowedChildren = [_block2.default, _block.BlockEmbed, _container2.defaul
 exports.default = Scroll;
 
 /***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _text = __webpack_require__(7);
-
-var _text2 = _interopRequireDefault(_text);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class Cursor extends _parchment2.default.Embed {
-  static value() {
-    return undefined;
-  }
-
-  constructor(editorRegistry, domNode, selection) {
-    super(editorRegistry, domNode);
-    this.selection = selection;
-    this.textNode = document.createTextNode(Cursor.CONTENTS);
-    this.domNode.appendChild(this.textNode);
-    this.savedLength = 0;
-  }
-
-  detach() {
-    // super.detach() will also clear domNode.__blot
-    if (this.parent != null) this.parent.removeChild(this);
-  }
-
-  format(name, value) {
-    if (this.savedLength !== 0) {
-      super.format(name, value);
-      return;
-    }
-    let target = this;
-    let index = 0;
-    while (target != null && target.statics.scope !== _parchment2.default.Scope.BLOCK_BLOT) {
-      index += target.offset(target.parent);
-      target = target.parent;
-    }
-    if (target != null) {
-      this.savedLength = Cursor.CONTENTS.length;
-      target.optimize();
-      target.formatAt(index, Cursor.CONTENTS.length, name, value);
-      this.savedLength = 0;
-    }
-  }
-
-  index(node, offset) {
-    if (node === this.textNode) return 0;
-    return super.index(node, offset);
-  }
-
-  length() {
-    return this.savedLength;
-  }
-
-  position() {
-    return [this.textNode, this.textNode.data.length];
-  }
-
-  remove() {
-    super.remove();
-    this.parent = null;
-  }
-
-  restore() {
-    if (this.selection.composing || this.parent == null) return null;
-    const range = this.selection.getNativeRange();
-    let restoreText;
-    let start;
-    let end;
-    if (range != null && range.start.node === this.textNode && range.end.node === this.textNode) {
-      var _ref = [this.textNode, range.start.offset, range.end.offset];
-      restoreText = _ref[0];
-      start = _ref[1];
-      end = _ref[2];
-    }
-    // Link format will insert text outside of anchor tag
-    while (this.domNode.lastChild != null && this.domNode.lastChild !== this.textNode) {
-      this.domNode.parentNode.insertBefore(this.domNode.lastChild, this.domNode);
-    }
-    if (this.textNode.data !== Cursor.CONTENTS) {
-      const text = this.textNode.data.split(Cursor.CONTENTS).join('');
-      if (this.next instanceof _text2.default) {
-        restoreText = this.next.domNode;
-        this.next.insertAt(0, text);
-        this.textNode.data = Cursor.CONTENTS;
-      } else {
-        this.textNode.data = text;
-        this.parent.insertBefore(this.editorRegistry.create(this.textNode), this);
-        this.textNode = document.createTextNode(Cursor.CONTENTS);
-        this.domNode.appendChild(this.textNode);
-      }
-    }
-    this.remove();
-    if (start != null) {
-      var _map = [start, end].map(offset => {
-        return Math.max(0, Math.min(restoreText.data.length, offset - 1));
-      });
-
-      var _map2 = _slicedToArray(_map, 2);
-
-      start = _map2[0];
-      end = _map2[1];
-
-      return {
-        startNode: restoreText,
-        startOffset: start,
-        endNode: restoreText,
-        endOffset: end
-      };
-    }
-    return null;
-  }
-
-  update(mutations, context) {
-    if (mutations.some(mutation => {
-      return mutation.type === 'characterData' && mutation.target === this.textNode;
-    })) {
-      const range = this.restore();
-      if (range) context.range = range;
-    }
-  }
-
-  value() {
-    return '';
-  }
-}
-Cursor.blotName = 'cursor';
-Cursor.className = 'ql-cursor';
-Cursor.tagName = 'span';
-Cursor.CONTENTS = '\uFEFF'; // Zero width no break space
-
-exports.default = Cursor;
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _block = __webpack_require__(4);
-
-var _block2 = _interopRequireDefault(_block);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class Container extends _parchment2.default.Container {}
-Container.allowedChildren = [_block2.default, _block.BlockEmbed, Container];
-
-exports.default = Container;
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _text = __webpack_require__(7);
-
-var _text2 = _interopRequireDefault(_text);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const GUARD_TEXT = '\uFEFF';
-
-class Embed extends _parchment2.default.Embed {
-  constructor(editorRegistry, node) {
-    super(editorRegistry, node);
-    this.contentNode = document.createElement('span');
-    this.contentNode.setAttribute('contenteditable', false);
-    [].slice.call(this.domNode.childNodes).forEach(childNode => {
-      this.contentNode.appendChild(childNode);
-    });
-    this.leftGuard = document.createTextNode(GUARD_TEXT);
-    this.rightGuard = document.createTextNode(GUARD_TEXT);
-    this.domNode.appendChild(this.leftGuard);
-    this.domNode.appendChild(this.contentNode);
-    this.domNode.appendChild(this.rightGuard);
-  }
-
-  index(node, offset) {
-    if (node === this.leftGuard) return 0;
-    if (node === this.rightGuard) return 1;
-    return super.index(node, offset);
-  }
-
-  restore(node) {
-    let range;
-    let textNode;
-    const text = node.data.split(GUARD_TEXT).join('');
-    if (node === this.leftGuard) {
-      if (this.prev instanceof _text2.default) {
-        const prevLength = this.prev.length();
-        this.prev.insertAt(prevLength, text);
-        range = {
-          startNode: this.prev.domNode,
-          startOffset: prevLength + text.length
-        };
-      } else {
-        textNode = document.createTextNode(text);
-        this.parent.insertBefore(this.editorRegistry.create(textNode), this);
-        range = {
-          startNode: textNode,
-          startOffset: text.length
-        };
-      }
-    } else if (node === this.rightGuard) {
-      if (this.next instanceof _text2.default) {
-        this.next.insertAt(0, text);
-        range = {
-          startNode: this.next.domNode,
-          startOffset: text.length
-        };
-      } else {
-        textNode = document.createTextNode(text);
-        this.parent.insertBefore(this.editorRegistry.create(textNode), this.next);
-        range = {
-          startNode: textNode,
-          startOffset: text.length
-        };
-      }
-    }
-    node.data = GUARD_TEXT;
-    return range;
-  }
-
-  update(mutations, context) {
-    mutations.forEach(mutation => {
-      if (mutation.type === 'characterData' && (mutation.target === this.leftGuard || mutation.target === this.rightGuard)) {
-        const range = this.restore(mutation.target);
-        if (range) context.range = range;
-      }
-    });
-  }
-}
-
-exports.default = Embed;
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ColorStyle = exports.ColorClass = exports.ColorAttributor = undefined;
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class ColorAttributor extends _parchment2.default.Attributor.Style {
-  value(domNode) {
-    let value = super.value(domNode);
-    if (!value.startsWith('rgb(')) return value;
-    value = value.replace(/^[^\d]+/, '').replace(/[^\d]+$/, '');
-    const hex = value.split(',').map(component => `00${parseInt(component, 10).toString(16)}`.slice(-2)).join('');
-    return `#${hex}`;
-  }
-}
-
-const ColorClass = new _parchment2.default.Attributor.Class('color', 'ql-color', {
-  scope: _parchment2.default.Scope.INLINE
-});
-const ColorStyle = new ColorAttributor('color', 'color', {
-  scope: _parchment2.default.Scope.INLINE
-});
-
-exports.ColorAttributor = ColorAttributor;
-exports.ColorClass = ColorClass;
-exports.ColorStyle = ColorStyle;
-
-/***/ }),
-/* 27 */,
-/* 28 */,
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _quill = __webpack_require__(6);
-
-var _quill2 = _interopRequireDefault(_quill);
-
-var _block = __webpack_require__(4);
-
-var _block2 = _interopRequireDefault(_block);
-
-var _break = __webpack_require__(16);
-
-var _break2 = _interopRequireDefault(_break);
-
-var _container = __webpack_require__(24);
-
-var _container2 = _interopRequireDefault(_container);
-
-var _cursor = __webpack_require__(23);
-
-var _cursor2 = _interopRequireDefault(_cursor);
-
-var _embed = __webpack_require__(25);
-
-var _embed2 = _interopRequireDefault(_embed);
-
-var _inline = __webpack_require__(5);
-
-var _inline2 = _interopRequireDefault(_inline);
-
-var _scroll = __webpack_require__(22);
-
-var _scroll2 = _interopRequireDefault(_scroll);
-
-var _text = __webpack_require__(7);
-
-var _text2 = _interopRequireDefault(_text);
-
-var _clipboard = __webpack_require__(54);
-
-var _clipboard2 = _interopRequireDefault(_clipboard);
-
-var _history = __webpack_require__(41);
-
-var _history2 = _interopRequireDefault(_history);
-
-var _keyboard = __webpack_require__(42);
-
-var _keyboard2 = _interopRequireDefault(_keyboard);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_quill2.default.QUILL_CORE_DEFAULTS = {
-  'blots/block': _block2.default,
-  'blots/block/embed': _block.BlockEmbed,
-  'blots/break': _break2.default,
-  'blots/container': _container2.default,
-  'blots/cursor': _cursor2.default,
-  'blots/embed': _embed2.default,
-  'blots/inline': _inline2.default,
-  'blots/scroll': _scroll2.default,
-  'blots/text': _text2.default,
-
-  'modules/clipboard': _clipboard2.default,
-  'modules/history': _history2.default,
-  'modules/keyboard': _keyboard2.default
-};
-
-// Default modules
-
-
-// Default blots
-
-
-_quill2.default.PARCHMENT_DEFAULTS = [_block2.default, _break2.default, _cursor2.default, _inline2.default, _scroll2.default, _text2.default];
-
-exports.default = _quill2.default;
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Registry = __webpack_require__(2);
-var ShadowBlot = /** @class */ (function () {
-    function ShadowBlot(editorRegistry, domNode) {
-        this.editorRegistry = editorRegistry;
-        this.domNode = domNode;
-        this.domNode[Registry.DATA_KEY] = { blot: this };
-    }
-    Object.defineProperty(ShadowBlot.prototype, "statics", {
-        // Hack for accessing inherited static methods
-        get: function () {
-            return this.constructor;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ShadowBlot.create = function (value) {
-        if (this.tagName == null) {
-            throw new Registry.ParchmentError('Blot definition missing tagName');
-        }
-        var node;
-        if (Array.isArray(this.tagName)) {
-            if (typeof value === 'string') {
-                value = value.toUpperCase();
-                if (parseInt(value).toString() === value) {
-                    value = parseInt(value);
-                }
-            }
-            if (typeof value === 'number') {
-                node = document.createElement(this.tagName[value - 1]);
-            }
-            else if (this.tagName.indexOf(value) > -1) {
-                node = document.createElement(value);
-            }
-            else {
-                node = document.createElement(this.tagName[0]);
-            }
-        }
-        else {
-            node = document.createElement(this.tagName);
-        }
-        if (this.className) {
-            node.classList.add(this.className);
-        }
-        return node;
-    };
-    ShadowBlot.prototype.attach = function () {
-        if (this.parent != null) {
-            this.scroll = this.parent.scroll;
-        }
-    };
-    ShadowBlot.prototype.clone = function () {
-        var domNode = this.domNode.cloneNode(false);
-        return this.editorRegistry.create(domNode);
-    };
-    ShadowBlot.prototype.detach = function () {
-        if (this.parent != null)
-            this.parent.removeChild(this);
-        delete this.domNode[Registry.DATA_KEY];
-    };
-    ShadowBlot.prototype.deleteAt = function (index, length) {
-        var blot = this.isolate(index, length);
-        blot.remove();
-    };
-    ShadowBlot.prototype.formatAt = function (index, length, name, value) {
-        var blot = this.isolate(index, length);
-        if (this.editorRegistry.query(name, Registry.Scope.BLOT) != null && value) {
-            blot.wrap(name, value);
-        }
-        else if (this.editorRegistry.query(name, Registry.Scope.ATTRIBUTE) != null) {
-            var parent = this.editorRegistry.create(this.statics.scope);
-            blot.wrap(parent);
-            parent.format(name, value);
-        }
-    };
-    ShadowBlot.prototype.insertAt = function (index, value, def) {
-        var blot = def == null ? this.editorRegistry.create('text', value) : this.editorRegistry.create(value, def);
-        var ref = this.split(index);
-        this.parent.insertBefore(blot, ref);
-    };
-    ShadowBlot.prototype.insertInto = function (parentBlot, refBlot) {
-        if (this.parent != null) {
-            this.parent.children.remove(this);
-        }
-        parentBlot.children.insertBefore(this, refBlot);
-        if (refBlot != null) {
-            var refDomNode = refBlot.domNode;
-        }
-        if (this.next == null || this.domNode.nextSibling != refDomNode) {
-            parentBlot.domNode.insertBefore(this.domNode, typeof refDomNode !== 'undefined' ? refDomNode : null);
-        }
-        this.parent = parentBlot;
-        this.attach();
-    };
-    ShadowBlot.prototype.isolate = function (index, length) {
-        var target = this.split(index);
-        target.split(length);
-        return target;
-    };
-    ShadowBlot.prototype.length = function () {
-        return 1;
-    };
-    ShadowBlot.prototype.offset = function (root) {
-        if (root === void 0) { root = this.parent; }
-        if (this.parent == null || this == root)
-            return 0;
-        return this.parent.children.offset(this) + this.parent.offset(root);
-    };
-    ShadowBlot.prototype.optimize = function (context) {
-        // TODO clean up once we use WeakMap
-        if (this.domNode[Registry.DATA_KEY] != null) {
-            delete this.domNode[Registry.DATA_KEY].mutations;
-        }
-    };
-    ShadowBlot.prototype.remove = function () {
-        if (this.domNode.parentNode != null) {
-            this.domNode.parentNode.removeChild(this.domNode);
-        }
-        this.detach();
-    };
-    ShadowBlot.prototype.replace = function (target) {
-        if (target.parent == null)
-            return;
-        target.parent.insertBefore(this, target.next);
-        target.remove();
-    };
-    ShadowBlot.prototype.replaceWith = function (name, value) {
-        var replacement = typeof name === 'string' ? this.editorRegistry.create(name, value) : name;
-        replacement.replace(this);
-        return replacement;
-    };
-    ShadowBlot.prototype.split = function (index, force) {
-        return index === 0 ? this : this.next;
-    };
-    ShadowBlot.prototype.update = function (mutations, context) {
-        // Nothing to do by default
-    };
-    ShadowBlot.prototype.wrap = function (name, value) {
-        var wrapper = typeof name === 'string' ? this.editorRegistry.create(name, value) : name;
-        if (this.parent != null) {
-            this.parent.insertBefore(wrapper, this.next);
-        }
-        wrapper.appendChild(this);
-        return wrapper;
-    };
-    ShadowBlot.blotName = 'abstract';
-    return ShadowBlot;
-}());
-exports.default = ShadowBlot;
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var attributor_1 = __webpack_require__(12);
-var class_1 = __webpack_require__(32);
-var style_1 = __webpack_require__(33);
-var Registry = __webpack_require__(2);
-var AttributorStore = /** @class */ (function () {
-    function AttributorStore(editorRegistry, domNode) {
-        this.attributes = {};
-        this.domNode = domNode;
-        this.editorRegistry = editorRegistry;
-        this.build();
-    }
-    AttributorStore.prototype.attribute = function (attribute, value) {
-        // verb
-        if (value) {
-            if (attribute.add(this.domNode, value, this.editorRegistry)) {
-                if (attribute.value(this.domNode, this.editorRegistry) != null) {
-                    this.attributes[attribute.attrName] = attribute;
-                }
-                else {
-                    delete this.attributes[attribute.attrName];
-                }
-            }
-        }
-        else {
-            attribute.remove(this.domNode);
-            delete this.attributes[attribute.attrName];
-        }
-    };
-    AttributorStore.prototype.build = function () {
-        var _this = this;
-        this.attributes = {};
-        var attributes = attributor_1.default.keys(this.domNode);
-        var classes = class_1.default.keys(this.domNode);
-        var styles = style_1.default.keys(this.domNode);
-        attributes
-            .concat(classes)
-            .concat(styles)
-            .forEach(function (name) {
-            var attr = _this.editorRegistry.query(name, Registry.Scope.ATTRIBUTE);
-            if (attr instanceof attributor_1.default) {
-                _this.attributes[attr.attrName] = attr;
-            }
-        });
-    };
-    AttributorStore.prototype.copy = function (target) {
-        var _this = this;
-        Object.keys(this.attributes).forEach(function (key) {
-            var value = _this.attributes[key].value(_this.domNode, _this.editorRegistry);
-            target.format(key, value);
-        });
-    };
-    AttributorStore.prototype.move = function (target) {
-        var _this = this;
-        this.copy(target);
-        Object.keys(this.attributes).forEach(function (key) {
-            _this.attributes[key].remove(_this.domNode);
-        });
-        this.attributes = {};
-    };
-    AttributorStore.prototype.values = function () {
-        var _this = this;
-        return Object.keys(this.attributes).reduce(function (attributes, name) {
-            attributes[name] = _this.attributes[name].value(_this.domNode, _this.editorRegistry);
-            return attributes;
-        }, {});
-    };
-    return AttributorStore;
-}());
-exports.default = AttributorStore;
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var attributor_1 = __webpack_require__(12);
-function match(node, prefix) {
-    var className = node.getAttribute('class') || '';
-    return className.split(/\s+/).filter(function (name) {
-        return name.indexOf(prefix + "-") === 0;
-    });
-}
-var ClassAttributor = /** @class */ (function (_super) {
-    __extends(ClassAttributor, _super);
-    function ClassAttributor() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    ClassAttributor.keys = function (node) {
-        return (node.getAttribute('class') || '').split(/\s+/).map(function (name) {
-            return name
-                .split('-')
-                .slice(0, -1)
-                .join('-');
-        });
-    };
-    ClassAttributor.prototype.add = function (node, value, editorRegistry) {
-        if (!this.canAdd(node, value, editorRegistry))
-            return false;
-        this.remove(node);
-        node.classList.add(this.keyName + "-" + value);
-        return true;
-    };
-    ClassAttributor.prototype.remove = function (node) {
-        var matches = match(node, this.keyName);
-        matches.forEach(function (name) {
-            node.classList.remove(name);
-        });
-        if (node.classList.length === 0) {
-            node.removeAttribute('class');
-        }
-    };
-    ClassAttributor.prototype.value = function (node, editorRegistry) {
-        var result = match(node, this.keyName)[0] || '';
-        var value = result.slice(this.keyName.length + 1); // +1 for hyphen
-        return this.canAdd(node, value, editorRegistry) ? value : '';
-    };
-    return ClassAttributor;
-}(attributor_1.default));
-exports.default = ClassAttributor;
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var attributor_1 = __webpack_require__(12);
-function camelize(name) {
-    var parts = name.split('-');
-    var rest = parts
-        .slice(1)
-        .map(function (part) {
-        return part[0].toUpperCase() + part.slice(1);
-    })
-        .join('');
-    return parts[0] + rest;
-}
-var StyleAttributor = /** @class */ (function (_super) {
-    __extends(StyleAttributor, _super);
-    function StyleAttributor() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    StyleAttributor.keys = function (node) {
-        return (node.getAttribute('style') || '').split(';').map(function (value) {
-            var arr = value.split(':');
-            return arr[0].trim();
-        });
-    };
-    StyleAttributor.prototype.add = function (node, value, editorRegistry) {
-        if (!this.canAdd(node, value, editorRegistry))
-            return false;
-        node.style[camelize(this.keyName)] = value;
-        return true;
-    };
-    StyleAttributor.prototype.remove = function (node) {
-        node.style[camelize(this.keyName)] = '';
-        if (!node.getAttribute('style')) {
-            node.removeAttribute('style');
-        }
-    };
-    StyleAttributor.prototype.value = function (node, editorRegistry) {
-        var value = node.style[camelize(this.keyName)];
-        return this.canAdd(node, value, editorRegistry) ? value : '';
-    };
-    return StyleAttributor;
-}(attributor_1.default));
-exports.default = StyleAttributor;
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-class Theme {
-  constructor(quill, options) {
-    this.quill = quill;
-    this.options = options;
-    this.modules = {};
-  }
-
-  init() {
-    Object.keys(this.options.modules).forEach(name => {
-      if (this.modules[name] == null) {
-        this.addModule(name);
-      }
-    });
-  }
-
-  addModule(name) {
-    const ModuleClass = this.quill.import(`modules/${name}`);
-    this.modules[name] = new ModuleClass(this.quill, this.options.modules[name] || {});
-    return this.modules[name];
-  }
-}
-Theme.DEFAULTS = {
-  modules: {}
-};
-Theme.themes = {
-  default: Theme
-};
-
-exports.default = Theme;
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.AlignStyle = exports.AlignClass = exports.AlignAttribute = undefined;
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const config = {
-  scope: _parchment2.default.Scope.BLOCK,
-  whitelist: ['right', 'center', 'justify']
-};
-
-const AlignAttribute = new _parchment2.default.Attributor.Attribute('align', 'align', config);
-const AlignClass = new _parchment2.default.Attributor.Class('align', 'ql-align', config);
-const AlignStyle = new _parchment2.default.Attributor.Style('align', 'text-align', config);
-
-exports.AlignAttribute = AlignAttribute;
-exports.AlignClass = AlignClass;
-exports.AlignStyle = AlignStyle;
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.BackgroundStyle = exports.BackgroundClass = undefined;
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _color = __webpack_require__(26);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const BackgroundClass = new _parchment2.default.Attributor.Class('background', 'ql-bg', {
-  scope: _parchment2.default.Scope.INLINE
-});
-const BackgroundStyle = new _color.ColorAttributor('background', 'background-color', {
-  scope: _parchment2.default.Scope.INLINE
-});
-
-exports.BackgroundClass = BackgroundClass;
-exports.BackgroundStyle = BackgroundStyle;
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.DirectionStyle = exports.DirectionClass = exports.DirectionAttribute = undefined;
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const config = {
-  scope: _parchment2.default.Scope.BLOCK,
-  whitelist: ['rtl']
-};
-
-const DirectionAttribute = new _parchment2.default.Attributor.Attribute('direction', 'dir', config);
-const DirectionClass = new _parchment2.default.Attributor.Class('direction', 'ql-direction', config);
-const DirectionStyle = new _parchment2.default.Attributor.Style('direction', 'direction', config);
-
-exports.DirectionAttribute = DirectionAttribute;
-exports.DirectionClass = DirectionClass;
-exports.DirectionStyle = DirectionStyle;
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.FontClass = exports.FontStyle = undefined;
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const config = {
-  scope: _parchment2.default.Scope.INLINE,
-  whitelist: ['serif', 'monospace']
-};
-
-const FontClass = new _parchment2.default.Attributor.Class('font', 'ql-font', config);
-
-class FontStyleAttributor extends _parchment2.default.Attributor.Style {
-  value(node) {
-    return super.value(node).replace(/["']/g, '');
-  }
-}
-
-const FontStyle = new FontStyleAttributor('font', 'font-family', config);
-
-exports.FontStyle = FontStyle;
-exports.FontClass = FontClass;
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.SizeStyle = exports.SizeClass = undefined;
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const SizeClass = new _parchment2.default.Attributor.Class('size', 'ql-size', {
-  scope: _parchment2.default.Scope.INLINE,
-  whitelist: ['small', 'large', 'huge']
-});
-const SizeStyle = new _parchment2.default.Attributor.Style('size', 'font-size', {
-  scope: _parchment2.default.Scope.INLINE,
-  whitelist: ['10px', '18px', '32px']
-});
-
-exports.SizeClass = SizeClass;
-exports.SizeStyle = SizeStyle;
-
-/***/ }),
-/* 40 */,
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4871,7 +4871,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _quill = __webpack_require__(6);
+var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
@@ -5034,11 +5034,11 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _embed = __webpack_require__(25);
+var _embed = __webpack_require__(24);
 
 var _embed2 = _interopRequireDefault(_embed);
 
-var _quill = __webpack_require__(6);
+var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
@@ -7329,7 +7329,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _quill = __webpack_require__(6);
+var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
@@ -7341,21 +7341,21 @@ var _module = __webpack_require__(11);
 
 var _module2 = _interopRequireDefault(_module);
 
-var _align = __webpack_require__(35);
+var _align = __webpack_require__(34);
 
-var _background = __webpack_require__(36);
+var _background = __webpack_require__(35);
 
 var _code = __webpack_require__(13);
 
 var _code2 = _interopRequireDefault(_code);
 
-var _color = __webpack_require__(26);
+var _color = __webpack_require__(25);
 
-var _direction = __webpack_require__(37);
+var _direction = __webpack_require__(36);
 
-var _font = __webpack_require__(38);
+var _font = __webpack_require__(37);
 
-var _size = __webpack_require__(39);
+var _size = __webpack_require__(38);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7734,11 +7734,10 @@ exports.matchText = matchText;
 /* 102 */,
 /* 103 */,
 /* 104 */,
-/* 105 */,
-/* 106 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(29);
+module.exports = __webpack_require__(28);
 
 
 /***/ })

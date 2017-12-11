@@ -1,8 +1,5 @@
+import { EditorRegistry } from 'parchment';
 import equal from 'deep-equal';
-import Editor from '../../core/editor';
-import Emitter from '../../core/emitter';
-import Selection from '../../core/selection';
-import Scroll from '../../blots/scroll';
 import Quill from '../../core/quill';
 
 const div = document.createElement('div');
@@ -25,7 +22,8 @@ beforeEach(function() {
 
   div.innerHTML = '<div></div>';
   this.container = div.firstChild;
-  this.initialize = initialize.bind(this);
+  this.editorRegistry = new EditorRegistry();
+  this.initialize = initialize.bind(this, this.editorRegistry);
 });
 
 function compareApproximately(actual, expected, tolerance) {
@@ -104,21 +102,13 @@ function compareNodes(node1, node2, ignoredAttributes = []) {
   return null;
 }
 
-function initialize(klass, html, container = this.container) {
+function initialize(editorRegistry = this.editorRegistry, klass, html, container = this.container) {
   if (typeof html === 'object') {
     container.innerHTML = html.html;
   } else {
     container.innerHTML = html.replace(/\n\s*/g, '');
   }
   if (klass === HTMLElement) return container;
-  if (klass === Quill) return new Quill(container);
-  const emitter = new Emitter();
-  const scroll = new Scroll(container, { emitter });
-  if (klass === Scroll) return scroll;
-  if (klass === Editor) return new Editor(scroll);
-  if (klass === Selection) return new Selection(scroll, emitter);
-  if (klass[0] === Editor && klass[1] === Selection) {
-    return [new Editor(scroll), new Selection(scroll, emitter)];
-  }
+  if (klass === Quill) return new Quill(container, {}, editorRegistry);
   return null;
 }

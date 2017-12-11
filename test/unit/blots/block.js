@@ -1,38 +1,22 @@
-import Parchment, { EditorRegistry } from 'parchment';
-import Quill from '../../unit';
-import Scroll from '../../../blots/scroll';
+import Quill from '../../../core/quill';
 
-fdescribe('Block', function() {
-  let editorRegistry = null;
-  let mockContainer = null;
-  let quillInstance = null; // eslint-disable-line no-unused-vars
-
-  beforeEach(function() {
-    editorRegistry = new EditorRegistry();
-    mockContainer = document.createElement('div');
-    quillInstance = new Quill(mockContainer, {}, editorRegistry);
-  });
-
-  afterEach(function() {
-    editorRegistry = null;
-    mockContainer = null;
-    quillInstance = null;
-  });
-
-  fit('childless', function() {
-    const block = editorRegistry.create('block');
+describe('Block', function() {
+  it('childless', function() {
+    this.initialize(Quill, '');
+    const block = this.editorRegistry.create('block');
     block.optimize();
     expect(block.domNode).toEqualHTML('<br>');
   });
 
   it('insert into empty', function() {
-    const block = Parchment.create('block');
+    this.initialize(Quill, '');
+    const block = this.editorRegistry.create('block');
     block.insertAt(0, 'Test');
     expect(block.domNode).toEqualHTML('Test');
   });
 
   it('insert newlines', function() {
-    const scroll = this.initialize(Scroll, '<p><br></p>');
+    const { scroll } = this.initialize(Quill, '<p><br></p>');
     scroll.insertAt(0, '\n\n\n');
     expect(scroll.domNode).toEqualHTML(
       '<p><br></p><p><br></p><p><br></p><p><br></p>',
@@ -40,7 +24,7 @@ fdescribe('Block', function() {
   });
 
   it('insert multiline', function() {
-    const scroll = this.initialize(Scroll, '<p>Hello World!</p>');
+    const { scroll } = this.initialize(Quill, '<p>Hello World!</p>');
     scroll.insertAt(6, 'pardon\nthis\n\ninterruption\n');
     expect(scroll.domNode).toEqualHTML(`
       <p>Hello pardon</p>
@@ -52,27 +36,27 @@ fdescribe('Block', function() {
   });
 
   it('insert into formatted', function() {
-    const scroll = this.initialize(Scroll, '<h1>Welcome</h1>');
+    const { scroll } = this.initialize(Quill, '<h1>Welcome</h1>');
     scroll.insertAt(3, 'l\n');
     expect(scroll.domNode.firstChild.outerHTML).toEqualHTML('<h1>Well</h1>');
     expect(scroll.domNode.childNodes[1].outerHTML).toEqualHTML('<h1>come</h1>');
   });
 
   it('delete line contents', function() {
-    const scroll = this.initialize(Scroll, '<p>Hello</p><p>World!</p>');
+    const { scroll } = this.initialize(Quill, '<p>Hello</p><p>World!</p>');
     scroll.deleteAt(0, 5);
     expect(scroll.domNode).toEqualHTML('<p><br></p><p>World!</p>');
   });
 
   it('join lines', function() {
-    const scroll = this.initialize(Scroll, '<h1>Hello</h1><h2>World!</h2>');
+    const { scroll } = this.initialize(Quill, '<h1>Hello</h1><h2>World!</h2>');
     scroll.deleteAt(5, 1);
     expect(scroll.domNode).toEqualHTML('<h2>HelloWorld!</h2>');
   });
 
   it('join line with empty', function() {
-    const scroll = this.initialize(
-      Scroll,
+    const { scroll } = this.initialize(
+      Quill,
       '<p>Hello<strong>World</strong></p><p><br></p>',
     );
     scroll.deleteAt(10, 1);
@@ -80,25 +64,25 @@ fdescribe('Block', function() {
   });
 
   it('join empty lines', function() {
-    const scroll = this.initialize(Scroll, '<h1><br></h1><p><br></p>');
+    const { scroll } = this.initialize(Quill, '<h1><br></h1><p><br></p>');
     scroll.deleteAt(1, 1);
     expect(scroll.domNode).toEqualHTML('<h1><br></h1>');
   });
 
   it('format empty', function() {
-    const scroll = this.initialize(Scroll, '<p><br></p>');
+    const { scroll } = this.initialize(Quill, '<p><br></p>');
     scroll.formatAt(0, 1, 'header', 1);
     expect(scroll.domNode).toEqualHTML('<h1><br></h1>');
   });
 
   it('format newline', function() {
-    const scroll = this.initialize(Scroll, '<h1>Hello</h1>');
+    const { scroll } = this.initialize(Quill, '<h1>Hello</h1>');
     scroll.formatAt(5, 1, 'header', 2);
     expect(scroll.domNode).toEqualHTML('<h2>Hello</h2>');
   });
 
   it('remove unnecessary break', function() {
-    const scroll = this.initialize(Scroll, '<p>Test</p>');
+    const { scroll } = this.initialize(Quill, '<p>Test</p>');
     scroll.children.head.domNode.appendChild(document.createElement('br'));
     scroll.update();
     expect(scroll.domNode).toEqualHTML('<p>Test</p>');
