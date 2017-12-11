@@ -1,10 +1,11 @@
-import Selection, { Range } from '../../../core/selection';
+import Quill from '../../../core/quill';
+import { Range } from '../../../core/selection';
 import Cursor from '../../../blots/cursor';
 
-describe('Selection', function() {
+describe('Quill', function() {
   beforeEach(function() {
     this.setup = (html, index) => {
-      this.selection = this.initialize(Selection, html);
+      this.selection = this.initialize(Quill, html).selection;
       this.selection.setRange(new Range(index));
     };
   });
@@ -13,10 +14,10 @@ describe('Selection', function() {
     beforeEach(function() {
       this.initialize(HTMLElement, '<textarea>Test</textarea><div></div>');
       this.selection = this.initialize(
-        Selection,
+        Quill,
         '<p>0123</p>',
         this.container.lastChild,
-      );
+      ).selection;
       this.textarea = this.container.querySelector('textarea');
       this.textarea.focus();
       this.textarea.select();
@@ -42,7 +43,7 @@ describe('Selection', function() {
 
   describe('getRange()', function() {
     it('empty document', function() {
-      const selection = this.initialize(Selection, '');
+      const { selection } = this.initialize(Quill, '');
       selection.setNativeRange(this.container.querySelector('br'), 0);
       const [range] = selection.getRange();
       expect(range.index).toEqual(0);
@@ -50,8 +51,8 @@ describe('Selection', function() {
     });
 
     it('empty line', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         '<p>0</p><p><br></p><p>3</p>',
       );
       selection.setNativeRange(this.container.querySelector('br'), 0);
@@ -61,7 +62,7 @@ describe('Selection', function() {
     });
 
     it('end of line', function() {
-      const selection = this.initialize(Selection, '<p>0</p>');
+      const { selection } = this.initialize(Quill, '<p>0</p>');
       selection.setNativeRange(this.container.firstChild.firstChild, 1);
       const [range] = selection.getRange();
       expect(range.index).toEqual(1);
@@ -69,19 +70,19 @@ describe('Selection', function() {
     });
 
     it('text node', function() {
-      const selection = this.initialize(Selection, '<p>0123</p>');
-      selection.setNativeRange(this.container.firstChild.firstChild, 1);
+      const { selection } = this.initialize(Quill, '<p>0123</p>');
+      selection.setNativeRange(this.container.firstChild.firstChild.firstChild, 1);
       const [range] = selection.getRange();
       expect(range.index).toEqual(1);
       expect(range.length).toEqual(0);
     });
 
     it('line boundaries', function() {
-      const selection = this.initialize(Selection, '<p><br></p><p>12</p>');
+      const { selection } = this.initialize(Quill, '<p><br></p><p>12</p>');
       selection.setNativeRange(
-        this.container.firstChild,
+        this.container.firstChild.firstChild,
         0,
-        this.container.lastChild.lastChild,
+        this.container.firstChild.lastChild.lastChild,
         2,
       );
       const [range] = selection.getRange();
@@ -90,8 +91,8 @@ describe('Selection', function() {
     });
 
     it('nested text node', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p><strong><em>01</em></strong></p>
         <ul>
@@ -110,8 +111,8 @@ describe('Selection', function() {
     });
 
     it('between embed', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>
           <img src="/assets/favicon.png">
@@ -125,9 +126,9 @@ describe('Selection', function() {
         </ul>`,
       );
       selection.setNativeRange(
-        this.container.firstChild,
+        this.container.firstChild.firstChild,
         1,
-        this.container.lastChild.lastChild,
+        this.container.firstChild.lastChild.lastChild,
         1,
       );
       const [range] = selection.getRange();
@@ -136,14 +137,14 @@ describe('Selection', function() {
     });
 
     it('between inlines', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         '<p><em>01</em><s>23</s><u>45</u></p>',
       );
       selection.setNativeRange(
-        this.container.firstChild,
+        this.container.firstChild.firstChild,
         1,
-        this.container.firstChild,
+        this.container.firstChild.firstChild,
         2,
       );
       const [range] = selection.getRange();
@@ -152,8 +153,8 @@ describe('Selection', function() {
     });
 
     it('between blocks', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>01</p>
         <p><br></p>
@@ -162,7 +163,7 @@ describe('Selection', function() {
           <li>78</li>
         </ul>`,
       );
-      selection.setNativeRange(this.container, 1, this.container.lastChild, 1);
+      selection.setNativeRange(this.container.firstChild, 1, this.container.firstChild.lastChild, 1);
       const [range] = selection.getRange();
       expect(range.index).toEqual(3);
       expect(range.length).toEqual(4);
@@ -175,8 +176,8 @@ describe('Selection', function() {
         <textarea>Test</textarea>
         <div></div>`,
       );
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         '<p>0123</p>',
         container.lastChild,
       );
@@ -188,7 +189,7 @@ describe('Selection', function() {
 
   describe('setRange()', function() {
     it('empty document', function() {
-      const selection = this.initialize(Selection, '');
+      const { selection } = this.initialize(Quill, '');
       const expected = new Range(0);
       selection.setRange(expected);
       const [range] = selection.getRange();
@@ -197,8 +198,8 @@ describe('Selection', function() {
     });
 
     it('empty lines', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p><br></p>
         <ul>
@@ -213,8 +214,8 @@ describe('Selection', function() {
     });
 
     it('nested text node', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p><strong><em>01</em></strong></p>
         <ul>
@@ -229,8 +230,8 @@ describe('Selection', function() {
     });
 
     it('between inlines', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         '<p><em>01</em><s>23</s><u>45</u></p>',
       );
       const expected = new Range(2, 2);
@@ -241,8 +242,8 @@ describe('Selection', function() {
     });
 
     it('single embed', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `<p><img src="/assets/favicon.png"></p>`,
       );
       const expected = new Range(1, 0);
@@ -253,8 +254,8 @@ describe('Selection', function() {
     });
 
     it('between embeds', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>
           <img src="/assets/favicon.png">
@@ -275,7 +276,7 @@ describe('Selection', function() {
     });
 
     it('null', function() {
-      const selection = this.initialize(Selection, '<p>0123</p>');
+      const { selection } = this.initialize(Quill, '<p>0123</p>');
       selection.setRange(new Range(1));
       let [range] = selection.getRange();
       expect(range).not.toEqual(null);
@@ -291,7 +292,7 @@ describe('Selection', function() {
       this.setup(`<p>0123</p>`, 4);
       this.selection.format('bold', true);
       expect(this.selection.getRange()[0].index).toEqual(4);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>0123<strong><span class="ql-cursor">${Cursor.CONTENTS}</span></strong></p>
       `);
     });
@@ -300,7 +301,7 @@ describe('Selection', function() {
       this.setup(`<p><em>0123</em></p>`, 2);
       this.selection.format('bold', true);
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>
           <em>01</em>
           <strong><em><span class="ql-cursor">${Cursor.CONTENTS}</span></em></strong>
@@ -313,7 +314,7 @@ describe('Selection', function() {
       this.setup(`<p><em>0</em><strong>1</strong></p>`, 1);
       this.selection.format('underline', true);
       expect(this.selection.getRange()[0].index).toEqual(1);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><em>0<u><span class="ql-cursor">${Cursor.CONTENTS}</span></u></em><strong>1</strong></p>
       `);
     });
@@ -322,7 +323,7 @@ describe('Selection', function() {
       this.setup(`<p><br></p>`, 0);
       this.selection.format('bold', true);
       expect(this.selection.getRange()[0].index).toEqual(0);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong><span class="ql-cursor">${Cursor.CONTENTS}</span></strong></p>
       `);
     });
@@ -342,7 +343,7 @@ describe('Selection', function() {
       this.selection.format('underline', true);
       this.selection.format('background', 'blue');
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>
           01
           <em style="color: red; background-color: blue;"><u>
@@ -359,7 +360,7 @@ describe('Selection', function() {
       this.selection.format('underline', true);
       this.selection.format('italic', false);
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>
           <strong>
             01<u><span class="ql-cursor">${Cursor.CONTENTS}</span></u>23
@@ -373,7 +374,7 @@ describe('Selection', function() {
       this.selection.format('italic', true);
       this.selection.setRange(new Range(0, 0));
       this.selection.scroll.update();
-      expect(this.container).toEqualHTML('<p>0123</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p>');
     });
 
     it('text change cleanup', function() {
@@ -382,16 +383,16 @@ describe('Selection', function() {
       this.selection.cursor.textNode.data = `${Cursor.CONTENTS}|`;
       this.selection.setNativeRange(this.selection.cursor.textNode, 2);
       this.selection.scroll.update();
-      expect(this.container).toEqualHTML('<p>01<em>|</em>23</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01<em>|</em>23</p>');
     });
 
     it('no cleanup', function() {
       this.setup('<p>0123</p><p><br></p>', 2);
       this.selection.format('italic', true);
-      this.container.removeChild(this.container.lastChild);
+      this.container.firstChild.removeChild(this.container.firstChild.lastChild);
       this.selection.scroll.update();
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>01<em><span class="ql-cursor">${Cursor.CONTENTS}</span></em>23</p>
       `);
     });
@@ -434,7 +435,7 @@ describe('Selection', function() {
     });
 
     it('empty document', function() {
-      const selection = this.initialize(Selection, '<p><br></p>', this.div);
+      const { selection } = this.initialize(Quill, '<p><br></p>', this.div);
       this.bounds = selection.getBounds(0);
       if (/Android/i.test(navigator.userAgent)) return; // false positive on emulators atm
       expect(this.bounds.left).toBeApproximately(this.reference.left, 1);
@@ -443,8 +444,8 @@ describe('Selection', function() {
     });
 
     it('empty line', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>0000</p>
         <p><br></p>
@@ -462,7 +463,7 @@ describe('Selection', function() {
     });
 
     it('plain text', function() {
-      const selection = this.initialize(Selection, '<p>0123</p>', this.div);
+      const { selection } = this.initialize(Quill, '<p>0123</p>', this.div);
       this.bounds = selection.getBounds(2);
       expect(this.bounds.left).toBeApproximately(
         this.reference.left + this.reference.width * 2,
@@ -473,7 +474,7 @@ describe('Selection', function() {
     });
 
     it('multiple characters', function() {
-      const selection = this.initialize(Selection, '<p>0123</p>', this.div);
+      const { selection } = this.initialize(Quill, '<p>0123</p>', this.div);
       this.bounds = selection.getBounds(1, 2);
       expect(this.bounds.left).toBeApproximately(
         this.reference.left + this.reference.width,
@@ -485,8 +486,8 @@ describe('Selection', function() {
     });
 
     it('start of line', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>0000</p>
         <p>0000</p>`,
@@ -502,8 +503,8 @@ describe('Selection', function() {
     });
 
     it('end of line', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>0000</p>
         <p>0000</p>
@@ -523,8 +524,8 @@ describe('Selection', function() {
     });
 
     it('multiple lines', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>0000</p>
         <p>0000</p>
@@ -542,8 +543,8 @@ describe('Selection', function() {
     });
 
     it('large text', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         '<p><span class="ql-size-large">0000</span></p>',
         this.div,
       );
@@ -561,8 +562,8 @@ describe('Selection', function() {
     });
 
     it('image', function() {
-      const selection = this.initialize(
-        Selection,
+      const { selection } = this.initialize(
+        Quill,
         `
         <p>
           <img src="/assets/favicon.png" width="32px" height="32px">
@@ -577,7 +578,7 @@ describe('Selection', function() {
     });
 
     it('beyond document', function() {
-      const selection = this.initialize(Selection, '<p>0123</p>');
+      const { selection } = this.initialize(Quill, '<p>0123</p>');
       expect(() => {
         this.bounds = selection.getBounds(10, 0);
       }).not.toThrow();

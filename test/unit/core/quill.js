@@ -8,8 +8,9 @@ import { Range } from '../../../core/selection';
 
 describe('Quill', function() {
   it('imports', function() {
-    Object.keys(Quill.imports).forEach(function(path) {
-      expect(Quill.import(path)).toBeTruthy();
+    const quill = this.initialize(Quill, '');
+    Object.keys(quill.imports).forEach(function(path) {
+      expect(quill.import(path)).toBeTruthy();
     });
   });
 
@@ -374,8 +375,11 @@ describe('Quill', function() {
   });
 
   describe('expandConfig', function() {
+    beforeEach(function() {
+      this.quill = this.initialize(Quill, '');
+    });
     it('user overwrite quill', function() {
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         placeholder: 'Test',
         readOnly: true,
       });
@@ -384,7 +388,7 @@ describe('Quill', function() {
     });
 
     it('convert css selectors', function() {
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         bounds: '#test-container',
       });
       expect(config.bounds).toEqual(document.querySelector('#test-container'));
@@ -398,7 +402,7 @@ describe('Quill', function() {
       Theme.DEFAULTS.modules = {
         formula: true,
       };
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           syntax: true,
         },
@@ -413,7 +417,7 @@ describe('Quill', function() {
 
     describe('theme defaults', function() {
       it('for Snow', function() {
-        const config = expandConfig('#test-container', {
+        const config = expandConfig(this.quill, '#test-container', {
           modules: {
             toolbar: true,
           },
@@ -426,21 +430,21 @@ describe('Quill', function() {
       });
 
       it('for false', function() {
-        const config = expandConfig('#test-container', {
+        const config = expandConfig(this.quill, '#test-container', {
           theme: false,
         });
         expect(config.theme).toEqual(Theme);
       });
 
       it('for undefined', function() {
-        const config = expandConfig('#test-container', {
+        const config = expandConfig(this.quill, '#test-container', {
           theme: undefined,
         });
         expect(config.theme).toEqual(Theme);
       });
 
       it('for null', function() {
-        const config = expandConfig('#test-container', {
+        const config = expandConfig(this.quill, '#test-container', {
           theme: null,
         });
         expect(config.theme).toEqual(Theme);
@@ -460,7 +464,7 @@ describe('Quill', function() {
           theme: true,
         },
       };
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           toolbar: {
             option: 0,
@@ -479,7 +483,7 @@ describe('Quill', function() {
     });
 
     it('toolbar default', function() {
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           toolbar: true,
         },
@@ -488,7 +492,7 @@ describe('Quill', function() {
     });
 
     it('toolbar disabled', function() {
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           toolbar: false,
         },
@@ -498,7 +502,7 @@ describe('Quill', function() {
     });
 
     it('toolbar selector', function() {
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           toolbar: {
             container: '#test-container',
@@ -512,7 +516,7 @@ describe('Quill', function() {
     });
 
     it('toolbar container shorthand', function() {
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           toolbar: document.querySelector('#test-container'),
         },
@@ -524,7 +528,7 @@ describe('Quill', function() {
     });
 
     it('toolbar format array', function() {
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           toolbar: ['bold'],
         },
@@ -537,7 +541,7 @@ describe('Quill', function() {
 
     it('toolbar custom handler, default container', function() {
       const handler = function() {}; // eslint-disable-line func-style
-      const config = expandConfig('#test-container', {
+      const config = expandConfig(this.quill, '#test-container', {
         modules: {
           toolbar: {
             handlers: {

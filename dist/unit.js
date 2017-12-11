@@ -10816,8 +10816,6 @@ describe('Inline', function () {
 "use strict";
 
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _quillDelta = __webpack_require__(1);
 
 var _quillDelta2 = _interopRequireDefault(_quillDelta);
@@ -10828,86 +10826,118 @@ var _editor2 = _interopRequireDefault(_editor);
 
 var _selection = __webpack_require__(16);
 
-var _selection2 = _interopRequireDefault(_selection);
+var _quill = __webpack_require__(4);
+
+var _quill2 = _interopRequireDefault(_quill);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 describe('Editor', function () {
   describe('insert', function () {
     it('text', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong>0123</strong></p>');
+      var _initialize = this.initialize(_quill2.default, '<p><strong>0123</strong></p>');
+
+      const editor = _initialize.editor;
+
       editor.insertText(2, '!!');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01!!23', { bold: true }).insert('\n'));
-      expect(this.container).toEqualHTML('<p><strong>01!!23</strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong>01!!23</strong></p>');
     });
 
     it('embed', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong>0123</strong></p>');
+      var _initialize2 = this.initialize(_quill2.default, '<p><strong>0123</strong></p>');
+
+      const editor = _initialize2.editor;
+
       editor.insertEmbed(2, 'image', '/assets/favicon.png');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01', { bold: true }).insert({ image: '/assets/favicon.png' }, { bold: true }).insert('23', { bold: true }).insert('\n'));
-      expect(this.container).toEqualHTML('<p><strong>01<img src="/assets/favicon.png">23</strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong>01<img src="/assets/favicon.png">23</strong></p>');
     });
 
     it('on empty line', function () {
-      const editor = this.initialize(_editor2.default, '<p>0</p><p><br></p><p>3</p>');
+      var _initialize3 = this.initialize(_quill2.default, '<p>0</p><p><br></p><p>3</p>');
+
+      const editor = _initialize3.editor;
+
       editor.insertText(2, '!');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0\n!\n3\n'));
-      expect(this.container).toEqualHTML('<p>0</p><p>!</p><p>3</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0</p><p>!</p><p>3</p>');
     });
 
     it('end of document', function () {
-      const editor = this.initialize(_editor2.default, '<p>Hello</p>');
+      var _initialize4 = this.initialize(_quill2.default, '<p>Hello</p>');
+
+      const editor = _initialize4.editor;
+
       editor.insertText(6, 'World!');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('Hello\nWorld!\n'));
-      expect(this.container).toEqualHTML('<p>Hello</p><p>World!</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>Hello</p><p>World!</p>');
     });
 
     it('end of document with newline', function () {
-      const editor = this.initialize(_editor2.default, '<p>Hello</p>');
+      var _initialize5 = this.initialize(_quill2.default, '<p>Hello</p>');
+
+      const editor = _initialize5.editor;
+
       editor.insertText(6, 'World!\n');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('Hello\nWorld!\n'));
-      expect(this.container).toEqualHTML('<p>Hello</p><p>World!</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>Hello</p><p>World!</p>');
     });
 
     it('embed at end of document with newline', function () {
-      const editor = this.initialize(_editor2.default, '<p>Hello</p>');
+      var _initialize6 = this.initialize(_quill2.default, '<p>Hello</p>');
+
+      const editor = _initialize6.editor;
+
       editor.insertEmbed(6, 'image', '/assets/favicon.png');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('Hello\n').insert({ image: '/assets/favicon.png' }).insert('\n'));
-      expect(this.container).toEqualHTML('<p>Hello</p><p><img src="/assets/favicon.png"></p>');
+      expect(this.container.firstChild).toEqualHTML('<p>Hello</p><p><img src="/assets/favicon.png"></p>');
     });
 
     it('newline splitting', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong>0123</strong></p>');
+      var _initialize7 = this.initialize(_quill2.default, '<p><strong>0123</strong></p>');
+
+      const editor = _initialize7.editor;
+
       editor.insertText(2, '\n');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01', { bold: true }).insert('\n').insert('23', { bold: true }).insert('\n'));
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>01</strong></p>
         <p><strong>23</strong></p>`);
     });
 
     it('prepend newline', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong>0123</strong></p>');
+      var _initialize8 = this.initialize(_quill2.default, '<p><strong>0123</strong></p>');
+
+      const editor = _initialize8.editor;
+
       editor.insertText(0, '\n');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('\n').insert('0123', { bold: true }).insert('\n'));
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><br></p>
         <p><strong>0123</strong></p>`);
     });
 
     it('append newline', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong>0123</strong></p>');
+      var _initialize9 = this.initialize(_quill2.default, '<p><strong>0123</strong></p>');
+
+      const editor = _initialize9.editor;
+
       editor.insertText(4, '\n');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123', { bold: true }).insert('\n\n'));
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>0123</strong></p>
         <p><br></p>`);
     });
 
     it('multiline text', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong>0123</strong></p>');
+      var _initialize10 = this.initialize(_quill2.default, '<p><strong>0123</strong></p>');
+
+      const editor = _initialize10.editor;
+
       editor.insertText(2, '\n!!\n!!\n');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01', { bold: true }).insert('\n').insert('!!', { bold: true }).insert('\n').insert('!!', { bold: true }).insert('\n').insert('23', { bold: true }).insert('\n'));
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>01</strong></p>
         <p><strong>!!</strong></p>
         <p><strong>!!</strong></p>
@@ -10915,17 +10945,23 @@ describe('Editor', function () {
     });
 
     it('multiple newlines', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong>0123</strong></p>');
+      var _initialize11 = this.initialize(_quill2.default, '<p><strong>0123</strong></p>');
+
+      const editor = _initialize11.editor;
+
       editor.insertText(2, '\n\n');
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01', { bold: true }).insert('\n\n').insert('23', { bold: true }).insert('\n'));
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>01</strong></p>
         <p><br></p>
         <p><strong>23</strong></p>`);
     });
 
     it('text removing formatting', function () {
-      const editor = this.initialize(_editor2.default, '<p><s>01</s></p>');
+      var _initialize12 = this.initialize(_quill2.default, '<p><s>01</s></p>');
+
+      const editor = _initialize12.editor;
+
       editor.insertText(2, '23', { bold: false, strike: false });
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01', { strike: true }).insert('23\n'));
     });
@@ -11041,124 +11077,184 @@ describe('Editor', function () {
 
   describe('applyDelta', function () {
     it('insert', function () {
-      const editor = this.initialize(_editor2.default, '<p></p>');
+      var _initialize13 = this.initialize(_quill2.default, '<p></p>');
+
+      const editor = _initialize13.editor;
+
       editor.applyDelta(new _quillDelta2.default().insert('01'));
-      expect(this.container).toEqualHTML('<p>01</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01</p>');
     });
 
     it('attributed insert', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize14 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize14.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(2).insert('|', { bold: true }));
-      expect(this.container).toEqualHTML('<p>01<strong>|</strong>23</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01<strong>|</strong>23</p>');
     });
 
     it('format', function () {
-      const editor = this.initialize(_editor2.default, '<p>01</p>');
+      var _initialize15 = this.initialize(_quill2.default, '<p>01</p>');
+
+      const editor = _initialize15.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(2, { bold: true }));
-      expect(this.container).toEqualHTML('<p><strong>01</strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong>01</strong></p>');
     });
 
     it('discontinuous formats', function () {
-      const editor = this.initialize(_editor2.default, '');
+      var _initialize16 = this.initialize(_quill2.default, '');
+
+      const editor = _initialize16.editor;
+
       const delta = new _quillDelta2.default().insert('ab', { bold: true }).insert('23\n45').insert('cd', { bold: true });
       editor.applyDelta(delta);
-      expect(this.container).toEqualHTML('<p><strong>ab</strong>23</p><p>45<strong>cd</strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong>ab</strong>23</p><p>45<strong>cd</strong></p>');
     });
 
     it('unformatted insert', function () {
-      const editor = this.initialize(_editor2.default, '<p><em>01</em></p>');
+      var _initialize17 = this.initialize(_quill2.default, '<p><em>01</em></p>');
+
+      const editor = _initialize17.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(1).insert('|'));
-      expect(this.container).toEqualHTML('<p><em>0</em>|<em>1</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>0</em>|<em>1</em></p>');
     });
 
     it('insert at format boundary', function () {
-      const editor = this.initialize(_editor2.default, '<p><em>0</em><u>1</u></p>');
+      var _initialize18 = this.initialize(_quill2.default, '<p><em>0</em><u>1</u></p>');
+
+      const editor = _initialize18.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(1).insert('|', { strike: true }));
-      expect(this.container).toEqualHTML('<p><em>0</em><s>|</s><u>1</u></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>0</em><s>|</s><u>1</u></p>');
     });
 
     it('unformatted newline', function () {
-      const editor = this.initialize(_editor2.default, '<h1>01</h1>');
+      var _initialize19 = this.initialize(_quill2.default, '<h1>01</h1>');
+
+      const editor = _initialize19.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(2).insert('\n'));
-      expect(this.container).toEqualHTML('<p>01</p><h1><br></h1>');
+      expect(this.container.firstChild).toEqualHTML('<p>01</p><h1><br></h1>');
     });
 
     it('formatted embed', function () {
-      const editor = this.initialize(_editor2.default, '');
+      var _initialize20 = this.initialize(_quill2.default, '');
+
+      const editor = _initialize20.editor;
+
       editor.applyDelta(new _quillDelta2.default().insert({ image: '/assets/favicon.png' }, { italic: true }));
-      expect(this.container).toEqualHTML('<p><em><img src="/assets/favicon.png"></em>');
+      expect(this.container.firstChild).toEqualHTML('<p><em><img src="/assets/favicon.png"></em>');
     });
 
     it('old embed', function () {
-      const editor = this.initialize(_editor2.default, '');
+      var _initialize21 = this.initialize(_quill2.default, '');
+
+      const editor = _initialize21.editor;
+
       editor.applyDelta(new _quillDelta2.default().insert(1, { image: '/assets/favicon.png', italic: true }));
-      expect(this.container).toEqualHTML('<p><em><img src="/assets/favicon.png"></em>');
+      expect(this.container.firstChild).toEqualHTML('<p><em><img src="/assets/favicon.png"></em>');
     });
 
     it('old list', function () {
-      const editor = this.initialize(_editor2.default, '');
+      var _initialize22 = this.initialize(_quill2.default, '');
+
+      const editor = _initialize22.editor;
+
       editor.applyDelta(new _quillDelta2.default().insert('\n', { bullet: true }).insert('\n', { list: true }));
-      expect(this.container).toEqualHTML('<ul><li><br></li></ul><ol><li><br></li></ol><p><br></p>');
+      expect(this.container.firstChild).toEqualHTML('<ul><li><br></li></ul><ol><li><br></li></ol><p><br></p>');
     });
 
     it('improper block embed insert', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize23 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize23.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(2).insert({ video: '#' }));
-      expect(this.container).toEqualHTML('<p>01</p><iframe src="#" class="ql-video" frameborder="0" allowfullscreen="true"></iframe><p>23</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01</p><iframe src="#" class="ql-video" frameborder="0" allowfullscreen="true"></iframe><p>23</p>');
     });
 
     it('append formatted block embed', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p><p><br></p>');
+      var _initialize24 = this.initialize(_quill2.default, '<p>0123</p><p><br></p>');
+
+      const editor = _initialize24.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(5).insert({ video: '#' }, { align: 'right' }));
-      expect(this.container).toEqualHTML('<p>0123</p><iframe src="#" class="ql-video ql-align-right" frameborder="0" allowfullscreen="true"></iframe><p><br></p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><iframe src="#" class="ql-video ql-align-right" frameborder="0" allowfullscreen="true"></iframe><p><br></p>');
     });
 
     it('append', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize25 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize25.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678'));
-      expect(this.container).toEqualHTML('<p>0123</p><p>5678</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><p>5678</p>');
     });
 
     it('append newline', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize26 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize26.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<p>0123</p><h2><br></h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2><br></h2>');
     });
 
     it('append text with newline', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize27 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize27.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678').insert('\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<p>0123</p><h2>5678</h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678</h2>');
     });
 
     it('append non-isolated newline', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize28 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize28.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<p>0123</p><h2>5678</h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678</h2>');
     });
 
     it('eventual append', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize29 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize29.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(2).insert('ab\n', { header: 1 }).retain(3).insert('cd\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<h1>01ab</h1><p>23</p><h2>cd</h2>');
+      expect(this.container.firstChild).toEqualHTML('<h1>01ab</h1><p>23</p><h2>cd</h2>');
     });
 
     it('append text, embed and newline', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize30 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize30.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678').insert({ image: '/assets/favicon.png' }).insert('\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<p>0123</p><h2>5678<img src="/assets/favicon.png"></h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678<img src="/assets/favicon.png"></h2>');
     });
 
     it('append multiple lines', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize31 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize31.editor;
+
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('56').insert('\n', { header: 1 }).insert('89').insert('\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<p>0123</p><h1>56</h1><h2>89</h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h1>56</h1><h2>89</h2>');
     });
 
     it('code', function () {
-      const editor = this.initialize(_editor2.default, {
+      var _initialize32 = this.initialize(_quill2.default, {
         html: '<p>0</p><pre>1\n23\n</pre><p><br></p>'
       });
+
+      const editor = _initialize32.editor;
+
       editor.applyDelta(new _quillDelta2.default().delete(4).retain(1).delete(2));
       expect(editor.scroll.domNode.innerHTML).toEqual('<p>2</p>');
     });
@@ -11166,17 +11262,26 @@ describe('Editor', function () {
 
   describe('getFormat()', function () {
     it('unformatted', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize33 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize33.editor;
+
       expect(editor.getFormat(1)).toEqual({});
     });
 
     it('formatted', function () {
-      const editor = this.initialize(_editor2.default, '<h1><em>0123</em></h1>');
+      var _initialize34 = this.initialize(_quill2.default, '<h1><em>0123</em></h1>');
+
+      const editor = _initialize34.editor;
+
       expect(editor.getFormat(1)).toEqual({ header: 1, italic: true });
     });
 
     it('cursor', function () {
-      const editor = this.initialize(_editor2.default, '<h1><strong><em>0123</em></strong></h1><h2><u>5678</u></h2>');
+      var _initialize35 = this.initialize(_quill2.default, '<h1><strong><em>0123</em></strong></h1><h2><u>5678</u></h2>');
+
+      const editor = _initialize35.editor;
+
       expect(editor.getFormat(2)).toEqual({
         bold: true,
         italic: true,
@@ -11185,11 +11290,10 @@ describe('Editor', function () {
     });
 
     it('cursor with preformat', function () {
-      var _initialize = this.initialize([_editor2.default, _selection2.default], '<h1><strong><em>0123</em></strong></h1>'),
-          _initialize2 = _slicedToArray(_initialize, 2);
+      var _initialize36 = this.initialize(_quill2.default, '<h1><strong><em>0123</em></strong></h1>');
 
-      const editor = _initialize2[0],
-            selection = _initialize2[1];
+      const editor = _initialize36.editor,
+            selection = _initialize36.selection;
 
       selection.setRange(new _selection.Range(2));
       selection.format('underline', true);
@@ -11204,13 +11308,16 @@ describe('Editor', function () {
     });
 
     it('across leaves', function () {
-      const editor = this.initialize(_editor2.default, `
+      var _initialize37 = this.initialize(_quill2.default, `
         <h1>
           <strong class="ql-size-small"><em>01</em></strong>
           <em class="ql-size-large"><u>23</u></em>
           <em class="ql-size-huge"><u>45</u></em>
         </h1>
       `);
+
+      const editor = _initialize37.editor;
+
       expect(editor.getFormat(1, 4)).toEqual({
         italic: true,
         header: 1,
@@ -11219,10 +11326,13 @@ describe('Editor', function () {
     });
 
     it('across lines', function () {
-      const editor = this.initialize(_editor2.default, `
+      var _initialize38 = this.initialize(_quill2.default, `
         <h1 class="ql-align-right"><em>01</em></h1>
         <h1 class="ql-align-center"><em>34</em></h1>
       `);
+
+      const editor = _initialize38.editor;
+
       expect(editor.getFormat(1, 3)).toEqual({
         italic: true,
         header: 1,
@@ -11241,9 +11351,11 @@ describe('Editor', function () {
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _selection = __webpack_require__(16);
+var _quill = __webpack_require__(4);
 
-var _selection2 = _interopRequireDefault(_selection);
+var _quill2 = _interopRequireDefault(_quill);
+
+var _selection = __webpack_require__(16);
 
 var _cursor = __webpack_require__(22);
 
@@ -11251,10 +11363,10 @@ var _cursor2 = _interopRequireDefault(_cursor);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-describe('Selection', function () {
+describe('Quill', function () {
   beforeEach(function () {
     this.setup = (html, index) => {
-      this.selection = this.initialize(_selection2.default, html);
+      this.selection = this.initialize(_quill2.default, html).selection;
       this.selection.setRange(new _selection.Range(index));
     };
   });
@@ -11262,7 +11374,7 @@ describe('Selection', function () {
   describe('focus()', function () {
     beforeEach(function () {
       this.initialize(HTMLElement, '<textarea>Test</textarea><div></div>');
-      this.selection = this.initialize(_selection2.default, '<p>0123</p>', this.container.lastChild);
+      this.selection = this.initialize(_quill2.default, '<p>0123</p>', this.container.lastChild).selection;
       this.textarea = this.container.querySelector('textarea');
       this.textarea.focus();
       this.textarea.select();
@@ -11288,7 +11400,10 @@ describe('Selection', function () {
 
   describe('getRange()', function () {
     it('empty document', function () {
-      const selection = this.initialize(_selection2.default, '');
+      var _initialize = this.initialize(_quill2.default, '');
+
+      const selection = _initialize.selection;
+
       selection.setNativeRange(this.container.querySelector('br'), 0);
 
       var _selection$getRange = selection.getRange(),
@@ -11301,7 +11416,10 @@ describe('Selection', function () {
     });
 
     it('empty line', function () {
-      const selection = this.initialize(_selection2.default, '<p>0</p><p><br></p><p>3</p>');
+      var _initialize2 = this.initialize(_quill2.default, '<p>0</p><p><br></p><p>3</p>');
+
+      const selection = _initialize2.selection;
+
       selection.setNativeRange(this.container.querySelector('br'), 0);
 
       var _selection$getRange3 = selection.getRange(),
@@ -11314,7 +11432,10 @@ describe('Selection', function () {
     });
 
     it('end of line', function () {
-      const selection = this.initialize(_selection2.default, '<p>0</p>');
+      var _initialize3 = this.initialize(_quill2.default, '<p>0</p>');
+
+      const selection = _initialize3.selection;
+
       selection.setNativeRange(this.container.firstChild.firstChild, 1);
 
       var _selection$getRange5 = selection.getRange(),
@@ -11327,8 +11448,11 @@ describe('Selection', function () {
     });
 
     it('text node', function () {
-      const selection = this.initialize(_selection2.default, '<p>0123</p>');
-      selection.setNativeRange(this.container.firstChild.firstChild, 1);
+      var _initialize4 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const selection = _initialize4.selection;
+
+      selection.setNativeRange(this.container.firstChild.firstChild.firstChild, 1);
 
       var _selection$getRange7 = selection.getRange(),
           _selection$getRange8 = _slicedToArray(_selection$getRange7, 1);
@@ -11340,8 +11464,11 @@ describe('Selection', function () {
     });
 
     it('line boundaries', function () {
-      const selection = this.initialize(_selection2.default, '<p><br></p><p>12</p>');
-      selection.setNativeRange(this.container.firstChild, 0, this.container.lastChild.lastChild, 2);
+      var _initialize5 = this.initialize(_quill2.default, '<p><br></p><p>12</p>');
+
+      const selection = _initialize5.selection;
+
+      selection.setNativeRange(this.container.firstChild.firstChild, 0, this.container.firstChild.lastChild.lastChild, 2);
 
       var _selection$getRange9 = selection.getRange(),
           _selection$getRange10 = _slicedToArray(_selection$getRange9, 1);
@@ -11353,11 +11480,14 @@ describe('Selection', function () {
     });
 
     it('nested text node', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize6 = this.initialize(_quill2.default, `
         <p><strong><em>01</em></strong></p>
         <ul>
           <li><em><u>34</u></em></li>
         </ul>`);
+
+      const selection = _initialize6.selection;
+
       selection.setNativeRange(this.container.querySelector('em').firstChild, 1, this.container.querySelector('u').firstChild, 1);
 
       var _selection$getRange11 = selection.getRange(),
@@ -11370,7 +11500,7 @@ describe('Selection', function () {
     });
 
     it('between embed', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize7 = this.initialize(_quill2.default, `
         <p>
           <img src="/assets/favicon.png">
           <img src="/assets/favicon.png">
@@ -11381,7 +11511,10 @@ describe('Selection', function () {
             <img src="/assets/favicon.png">
           </li>
         </ul>`);
-      selection.setNativeRange(this.container.firstChild, 1, this.container.lastChild.lastChild, 1);
+
+      const selection = _initialize7.selection;
+
+      selection.setNativeRange(this.container.firstChild.firstChild, 1, this.container.firstChild.lastChild.lastChild, 1);
 
       var _selection$getRange13 = selection.getRange(),
           _selection$getRange14 = _slicedToArray(_selection$getRange13, 1);
@@ -11393,8 +11526,11 @@ describe('Selection', function () {
     });
 
     it('between inlines', function () {
-      const selection = this.initialize(_selection2.default, '<p><em>01</em><s>23</s><u>45</u></p>');
-      selection.setNativeRange(this.container.firstChild, 1, this.container.firstChild, 2);
+      var _initialize8 = this.initialize(_quill2.default, '<p><em>01</em><s>23</s><u>45</u></p>');
+
+      const selection = _initialize8.selection;
+
+      selection.setNativeRange(this.container.firstChild.firstChild, 1, this.container.firstChild.firstChild, 2);
 
       var _selection$getRange15 = selection.getRange(),
           _selection$getRange16 = _slicedToArray(_selection$getRange15, 1);
@@ -11406,14 +11542,17 @@ describe('Selection', function () {
     });
 
     it('between blocks', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize9 = this.initialize(_quill2.default, `
         <p>01</p>
         <p><br></p>
         <ul>
           <li>45</li>
           <li>78</li>
         </ul>`);
-      selection.setNativeRange(this.container, 1, this.container.lastChild, 1);
+
+      const selection = _initialize9.selection;
+
+      selection.setNativeRange(this.container.firstChild, 1, this.container.firstChild.lastChild, 1);
 
       var _selection$getRange17 = selection.getRange(),
           _selection$getRange18 = _slicedToArray(_selection$getRange17, 1);
@@ -11428,7 +11567,11 @@ describe('Selection', function () {
       const container = this.initialize(HTMLElement, `
         <textarea>Test</textarea>
         <div></div>`);
-      const selection = this.initialize(_selection2.default, '<p>0123</p>', container.lastChild);
+
+      var _initialize10 = this.initialize(_quill2.default, '<p>0123</p>', container.lastChild);
+
+      const selection = _initialize10.selection;
+
       container.firstChild.select();
 
       var _selection$getRange19 = selection.getRange(),
@@ -11442,7 +11585,10 @@ describe('Selection', function () {
 
   describe('setRange()', function () {
     it('empty document', function () {
-      const selection = this.initialize(_selection2.default, '');
+      var _initialize11 = this.initialize(_quill2.default, '');
+
+      const selection = _initialize11.selection;
+
       const expected = new _selection.Range(0);
       selection.setRange(expected);
 
@@ -11456,11 +11602,14 @@ describe('Selection', function () {
     });
 
     it('empty lines', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize12 = this.initialize(_quill2.default, `
         <p><br></p>
         <ul>
           <li><br></li>
         </ul>`);
+
+      const selection = _initialize12.selection;
+
       const expected = new _selection.Range(0, 1);
       selection.setRange(expected);
 
@@ -11474,11 +11623,14 @@ describe('Selection', function () {
     });
 
     it('nested text node', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize13 = this.initialize(_quill2.default, `
         <p><strong><em>01</em></strong></p>
         <ul>
           <li><em><u>34</u></em></li>
         </ul>`);
+
+      const selection = _initialize13.selection;
+
       const expected = new _selection.Range(1, 3);
       selection.setRange(expected);
 
@@ -11492,7 +11644,10 @@ describe('Selection', function () {
     });
 
     it('between inlines', function () {
-      const selection = this.initialize(_selection2.default, '<p><em>01</em><s>23</s><u>45</u></p>');
+      var _initialize14 = this.initialize(_quill2.default, '<p><em>01</em><s>23</s><u>45</u></p>');
+
+      const selection = _initialize14.selection;
+
       const expected = new _selection.Range(2, 2);
       selection.setRange(expected);
 
@@ -11506,7 +11661,10 @@ describe('Selection', function () {
     });
 
     it('single embed', function () {
-      const selection = this.initialize(_selection2.default, `<p><img src="/assets/favicon.png"></p>`);
+      var _initialize15 = this.initialize(_quill2.default, `<p><img src="/assets/favicon.png"></p>`);
+
+      const selection = _initialize15.selection;
+
       const expected = new _selection.Range(1, 0);
       selection.setRange(expected);
 
@@ -11520,7 +11678,7 @@ describe('Selection', function () {
     });
 
     it('between embeds', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize16 = this.initialize(_quill2.default, `
         <p>
           <img src="/assets/favicon.png">
           <img src="/assets/favicon.png">
@@ -11531,6 +11689,9 @@ describe('Selection', function () {
             <img src="/assets/favicon.png">
           </li>
         </ul>`);
+
+      const selection = _initialize16.selection;
+
       const expected = new _selection.Range(1, 3);
       selection.setRange(expected);
 
@@ -11544,7 +11705,10 @@ describe('Selection', function () {
     });
 
     it('null', function () {
-      const selection = this.initialize(_selection2.default, '<p>0123</p>');
+      var _initialize17 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const selection = _initialize17.selection;
+
       selection.setRange(new _selection.Range(1));
 
       var _selection$getRange33 = selection.getRange(),
@@ -11571,7 +11735,7 @@ describe('Selection', function () {
       this.setup(`<p>0123</p>`, 4);
       this.selection.format('bold', true);
       expect(this.selection.getRange()[0].index).toEqual(4);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>0123<strong><span class="ql-cursor">${_cursor2.default.CONTENTS}</span></strong></p>
       `);
     });
@@ -11580,7 +11744,7 @@ describe('Selection', function () {
       this.setup(`<p><em>0123</em></p>`, 2);
       this.selection.format('bold', true);
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>
           <em>01</em>
           <strong><em><span class="ql-cursor">${_cursor2.default.CONTENTS}</span></em></strong>
@@ -11593,7 +11757,7 @@ describe('Selection', function () {
       this.setup(`<p><em>0</em><strong>1</strong></p>`, 1);
       this.selection.format('underline', true);
       expect(this.selection.getRange()[0].index).toEqual(1);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><em>0<u><span class="ql-cursor">${_cursor2.default.CONTENTS}</span></u></em><strong>1</strong></p>
       `);
     });
@@ -11602,7 +11766,7 @@ describe('Selection', function () {
       this.setup(`<p><br></p>`, 0);
       this.selection.format('bold', true);
       expect(this.selection.getRange()[0].index).toEqual(0);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong><span class="ql-cursor">${_cursor2.default.CONTENTS}</span></strong></p>
       `);
     });
@@ -11622,7 +11786,7 @@ describe('Selection', function () {
       this.selection.format('underline', true);
       this.selection.format('background', 'blue');
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>
           01
           <em style="color: red; background-color: blue;"><u>
@@ -11639,7 +11803,7 @@ describe('Selection', function () {
       this.selection.format('underline', true);
       this.selection.format('italic', false);
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>
           <strong>
             01<u><span class="ql-cursor">${_cursor2.default.CONTENTS}</span></u>23
@@ -11653,7 +11817,7 @@ describe('Selection', function () {
       this.selection.format('italic', true);
       this.selection.setRange(new _selection.Range(0, 0));
       this.selection.scroll.update();
-      expect(this.container).toEqualHTML('<p>0123</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p>');
     });
 
     it('text change cleanup', function () {
@@ -11662,16 +11826,16 @@ describe('Selection', function () {
       this.selection.cursor.textNode.data = `${_cursor2.default.CONTENTS}|`;
       this.selection.setNativeRange(this.selection.cursor.textNode, 2);
       this.selection.scroll.update();
-      expect(this.container).toEqualHTML('<p>01<em>|</em>23</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01<em>|</em>23</p>');
     });
 
     it('no cleanup', function () {
       this.setup('<p>0123</p><p><br></p>', 2);
       this.selection.format('italic', true);
-      this.container.removeChild(this.container.lastChild);
+      this.container.firstChild.removeChild(this.container.firstChild.lastChild);
       this.selection.scroll.update();
       expect(this.selection.getRange()[0].index).toEqual(2);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>01<em><span class="ql-cursor">${_cursor2.default.CONTENTS}</span></em>23</p>
       `);
     });
@@ -11712,7 +11876,10 @@ describe('Selection', function () {
     });
 
     it('empty document', function () {
-      const selection = this.initialize(_selection2.default, '<p><br></p>', this.div);
+      var _initialize18 = this.initialize(_quill2.default, '<p><br></p>', this.div);
+
+      const selection = _initialize18.selection;
+
       this.bounds = selection.getBounds(0);
       if (/Android/i.test(navigator.userAgent)) return; // false positive on emulators atm
       expect(this.bounds.left).toBeApproximately(this.reference.left, 1);
@@ -11721,10 +11888,13 @@ describe('Selection', function () {
     });
 
     it('empty line', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize19 = this.initialize(_quill2.default, `
         <p>0000</p>
         <p><br></p>
         <p>0000</p>`, this.div);
+
+      const selection = _initialize19.selection;
+
       this.bounds = selection.getBounds(5);
       if (/Android/i.test(navigator.userAgent)) return; // false positive on emulators atm
       expect(this.bounds.left).toBeApproximately(this.reference.left, 1);
@@ -11733,7 +11903,10 @@ describe('Selection', function () {
     });
 
     it('plain text', function () {
-      const selection = this.initialize(_selection2.default, '<p>0123</p>', this.div);
+      var _initialize20 = this.initialize(_quill2.default, '<p>0123</p>', this.div);
+
+      const selection = _initialize20.selection;
+
       this.bounds = selection.getBounds(2);
       expect(this.bounds.left).toBeApproximately(this.reference.left + this.reference.width * 2, 2);
       expect(this.bounds.height).toBeApproximately(this.reference.height, 1);
@@ -11741,7 +11914,10 @@ describe('Selection', function () {
     });
 
     it('multiple characters', function () {
-      const selection = this.initialize(_selection2.default, '<p>0123</p>', this.div);
+      var _initialize21 = this.initialize(_quill2.default, '<p>0123</p>', this.div);
+
+      const selection = _initialize21.selection;
+
       this.bounds = selection.getBounds(1, 2);
       expect(this.bounds.left).toBeApproximately(this.reference.left + this.reference.width, 2);
       expect(this.bounds.height).toBeApproximately(this.reference.height, 1);
@@ -11750,9 +11926,12 @@ describe('Selection', function () {
     });
 
     it('start of line', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize22 = this.initialize(_quill2.default, `
         <p>0000</p>
         <p>0000</p>`, this.div);
+
+      const selection = _initialize22.selection;
+
       this.bounds = selection.getBounds(5);
       expect(this.bounds.left).toBeApproximately(this.reference.left, 1);
       expect(this.bounds.height).toBeApproximately(this.reference.height, 1);
@@ -11760,10 +11939,13 @@ describe('Selection', function () {
     });
 
     it('end of line', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize23 = this.initialize(_quill2.default, `
         <p>0000</p>
         <p>0000</p>
         <p>0000</p>`, this.div);
+
+      const selection = _initialize23.selection;
+
       this.bounds = selection.getBounds(9);
       expect(this.bounds.left).toBeApproximately(this.reference.left + this.reference.width * 4, 4);
       expect(this.bounds.height).toBeApproximately(this.reference.height, 1);
@@ -11771,10 +11953,13 @@ describe('Selection', function () {
     });
 
     it('multiple lines', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize24 = this.initialize(_quill2.default, `
         <p>0000</p>
         <p>0000</p>
         <p>0000</p>`, this.div);
+
+      const selection = _initialize24.selection;
+
       this.bounds = selection.getBounds(2, 4);
       expect(this.bounds.left).toBeApproximately(this.reference.left, 1);
       expect(this.bounds.height).toBeApproximately(this.reference.height * 2, 2);
@@ -11783,7 +11968,10 @@ describe('Selection', function () {
     });
 
     it('large text', function () {
-      const selection = this.initialize(_selection2.default, '<p><span class="ql-size-large">0000</span></p>', this.div);
+      var _initialize25 = this.initialize(_quill2.default, '<p><span class="ql-size-large">0000</span></p>', this.div);
+
+      const selection = _initialize25.selection;
+
       const span = this.div.querySelector('span');
       if (/Trident/i.test(navigator.userAgent)) {
         span.style.lineHeight = '27px';
@@ -11795,11 +11983,14 @@ describe('Selection', function () {
     });
 
     it('image', function () {
-      const selection = this.initialize(_selection2.default, `
+      var _initialize26 = this.initialize(_quill2.default, `
         <p>
           <img src="/assets/favicon.png" width="32px" height="32px">
           <img src="/assets/favicon.png" width="32px" height="32px">
         </p>`, this.div);
+
+      const selection = _initialize26.selection;
+
       this.bounds = selection.getBounds(1);
       expect(this.bounds.left).toBeApproximately(this.reference.left + 32, 1);
       expect(this.bounds.height).toBeApproximately(32, 1);
@@ -11807,7 +11998,10 @@ describe('Selection', function () {
     });
 
     it('beyond document', function () {
-      const selection = this.initialize(_selection2.default, '<p>0123</p>');
+      var _initialize27 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const selection = _initialize27.selection;
+
       expect(() => {
         this.bounds = selection.getBounds(10, 0);
       }).not.toThrow();
@@ -11857,8 +12051,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 describe('Quill', function () {
   it('imports', function () {
-    Object.keys(_quill2.default.imports).forEach(function (path) {
-      expect(_quill2.default.import(path)).toBeTruthy();
+    const quill = this.initialize(_quill2.default, '');
+    Object.keys(quill.imports).forEach(function (path) {
+      expect(quill.import(path)).toBeTruthy();
     });
   });
 
@@ -12137,8 +12332,11 @@ describe('Quill', function () {
   });
 
   describe('expandConfig', function () {
+    beforeEach(function () {
+      this.quill = this.initialize(_quill2.default, '');
+    });
     it('user overwrite quill', function () {
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         placeholder: 'Test',
         readOnly: true
       });
@@ -12147,7 +12345,7 @@ describe('Quill', function () {
     });
 
     it('convert css selectors', function () {
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         bounds: '#test-container'
       });
       expect(config.bounds).toEqual(document.querySelector('#test-container'));
@@ -12159,7 +12357,7 @@ describe('Quill', function () {
       _theme2.default.DEFAULTS.modules = {
         formula: true
       };
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           syntax: true
         }
@@ -12174,7 +12372,7 @@ describe('Quill', function () {
 
     describe('theme defaults', function () {
       it('for Snow', function () {
-        const config = (0, _quill.expandConfig)('#test-container', {
+        const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
           modules: {
             toolbar: true
           },
@@ -12185,21 +12383,21 @@ describe('Quill', function () {
       });
 
       it('for false', function () {
-        const config = (0, _quill.expandConfig)('#test-container', {
+        const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
           theme: false
         });
         expect(config.theme).toEqual(_theme2.default);
       });
 
       it('for undefined', function () {
-        const config = (0, _quill.expandConfig)('#test-container', {
+        const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
           theme: undefined
         });
         expect(config.theme).toEqual(_theme2.default);
       });
 
       it('for null', function () {
-        const config = (0, _quill.expandConfig)('#test-container', {
+        const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
           theme: null
         });
         expect(config.theme).toEqual(_theme2.default);
@@ -12219,7 +12417,7 @@ describe('Quill', function () {
           theme: true
         }
       };
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           toolbar: {
             option: 0,
@@ -12238,7 +12436,7 @@ describe('Quill', function () {
     });
 
     it('toolbar default', function () {
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           toolbar: true
         }
@@ -12247,7 +12445,7 @@ describe('Quill', function () {
     });
 
     it('toolbar disabled', function () {
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           toolbar: false
         },
@@ -12257,7 +12455,7 @@ describe('Quill', function () {
     });
 
     it('toolbar selector', function () {
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           toolbar: {
             container: '#test-container'
@@ -12271,7 +12469,7 @@ describe('Quill', function () {
     });
 
     it('toolbar container shorthand', function () {
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           toolbar: document.querySelector('#test-container')
         }
@@ -12283,7 +12481,7 @@ describe('Quill', function () {
     });
 
     it('toolbar format array', function () {
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           toolbar: ['bold']
         }
@@ -12296,7 +12494,7 @@ describe('Quill', function () {
 
     it('toolbar custom handler, default container', function () {
       const handler = function handler() {}; // eslint-disable-line func-style
-      const config = (0, _quill.expandConfig)('#test-container', {
+      const config = (0, _quill.expandConfig)(this.quill, '#test-container', {
         modules: {
           toolbar: {
             handlers: {

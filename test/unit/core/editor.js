@@ -1,20 +1,21 @@
 import Delta from 'quill-delta';
 import Editor from '../../../core/editor';
-import Selection, { Range } from '../../../core/selection';
+import { Range } from '../../../core/selection';
+import Quill from '../../../core/quill';
 
 describe('Editor', function() {
   describe('insert', function() {
     it('text', function() {
-      const editor = this.initialize(Editor, '<p><strong>0123</strong></p>');
+      const { editor } = this.initialize(Quill, '<p><strong>0123</strong></p>');
       editor.insertText(2, '!!');
       expect(editor.getDelta()).toEqual(
         new Delta().insert('01!!23', { bold: true }).insert('\n'),
       );
-      expect(this.container).toEqualHTML('<p><strong>01!!23</strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong>01!!23</strong></p>');
     });
 
     it('embed', function() {
-      const editor = this.initialize(Editor, '<p><strong>0123</strong></p>');
+      const { editor } = this.initialize(Quill, '<p><strong>0123</strong></p>');
       editor.insertEmbed(2, 'image', '/assets/favicon.png');
       expect(editor.getDelta()).toEqual(
         new Delta()
@@ -23,34 +24,34 @@ describe('Editor', function() {
           .insert('23', { bold: true })
           .insert('\n'),
       );
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p><strong>01<img src="/assets/favicon.png">23</strong></p>',
       );
     });
 
     it('on empty line', function() {
-      const editor = this.initialize(Editor, '<p>0</p><p><br></p><p>3</p>');
+      const { editor } = this.initialize(Quill, '<p>0</p><p><br></p><p>3</p>');
       editor.insertText(2, '!');
       expect(editor.getDelta()).toEqual(new Delta().insert('0\n!\n3\n'));
-      expect(this.container).toEqualHTML('<p>0</p><p>!</p><p>3</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0</p><p>!</p><p>3</p>');
     });
 
     it('end of document', function() {
-      const editor = this.initialize(Editor, '<p>Hello</p>');
+      const { editor } = this.initialize(Quill, '<p>Hello</p>');
       editor.insertText(6, 'World!');
       expect(editor.getDelta()).toEqual(new Delta().insert('Hello\nWorld!\n'));
-      expect(this.container).toEqualHTML('<p>Hello</p><p>World!</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>Hello</p><p>World!</p>');
     });
 
     it('end of document with newline', function() {
-      const editor = this.initialize(Editor, '<p>Hello</p>');
+      const { editor } = this.initialize(Quill, '<p>Hello</p>');
       editor.insertText(6, 'World!\n');
       expect(editor.getDelta()).toEqual(new Delta().insert('Hello\nWorld!\n'));
-      expect(this.container).toEqualHTML('<p>Hello</p><p>World!</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>Hello</p><p>World!</p>');
     });
 
     it('embed at end of document with newline', function() {
-      const editor = this.initialize(Editor, '<p>Hello</p>');
+      const { editor } = this.initialize(Quill, '<p>Hello</p>');
       editor.insertEmbed(6, 'image', '/assets/favicon.png');
       expect(editor.getDelta()).toEqual(
         new Delta()
@@ -58,13 +59,13 @@ describe('Editor', function() {
           .insert({ image: '/assets/favicon.png' })
           .insert('\n'),
       );
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p>Hello</p><p><img src="/assets/favicon.png"></p>',
       );
     });
 
     it('newline splitting', function() {
-      const editor = this.initialize(Editor, '<p><strong>0123</strong></p>');
+      const { editor } = this.initialize(Quill, '<p><strong>0123</strong></p>');
       editor.insertText(2, '\n');
       expect(editor.getDelta()).toEqual(
         new Delta()
@@ -73,13 +74,13 @@ describe('Editor', function() {
           .insert('23', { bold: true })
           .insert('\n'),
       );
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>01</strong></p>
         <p><strong>23</strong></p>`);
     });
 
     it('prepend newline', function() {
-      const editor = this.initialize(Editor, '<p><strong>0123</strong></p>');
+      const { editor } = this.initialize(Quill, '<p><strong>0123</strong></p>');
       editor.insertText(0, '\n');
       expect(editor.getDelta()).toEqual(
         new Delta()
@@ -87,24 +88,24 @@ describe('Editor', function() {
           .insert('0123', { bold: true })
           .insert('\n'),
       );
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><br></p>
         <p><strong>0123</strong></p>`);
     });
 
     it('append newline', function() {
-      const editor = this.initialize(Editor, '<p><strong>0123</strong></p>');
+      const { editor } = this.initialize(Quill, '<p><strong>0123</strong></p>');
       editor.insertText(4, '\n');
       expect(editor.getDelta()).toEqual(
         new Delta().insert('0123', { bold: true }).insert('\n\n'),
       );
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>0123</strong></p>
         <p><br></p>`);
     });
 
     it('multiline text', function() {
-      const editor = this.initialize(Editor, '<p><strong>0123</strong></p>');
+      const { editor } = this.initialize(Quill, '<p><strong>0123</strong></p>');
       editor.insertText(2, '\n!!\n!!\n');
       expect(editor.getDelta()).toEqual(
         new Delta()
@@ -117,7 +118,7 @@ describe('Editor', function() {
           .insert('23', { bold: true })
           .insert('\n'),
       );
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>01</strong></p>
         <p><strong>!!</strong></p>
         <p><strong>!!</strong></p>
@@ -125,7 +126,7 @@ describe('Editor', function() {
     });
 
     it('multiple newlines', function() {
-      const editor = this.initialize(Editor, '<p><strong>0123</strong></p>');
+      const { editor } = this.initialize(Quill, '<p><strong>0123</strong></p>');
       editor.insertText(2, '\n\n');
       expect(editor.getDelta()).toEqual(
         new Delta()
@@ -134,14 +135,14 @@ describe('Editor', function() {
           .insert('23', { bold: true })
           .insert('\n'),
       );
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p><strong>01</strong></p>
         <p><br></p>
         <p><strong>23</strong></p>`);
     });
 
     it('text removing formatting', function() {
-      const editor = this.initialize(Editor, '<p><s>01</s></p>');
+      const { editor } = this.initialize(Quill, '<p><s>01</s></p>');
       editor.insertText(2, '23', { bold: false, strike: false });
       expect(editor.getDelta()).toEqual(
         new Delta().insert('01', { strike: true }).insert('23\n'),
@@ -302,132 +303,132 @@ describe('Editor', function() {
 
   describe('applyDelta', function() {
     it('insert', function() {
-      const editor = this.initialize(Editor, '<p></p>');
+      const { editor } = this.initialize(Quill, '<p></p>');
       editor.applyDelta(new Delta().insert('01'));
-      expect(this.container).toEqualHTML('<p>01</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01</p>');
     });
 
     it('attributed insert', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(new Delta().retain(2).insert('|', { bold: true }));
-      expect(this.container).toEqualHTML('<p>01<strong>|</strong>23</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01<strong>|</strong>23</p>');
     });
 
     it('format', function() {
-      const editor = this.initialize(Editor, '<p>01</p>');
+      const { editor } = this.initialize(Quill, '<p>01</p>');
       editor.applyDelta(new Delta().retain(2, { bold: true }));
-      expect(this.container).toEqualHTML('<p><strong>01</strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong>01</strong></p>');
     });
 
     it('discontinuous formats', function() {
-      const editor = this.initialize(Editor, '');
+      const { editor } = this.initialize(Quill, '');
       const delta = new Delta()
         .insert('ab', { bold: true })
         .insert('23\n45')
         .insert('cd', { bold: true });
       editor.applyDelta(delta);
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p><strong>ab</strong>23</p><p>45<strong>cd</strong></p>',
       );
     });
 
     it('unformatted insert', function() {
-      const editor = this.initialize(Editor, '<p><em>01</em></p>');
+      const { editor } = this.initialize(Quill, '<p><em>01</em></p>');
       editor.applyDelta(new Delta().retain(1).insert('|'));
-      expect(this.container).toEqualHTML('<p><em>0</em>|<em>1</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>0</em>|<em>1</em></p>');
     });
 
     it('insert at format boundary', function() {
-      const editor = this.initialize(Editor, '<p><em>0</em><u>1</u></p>');
+      const { editor } = this.initialize(Quill, '<p><em>0</em><u>1</u></p>');
       editor.applyDelta(new Delta().retain(1).insert('|', { strike: true }));
-      expect(this.container).toEqualHTML('<p><em>0</em><s>|</s><u>1</u></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>0</em><s>|</s><u>1</u></p>');
     });
 
     it('unformatted newline', function() {
-      const editor = this.initialize(Editor, '<h1>01</h1>');
+      const { editor } = this.initialize(Quill, '<h1>01</h1>');
       editor.applyDelta(new Delta().retain(2).insert('\n'));
-      expect(this.container).toEqualHTML('<p>01</p><h1><br></h1>');
+      expect(this.container.firstChild).toEqualHTML('<p>01</p><h1><br></h1>');
     });
 
     it('formatted embed', function() {
-      const editor = this.initialize(Editor, '');
+      const { editor } = this.initialize(Quill, '');
       editor.applyDelta(
         new Delta().insert({ image: '/assets/favicon.png' }, { italic: true }),
       );
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p><em><img src="/assets/favicon.png"></em>',
       );
     });
 
     it('old embed', function() {
-      const editor = this.initialize(Editor, '');
+      const { editor } = this.initialize(Quill, '');
       editor.applyDelta(
         new Delta().insert(1, { image: '/assets/favicon.png', italic: true }),
       );
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p><em><img src="/assets/favicon.png"></em>',
       );
     });
 
     it('old list', function() {
-      const editor = this.initialize(Editor, '');
+      const { editor } = this.initialize(Quill, '');
       editor.applyDelta(
         new Delta().insert('\n', { bullet: true }).insert('\n', { list: true }),
       );
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<ul><li><br></li></ul><ol><li><br></li></ol><p><br></p>',
       );
     });
 
     it('improper block embed insert', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(new Delta().retain(2).insert({ video: '#' }));
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p>01</p><iframe src="#" class="ql-video" frameborder="0" allowfullscreen="true"></iframe><p>23</p>',
       );
     });
 
     it('append formatted block embed', function() {
-      const editor = this.initialize(Editor, '<p>0123</p><p><br></p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p><p><br></p>');
       editor.applyDelta(
         new Delta().retain(5).insert({ video: '#' }, { align: 'right' }),
       );
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p>0123</p><iframe src="#" class="ql-video ql-align-right" frameborder="0" allowfullscreen="true"></iframe><p><br></p>',
       );
     });
 
     it('append', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(new Delta().retain(5).insert('5678'));
-      expect(this.container).toEqualHTML('<p>0123</p><p>5678</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><p>5678</p>');
     });
 
     it('append newline', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(new Delta().retain(5).insert('\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<p>0123</p><h2><br></h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2><br></h2>');
     });
 
     it('append text with newline', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(
         new Delta()
           .retain(5)
           .insert('5678')
           .insert('\n', { header: 2 }),
       );
-      expect(this.container).toEqualHTML('<p>0123</p><h2>5678</h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678</h2>');
     });
 
     it('append non-isolated newline', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(new Delta().retain(5).insert('5678\n', { header: 2 }));
-      expect(this.container).toEqualHTML('<p>0123</p><h2>5678</h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678</h2>');
     });
 
     it('eventual append', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(
         new Delta()
           .retain(2)
@@ -435,11 +436,11 @@ describe('Editor', function() {
           .retain(3)
           .insert('cd\n', { header: 2 }),
       );
-      expect(this.container).toEqualHTML('<h1>01ab</h1><p>23</p><h2>cd</h2>');
+      expect(this.container.firstChild).toEqualHTML('<h1>01ab</h1><p>23</p><h2>cd</h2>');
     });
 
     it('append text, embed and newline', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(
         new Delta()
           .retain(5)
@@ -447,13 +448,13 @@ describe('Editor', function() {
           .insert({ image: '/assets/favicon.png' })
           .insert('\n', { header: 2 }),
       );
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p>0123</p><h2>5678<img src="/assets/favicon.png"></h2>',
       );
     });
 
     it('append multiple lines', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.applyDelta(
         new Delta()
           .retain(5)
@@ -462,11 +463,11 @@ describe('Editor', function() {
           .insert('89')
           .insert('\n', { header: 2 }),
       );
-      expect(this.container).toEqualHTML('<p>0123</p><h1>56</h1><h2>89</h2>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p><h1>56</h1><h2>89</h2>');
     });
 
     it('code', function() {
-      const editor = this.initialize(Editor, {
+      const { editor } = this.initialize(Quill, {
         html: '<p>0</p><pre>1\n23\n</pre><p><br></p>',
       });
       editor.applyDelta(
@@ -481,18 +482,18 @@ describe('Editor', function() {
 
   describe('getFormat()', function() {
     it('unformatted', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       expect(editor.getFormat(1)).toEqual({});
     });
 
     it('formatted', function() {
-      const editor = this.initialize(Editor, '<h1><em>0123</em></h1>');
+      const { editor } = this.initialize(Quill, '<h1><em>0123</em></h1>');
       expect(editor.getFormat(1)).toEqual({ header: 1, italic: true });
     });
 
     it('cursor', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<h1><strong><em>0123</em></strong></h1><h2><u>5678</u></h2>',
       );
       expect(editor.getFormat(2)).toEqual({
@@ -503,8 +504,8 @@ describe('Editor', function() {
     });
 
     it('cursor with preformat', function() {
-      const [editor, selection] = this.initialize(
-        [Editor, Selection],
+      const { editor, selection } = this.initialize(
+        Quill,
         '<h1><strong><em>0123</em></strong></h1>',
       );
       selection.setRange(new Range(2));
@@ -520,8 +521,8 @@ describe('Editor', function() {
     });
 
     it('across leaves', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         `
         <h1>
           <strong class="ql-size-small"><em>01</em></strong>
@@ -538,8 +539,8 @@ describe('Editor', function() {
     });
 
     it('across lines', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         `
         <h1 class="ql-align-right"><em>01</em></h1>
         <h1 class="ql-align-center"><em>34</em></h1>
