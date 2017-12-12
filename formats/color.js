@@ -1,8 +1,8 @@
 import Parchment from 'parchment';
 
 class ColorAttributor extends Parchment.Attributor.Style {
-  value(domNode) {
-    let value = super.value(domNode);
+  value(domNode, editorRegistry) {
+    let value = super.value(domNode, editorRegistry);
     if (!value.startsWith('rgb(')) return value;
     value = value.replace(/^[^\d]+/, '').replace(/[^\d]+$/, '');
     const hex = value

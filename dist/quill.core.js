@@ -3737,8 +3737,8 @@ var _parchment2 = _interopRequireDefault(_parchment);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class ColorAttributor extends _parchment2.default.Attributor.Style {
-  value(domNode) {
-    let value = super.value(domNode);
+  value(domNode, editorRegistry) {
+    let value = super.value(domNode, editorRegistry);
     if (!value.startsWith('rgb(')) return value;
     value = value.replace(/^[^\d]+/, '').replace(/[^\d]+$/, '');
     const hex = value.split(',').map(component => `00${parseInt(component, 10).toString(16)}`.slice(-2)).join('');
@@ -4275,8 +4275,8 @@ const config = {
 const FontClass = new _parchment2.default.Attributor.Class('font', 'ql-font', config);
 
 class FontStyleAttributor extends _parchment2.default.Attributor.Style {
-  value(node) {
-    return super.value(node).replace(/["']/g, '');
+  value(node, editorRegistry) {
+    return super.value(node, editorRegistry).replace(/["']/g, '');
   }
 }
 

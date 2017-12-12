@@ -2,7 +2,7 @@ import Delta from 'quill-delta';
 import { Range } from '../../../core/selection';
 import Quill from '../../../core';
 
-describe('Clipboard', function() {
+fdescribe('Clipboard', function() {
   describe('events', function() {
     beforeEach(function() {
       this.quill = this.initialize(Quill, '<h1>0123</h1><p>5<em>67</em>8</p>');
@@ -183,7 +183,7 @@ describe('Clipboard', function() {
       expect(delta).toEqual(new Delta().insert('Test\n', { direction: 'rtl' }));
     });
 
-    it('nested styles', function() {
+    fit('nested styles', function() {
       const delta = this.clipboard.convert(
         '<span style="color: red;"><span style="color: blue;">Test</span></span>',
       );

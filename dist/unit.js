@@ -3737,8 +3737,8 @@ var _parchment2 = _interopRequireDefault(_parchment);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class ColorAttributor extends _parchment2.default.Attributor.Style {
-  value(domNode) {
-    let value = super.value(domNode);
+  value(domNode, editorRegistry) {
+    let value = super.value(domNode, editorRegistry);
     if (!value.startsWith('rgb(')) return value;
     value = value.replace(/^[^\d]+/, '').replace(/[^\d]+$/, '');
     const hex = value.split(',').map(component => `00${parseInt(component, 10).toString(16)}`.slice(-2)).join('');
@@ -4457,8 +4457,8 @@ const config = {
 const FontClass = new _parchment2.default.Attributor.Class('font', 'ql-font', config);
 
 class FontStyleAttributor extends _parchment2.default.Attributor.Style {
-  value(node) {
-    return super.value(node).replace(/["']/g, '');
+  value(node, editorRegistry) {
+    return super.value(node, editorRegistry).replace(/["']/g, '');
   }
 }
 
@@ -13460,7 +13460,7 @@ var _core2 = _interopRequireDefault(_core);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-fdescribe('List', function () {
+describe('List', function () {
   it('add', function () {
     var _initialize = this.initialize(_core2.default, `
       <p>0123</p>
@@ -13837,7 +13837,7 @@ var _core2 = _interopRequireDefault(_core);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-describe('Clipboard', function () {
+fdescribe('Clipboard', function () {
   describe('events', function () {
     beforeEach(function () {
       this.quill = this.initialize(_core2.default, '<h1>0123</h1><p>5<em>67</em>8</p>');
@@ -13962,7 +13962,7 @@ describe('Clipboard', function () {
       expect(delta).toEqual(new _quillDelta2.default().insert('Test\n', { direction: 'rtl' }));
     });
 
-    it('nested styles', function () {
+    fit('nested styles', function () {
       const delta = this.clipboard.convert('<span style="color: red;"><span style="color: blue;">Test</span></span>');
       expect(delta).toEqual(new _quillDelta2.default().insert('Test', { color: 'blue' }));
     });

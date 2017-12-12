@@ -8,8 +8,8 @@ const config = {
 const FontClass = new Parchment.Attributor.Class('font', 'ql-font', config);
 
 class FontStyleAttributor extends Parchment.Attributor.Style {
-  value(node) {
-    return super.value(node).replace(/["']/g, '');
+  value(node, editorRegistry) {
+    return super.value(node, editorRegistry).replace(/["']/g, '');
   }
 }
 
