@@ -1,8 +1,9 @@
 import { EditorRegistry } from 'parchment';
 import equal from 'deep-equal';
-import Quill from '../../core/quill';
+import Quill from '../unit';
+import CodeBlock from '../../formats/code';
 
-let div = document.createElement('div');
+const div = document.createElement('div');
 div.id = 'test-container';
 document.body.appendChild(div);
 
@@ -11,12 +12,6 @@ window.onerror = function(msg) {
 };
 
 beforeEach(function() {
-  if (div) {
-    div.remove();
-    div = document.createElement('div');
-    div.id = 'test-container';
-    document.body.appendChild(div);
-  }
   jasmine.addMatchers({
     toEqualHTML() {
       return { compare: compareHTML };
@@ -115,6 +110,10 @@ function initialize(klass, html, container = this.container, editorRegistry = th
     container.innerHTML = html.replace(/\n\s*/g, '');
   }
   if (klass === HTMLElement) return container;
-  if (klass === Quill) return new Quill(container, {}, editorRegistry);
+  if (klass === Quill) {
+    const quillInstance = new Quill(container, {}, editorRegistry);
+    quillInstance.register(CodeBlock, true);
+    return quillInstance;
+  };
   return null;
 }

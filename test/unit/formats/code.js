@@ -302,12 +302,12 @@ describe('Code', function() {
   });
 
   it('ignore formatAt', function() {
-    const { editor } = this.initialize(Quill, '<pre>0123</pre>');
-    editor.formatText(1, 1, { bold: true });
-    expect(editor.getDelta()).toEqual(
+    const quill = this.initialize(Quill, '<pre>0123</pre>');
+    quill.editor.formatText(1, 1, { bold: true });
+    expect(quill.editor.getDelta()).toEqual(
       new Delta().insert('0123').insert('\n', { 'code-block': true }),
     );
-    expect(editor.scroll.domNode).toEqualHTML('<pre>0123</pre>');
+    expect(quill.editor.scroll.domNode).toEqualHTML('<pre>0123</pre>');
   });
 
   it('partial block modification applyDelta', function() {

@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 109);
+/******/ 	return __webpack_require__(__webpack_require__.s = 104);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10102,12 +10102,7 @@ exports.BubbleTooltip = BubbleTooltip;
 exports.default = BubbleTheme;
 
 /***/ }),
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10120,10 +10115,6 @@ Object.defineProperty(exports, "__esModule", {
 var _quill = __webpack_require__(62);
 
 var _quill2 = _interopRequireDefault(_quill);
-
-var _code = __webpack_require__(14);
-
-var _code2 = _interopRequireDefault(_code);
 
 __webpack_require__(110);
 
@@ -10175,17 +10166,14 @@ __webpack_require__(311);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// TODO: Determine whether this is still necessary
-// Quill.register(CodeBlock, true); // Syntax version will otherwise be registered
-/* eslint-disable */
-
-_quill2.default.QUILL_EXTRA_DEFAULTS = Object.assign(_quill2.default.QUILL_EXTRA_DEFAULTS, {
-  'formats/code-block': _code2.default
-});
-
-exports.default = _quill2.default;
+exports.default = _quill2.default; /* eslint-disable */
 
 /***/ }),
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
 /* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10200,13 +10188,17 @@ var _deepEqual = __webpack_require__(10);
 
 var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-var _quill = __webpack_require__(4);
+var _unit = __webpack_require__(104);
 
-var _quill2 = _interopRequireDefault(_quill);
+var _unit2 = _interopRequireDefault(_unit);
+
+var _code = __webpack_require__(14);
+
+var _code2 = _interopRequireDefault(_code);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let div = document.createElement('div');
+const div = document.createElement('div');
 div.id = 'test-container';
 document.body.appendChild(div);
 
@@ -10215,12 +10207,6 @@ window.onerror = function (msg) {
 };
 
 beforeEach(function () {
-  if (div) {
-    div.remove();
-    div = document.createElement('div');
-    div.id = 'test-container';
-    document.body.appendChild(div);
-  }
   jasmine.addMatchers({
     toEqualHTML() {
       return { compare: compareHTML };
@@ -10320,7 +10306,11 @@ function initialize(klass, html, container = this.container, editorRegistry = th
     container.innerHTML = html.replace(/\n\s*/g, '');
   }
   if (klass === HTMLElement) return container;
-  if (klass === _quill2.default) return new _quill2.default(container, {}, editorRegistry);
+  if (klass === _unit2.default) {
+    const quillInstance = new _unit2.default(container, {}, editorRegistry);
+    quillInstance.register(_code2.default, true);
+    return quillInstance;
+  };
   return null;
 }
 
@@ -13373,19 +13363,16 @@ describe('Code', function () {
   });
 
   it('ignore formatAt', function () {
-    var _initialize18 = this.initialize(_core2.default, '<pre>0123</pre>');
-
-    const editor = _initialize18.editor;
-
-    editor.formatText(1, 1, { bold: true });
-    expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123').insert('\n', { 'code-block': true }));
-    expect(editor.scroll.domNode).toEqualHTML('<pre>0123</pre>');
+    const quill = this.initialize(_core2.default, '<pre>0123</pre>');
+    quill.editor.formatText(1, 1, { bold: true });
+    expect(quill.editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123').insert('\n', { 'code-block': true }));
+    expect(quill.editor.scroll.domNode).toEqualHTML('<pre>0123</pre>');
   });
 
   it('partial block modification applyDelta', function () {
-    var _initialize19 = this.initialize(_core2.default, { html: '<pre>a\nb\n\n</pre>' });
+    var _initialize18 = this.initialize(_core2.default, { html: '<pre>a\nb\n\n</pre>' });
 
-    const editor = _initialize19.editor;
+    const editor = _initialize18.editor;
 
     const delta = new _quillDelta2.default().retain(3).insert('\n', { 'code-block': true }).delete(1).retain(1, { 'code-block': null });
     editor.applyDelta(delta);
