@@ -3,7 +3,7 @@ import Quill from '../../../core';
 
 describe('Code', function() {
   it('newline', function() {
-    const { editor } = this.initialize(
+    const quill = this.initialize(
       Quill,
       `
       <pre></pre>
@@ -14,7 +14,7 @@ describe('Code', function() {
       <p><br></p>
     `,
     );
-    expect(editor.scroll.domNode).toEqualHTML(`
+    expect(quill.editor.scroll.domNode).toEqualHTML(`
       <pre>\n</pre>
       <p><br></p>
       <pre>\n</pre>

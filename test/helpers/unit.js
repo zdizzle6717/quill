@@ -2,7 +2,7 @@ import { EditorRegistry } from 'parchment';
 import equal from 'deep-equal';
 import Quill from '../../core/quill';
 
-const div = document.createElement('div');
+let div = document.createElement('div');
 div.id = 'test-container';
 document.body.appendChild(div);
 
@@ -11,6 +11,12 @@ window.onerror = function(msg) {
 };
 
 beforeEach(function() {
+  if (div) {
+    div.remove();
+    div = document.createElement('div');
+    div.id = 'test-container';
+    document.body.appendChild(div);
+  }
   jasmine.addMatchers({
     toEqualHTML() {
       return { compare: compareHTML };

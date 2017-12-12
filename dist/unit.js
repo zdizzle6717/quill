@@ -89,11 +89,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var container_1 = __webpack_require__(18);
 var format_1 = __webpack_require__(19);
 var leaf_1 = __webpack_require__(20);
-var scroll_1 = __webpack_require__(47);
-var inline_1 = __webpack_require__(48);
-var block_1 = __webpack_require__(49);
-var embed_1 = __webpack_require__(50);
-var text_1 = __webpack_require__(51);
+var scroll_1 = __webpack_require__(46);
+var inline_1 = __webpack_require__(47);
+var block_1 = __webpack_require__(48);
+var embed_1 = __webpack_require__(49);
+var text_1 = __webpack_require__(50);
 var attributor_1 = __webpack_require__(13);
 var class_1 = __webpack_require__(30);
 var style_1 = __webpack_require__(31);
@@ -124,7 +124,7 @@ exports.default = Parchment;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var diff = __webpack_require__(43);
+var diff = __webpack_require__(42);
 var equal = __webpack_require__(10);
 var extend = __webpack_require__(3);
 var op = __webpack_require__(17);
@@ -723,7 +723,7 @@ var _extend = __webpack_require__(3);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _editor = __webpack_require__(39);
+var _editor = __webpack_require__(51);
 
 var _editor2 = _interopRequireDefault(_editor);
 
@@ -1738,8 +1738,8 @@ exports.default = namespace;
 /***/ (function(module, exports, __webpack_require__) {
 
 var pSlice = Array.prototype.slice;
-var objectKeys = __webpack_require__(44);
-var isArguments = __webpack_require__(45);
+var objectKeys = __webpack_require__(43);
+var isArguments = __webpack_require__(44);
 
 var deepEqual = module.exports = function (actual, expected, opts) {
   if (!opts) opts = {};
@@ -1904,11 +1904,11 @@ var _clipboard = __webpack_require__(54);
 
 var _clipboard2 = _interopRequireDefault(_clipboard);
 
-var _history = __webpack_require__(40);
+var _history = __webpack_require__(39);
 
 var _history2 = _interopRequireDefault(_history);
 
-var _keyboard = __webpack_require__(41);
+var _keyboard = __webpack_require__(40);
 
 var _keyboard2 = _interopRequireDefault(_keyboard);
 
@@ -2815,7 +2815,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var linked_list_1 = __webpack_require__(46);
+var linked_list_1 = __webpack_require__(45);
 var shadow_1 = __webpack_require__(28);
 var Registry = __webpack_require__(2);
 var ContainerBlot = /** @class */ (function (_super) {
@@ -4672,328 +4672,6 @@ module.exports = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _clone = __webpack_require__(21);
-
-var _clone2 = _interopRequireDefault(_clone);
-
-var _deepEqual = __webpack_require__(10);
-
-var _deepEqual2 = _interopRequireDefault(_deepEqual);
-
-var _extend = __webpack_require__(3);
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _quillDelta = __webpack_require__(1);
-
-var _quillDelta2 = _interopRequireDefault(_quillDelta);
-
-var _op = __webpack_require__(17);
-
-var _op2 = _interopRequireDefault(_op);
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _code = __webpack_require__(14);
-
-var _code2 = _interopRequireDefault(_code);
-
-var _cursor = __webpack_require__(22);
-
-var _cursor2 = _interopRequireDefault(_cursor);
-
-var _block = __webpack_require__(5);
-
-var _block2 = _interopRequireDefault(_block);
-
-var _break = __webpack_require__(15);
-
-var _break2 = _interopRequireDefault(_break);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const ASCII = /^[ -~]*$/;
-
-class Editor {
-  constructor(scroll, editorRegistry) {
-    this.editorRegistry = editorRegistry;
-    this.scroll = scroll;
-    this.delta = this.getDelta();
-  }
-
-  applyDelta(delta) {
-    let consumeNextNewline = false;
-    this.scroll.update();
-    let scrollLength = this.scroll.length();
-    this.scroll.batchStart();
-    const normalizedDelta = normalizeDelta(delta);
-    normalizedDelta.reduce((index, op) => {
-      const length = op.retain || op.delete || op.insert.length || 1;
-      let attributes = op.attributes || {};
-      if (op.insert != null) {
-        if (typeof op.insert === 'string') {
-          let text = op.insert;
-          if (text.endsWith('\n') && consumeNextNewline) {
-            consumeNextNewline = false;
-            text = text.slice(0, -1);
-          }
-          if (index >= scrollLength && !text.endsWith('\n')) {
-            consumeNextNewline = true;
-          }
-          this.scroll.insertAt(index, text);
-
-          var _scroll$line = this.scroll.line(index),
-              _scroll$line2 = _slicedToArray(_scroll$line, 2);
-
-          const line = _scroll$line2[0],
-                offset = _scroll$line2[1];
-
-          let formats = (0, _extend2.default)({}, (0, _block.bubbleFormats)(line));
-          if (line instanceof _block2.default) {
-            var _line$descendant = line.descendant(_parchment2.default.Leaf, offset),
-                _line$descendant2 = _slicedToArray(_line$descendant, 1);
-
-            const leaf = _line$descendant2[0];
-
-            formats = (0, _extend2.default)(formats, (0, _block.bubbleFormats)(leaf));
-          }
-          attributes = _op2.default.attributes.diff(formats, attributes) || {};
-        } else if (typeof op.insert === 'object') {
-          const key = Object.keys(op.insert)[0]; // There should only be one key
-          if (key == null) return index;
-          this.scroll.insertAt(index, key, op.insert[key]);
-        }
-        scrollLength += length;
-      }
-      Object.keys(attributes).forEach(name => {
-        this.scroll.formatAt(index, length, name, attributes[name]);
-      });
-      return index + length;
-    }, 0);
-    normalizedDelta.reduce((index, op) => {
-      if (typeof op.delete === 'number') {
-        this.scroll.deleteAt(index, op.delete);
-        return index;
-      }
-      return index + (op.retain || op.insert.length || 1);
-    }, 0);
-    this.scroll.batchEnd();
-    return this.update(normalizedDelta);
-  }
-
-  deleteText(index, length) {
-    this.scroll.deleteAt(index, length);
-    return this.update(new _quillDelta2.default().retain(index).delete(length));
-  }
-
-  formatLine(index, length, formats = {}) {
-    this.scroll.update();
-    Object.keys(formats).forEach(format => {
-      if (this.scroll.whitelist != null && !this.scroll.whitelist[format]) return;
-      const lines = this.scroll.lines(index, Math.max(length, 1));
-      let lengthRemaining = length;
-      lines.forEach(line => {
-        const lineLength = line.length();
-        if (!(line instanceof _code2.default)) {
-          line.format(format, formats[format]);
-        } else {
-          const codeIndex = index - line.offset(this.scroll);
-          const codeLength = line.newlineIndex(codeIndex + lengthRemaining) - codeIndex + 1;
-          line.formatAt(codeIndex, codeLength, format, formats[format]);
-        }
-        lengthRemaining -= lineLength;
-      });
-    });
-    this.scroll.optimize();
-    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
-  }
-
-  formatText(index, length, formats = {}) {
-    Object.keys(formats).forEach(format => {
-      this.scroll.formatAt(index, length, format, formats[format]);
-    });
-    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
-  }
-
-  getContents(index, length) {
-    return this.delta.slice(index, index + length);
-  }
-
-  getDelta() {
-    return this.scroll.lines().reduce((delta, line) => {
-      return delta.concat(line.delta());
-    }, new _quillDelta2.default());
-  }
-
-  getFormat(index, length = 0) {
-    let lines = [];
-    let leaves = [];
-    if (length === 0) {
-      this.scroll.path(index).forEach(path => {
-        var _path = _slicedToArray(path, 1);
-
-        const blot = _path[0];
-
-        if (blot instanceof _block2.default) {
-          lines.push(blot);
-        } else if (blot instanceof _parchment2.default.Leaf) {
-          leaves.push(blot);
-        }
-      });
-    } else {
-      lines = this.scroll.lines(index, length);
-      leaves = this.scroll.descendants(_parchment2.default.Leaf, index, length);
-    }
-    const formatsArr = [lines, leaves].map(blots => {
-      if (blots.length === 0) return {};
-      let formats = (0, _block.bubbleFormats)(blots.shift());
-      while (Object.keys(formats).length > 0) {
-        const blot = blots.shift();
-        if (blot == null) return formats;
-        formats = combineFormats((0, _block.bubbleFormats)(blot), formats);
-      }
-      return formats;
-    });
-    return _extend2.default.apply(_extend2.default, formatsArr);
-  }
-
-  getText(index, length) {
-    return this.getContents(index, length).filter(op => typeof op.insert === 'string').map(op => op.insert).join('');
-  }
-
-  insertEmbed(index, embed, value) {
-    this.scroll.insertAt(index, embed, value);
-    return this.update(new _quillDelta2.default().retain(index).insert({ [embed]: value }));
-  }
-
-  insertText(index, text, formats = {}) {
-    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    this.scroll.insertAt(index, text);
-    Object.keys(formats).forEach(format => {
-      this.scroll.formatAt(index, text.length, format, formats[format]);
-    });
-    return this.update(new _quillDelta2.default().retain(index).insert(text, (0, _clone2.default)(formats)));
-  }
-
-  isBlank() {
-    if (this.scroll.children.length === 0) return true;
-    if (this.scroll.children.length > 1) return false;
-    const block = this.scroll.children.head;
-    if (block.statics.blotName !== _block2.default.blotName) return false;
-    if (block.children.length > 1) return false;
-    return block.children.head instanceof _break2.default;
-  }
-
-  removeFormat(index, length) {
-    const text = this.getText(index, length);
-
-    var _scroll$line3 = this.scroll.line(index + length),
-        _scroll$line4 = _slicedToArray(_scroll$line3, 2);
-
-    const line = _scroll$line4[0],
-          offset = _scroll$line4[1];
-
-    let suffixLength = 0;
-    let suffix = new _quillDelta2.default();
-    if (line != null) {
-      if (!(line instanceof _code2.default)) {
-        suffixLength = line.length() - offset;
-      } else {
-        suffixLength = line.newlineIndex(offset) - offset + 1;
-      }
-      suffix = line.delta().slice(offset, offset + suffixLength - 1).insert('\n');
-    }
-    const contents = this.getContents(index, length + suffixLength);
-    const diff = contents.diff(new _quillDelta2.default().insert(text).concat(suffix));
-    const delta = new _quillDelta2.default().retain(index).concat(diff);
-    return this.applyDelta(delta);
-  }
-
-  update(change, mutations = [], cursorIndex = undefined) {
-    const oldDelta = this.delta;
-    if (mutations.length === 1 && mutations[0].type === 'characterData' && mutations[0].target.data.match(ASCII) && this.editorRegistry.find(mutations[0].target)) {
-      // Optimization for character changes
-      const textBlot = this.editorRegistry.find(mutations[0].target);
-      const formats = (0, _block.bubbleFormats)(textBlot);
-      const index = textBlot.offset(this.scroll);
-      const oldValue = mutations[0].oldValue.replace(_cursor2.default.CONTENTS, '');
-      const oldText = new _quillDelta2.default().insert(oldValue);
-      const newText = new _quillDelta2.default().insert(textBlot.value());
-      const diffDelta = new _quillDelta2.default().retain(index).concat(oldText.diff(newText, cursorIndex));
-      change = diffDelta.reduce((delta, op) => {
-        if (op.insert) {
-          return delta.insert(op.insert, formats);
-        }
-        return delta.push(op);
-      }, new _quillDelta2.default());
-      this.delta = oldDelta.compose(change);
-    } else {
-      this.delta = this.getDelta();
-      if (!change || !(0, _deepEqual2.default)(oldDelta.compose(change), this.delta)) {
-        change = oldDelta.diff(this.delta, cursorIndex);
-      }
-    }
-    return change;
-  }
-}
-
-function combineFormats(formats, combined) {
-  return Object.keys(combined).reduce((merged, name) => {
-    if (formats[name] == null) return merged;
-    if (combined[name] === formats[name]) {
-      merged[name] = combined[name];
-    } else if (Array.isArray(combined[name])) {
-      if (combined[name].indexOf(formats[name]) < 0) {
-        merged[name] = combined[name].concat([formats[name]]);
-      }
-    } else {
-      merged[name] = [combined[name], formats[name]];
-    }
-    return merged;
-  }, {});
-}
-
-function normalizeDelta(delta) {
-  return delta.reduce((normalizedDelta, op) => {
-    if (op.insert === 1) {
-      const attributes = (0, _clone2.default)(op.attributes);
-      delete attributes.image;
-      return normalizedDelta.insert({ image: op.attributes.image }, attributes);
-    }
-    if (op.attributes != null && (op.attributes.list === true || op.attributes.bullet === true)) {
-      op = (0, _clone2.default)(op);
-      if (op.attributes.list) {
-        op.attributes.list = 'ordered';
-      } else {
-        op.attributes.list = 'bullet';
-        delete op.attributes.bullet;
-      }
-    }
-    if (typeof op.insert === 'string') {
-      const text = op.insert.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      return normalizedDelta.insert(text, op.attributes);
-    }
-    return normalizedDelta.push(op);
-  }, new _quillDelta2.default());
-}
-
-exports.default = Editor;
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.getLastChangeIndex = exports.default = undefined;
 
 var _parchment = __webpack_require__(0);
@@ -5126,7 +4804,7 @@ exports.default = History;
 exports.getLastChangeIndex = getLastChangeIndex;
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5704,7 +5382,7 @@ exports.SHORTKEY = SHORTKEY;
 exports.normalize = normalize;
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5996,7 +5674,7 @@ exports.BaseTooltip = BaseTooltip;
 exports.default = BaseTheme;
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports) {
 
 /**
@@ -6740,7 +6418,7 @@ function merge_tuples (diffs, start, length) {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports) {
 
 exports = module.exports = typeof Object.keys === 'function'
@@ -6755,7 +6433,7 @@ function shim (obj) {
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports) {
 
 var supportsArgumentsClass = (function(){
@@ -6781,7 +6459,7 @@ function unsupported(object){
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6920,7 +6598,7 @@ exports.default = LinkedList;
 
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7092,7 +6770,7 @@ exports.default = ScrollBlot;
 
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7177,7 +6855,7 @@ exports.default = InlineBlot;
 
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7256,7 +6934,7 @@ exports.default = BlockBlot;
 
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7304,7 +6982,7 @@ exports.default = EmbedBlot;
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7405,6 +7083,328 @@ var TextBlot = /** @class */ (function (_super) {
 }(leaf_1.default));
 exports.default = TextBlot;
 
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _clone = __webpack_require__(21);
+
+var _clone2 = _interopRequireDefault(_clone);
+
+var _deepEqual = __webpack_require__(10);
+
+var _deepEqual2 = _interopRequireDefault(_deepEqual);
+
+var _extend = __webpack_require__(3);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _quillDelta = __webpack_require__(1);
+
+var _quillDelta2 = _interopRequireDefault(_quillDelta);
+
+var _op = __webpack_require__(17);
+
+var _op2 = _interopRequireDefault(_op);
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _code = __webpack_require__(14);
+
+var _code2 = _interopRequireDefault(_code);
+
+var _cursor = __webpack_require__(22);
+
+var _cursor2 = _interopRequireDefault(_cursor);
+
+var _block = __webpack_require__(5);
+
+var _block2 = _interopRequireDefault(_block);
+
+var _break = __webpack_require__(15);
+
+var _break2 = _interopRequireDefault(_break);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const ASCII = /^[ -~]*$/;
+
+class Editor {
+  constructor(scroll, editorRegistry) {
+    this.editorRegistry = editorRegistry;
+    this.scroll = scroll;
+    this.delta = this.getDelta();
+  }
+
+  applyDelta(delta) {
+    let consumeNextNewline = false;
+    this.scroll.update();
+    let scrollLength = this.scroll.length();
+    this.scroll.batchStart();
+    const normalizedDelta = normalizeDelta(delta);
+    normalizedDelta.reduce((index, op) => {
+      const length = op.retain || op.delete || op.insert.length || 1;
+      let attributes = op.attributes || {};
+      if (op.insert != null) {
+        if (typeof op.insert === 'string') {
+          let text = op.insert;
+          if (text.endsWith('\n') && consumeNextNewline) {
+            consumeNextNewline = false;
+            text = text.slice(0, -1);
+          }
+          if (index >= scrollLength && !text.endsWith('\n')) {
+            consumeNextNewline = true;
+          }
+          this.scroll.insertAt(index, text);
+
+          var _scroll$line = this.scroll.line(index),
+              _scroll$line2 = _slicedToArray(_scroll$line, 2);
+
+          const line = _scroll$line2[0],
+                offset = _scroll$line2[1];
+
+          let formats = (0, _extend2.default)({}, (0, _block.bubbleFormats)(line));
+          if (line instanceof _block2.default) {
+            var _line$descendant = line.descendant(_parchment2.default.Leaf, offset),
+                _line$descendant2 = _slicedToArray(_line$descendant, 1);
+
+            const leaf = _line$descendant2[0];
+
+            formats = (0, _extend2.default)(formats, (0, _block.bubbleFormats)(leaf));
+          }
+          attributes = _op2.default.attributes.diff(formats, attributes) || {};
+        } else if (typeof op.insert === 'object') {
+          const key = Object.keys(op.insert)[0]; // There should only be one key
+          if (key == null) return index;
+          this.scroll.insertAt(index, key, op.insert[key]);
+        }
+        scrollLength += length;
+      }
+      Object.keys(attributes).forEach(name => {
+        this.scroll.formatAt(index, length, name, attributes[name]);
+      });
+      return index + length;
+    }, 0);
+    normalizedDelta.reduce((index, op) => {
+      if (typeof op.delete === 'number') {
+        this.scroll.deleteAt(index, op.delete);
+        return index;
+      }
+      return index + (op.retain || op.insert.length || 1);
+    }, 0);
+    this.scroll.batchEnd();
+    return this.update(normalizedDelta);
+  }
+
+  deleteText(index, length) {
+    this.scroll.deleteAt(index, length);
+    return this.update(new _quillDelta2.default().retain(index).delete(length));
+  }
+
+  formatLine(index, length, formats = {}) {
+    this.scroll.update();
+    Object.keys(formats).forEach(format => {
+      if (this.scroll.whitelist != null && !this.scroll.whitelist[format]) return;
+      const lines = this.scroll.lines(index, Math.max(length, 1));
+      let lengthRemaining = length;
+      lines.forEach(line => {
+        const lineLength = line.length();
+        if (!(line instanceof _code2.default)) {
+          line.format(format, formats[format]);
+        } else {
+          const codeIndex = index - line.offset(this.scroll);
+          const codeLength = line.newlineIndex(codeIndex + lengthRemaining) - codeIndex + 1;
+          line.formatAt(codeIndex, codeLength, format, formats[format]);
+        }
+        lengthRemaining -= lineLength;
+      });
+    });
+    this.scroll.optimize();
+    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
+  }
+
+  formatText(index, length, formats = {}) {
+    Object.keys(formats).forEach(format => {
+      this.scroll.formatAt(index, length, format, formats[format]);
+    });
+    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
+  }
+
+  getContents(index, length) {
+    return this.delta.slice(index, index + length);
+  }
+
+  getDelta() {
+    return this.scroll.lines().reduce((delta, line) => {
+      return delta.concat(line.delta());
+    }, new _quillDelta2.default());
+  }
+
+  getFormat(index, length = 0) {
+    let lines = [];
+    let leaves = [];
+    if (length === 0) {
+      this.scroll.path(index).forEach(path => {
+        var _path = _slicedToArray(path, 1);
+
+        const blot = _path[0];
+
+        if (blot instanceof _block2.default) {
+          lines.push(blot);
+        } else if (blot instanceof _parchment2.default.Leaf) {
+          leaves.push(blot);
+        }
+      });
+    } else {
+      lines = this.scroll.lines(index, length);
+      leaves = this.scroll.descendants(_parchment2.default.Leaf, index, length);
+    }
+    const formatsArr = [lines, leaves].map(blots => {
+      if (blots.length === 0) return {};
+      let formats = (0, _block.bubbleFormats)(blots.shift());
+      while (Object.keys(formats).length > 0) {
+        const blot = blots.shift();
+        if (blot == null) return formats;
+        formats = combineFormats((0, _block.bubbleFormats)(blot), formats);
+      }
+      return formats;
+    });
+    return _extend2.default.apply(_extend2.default, formatsArr);
+  }
+
+  getText(index, length) {
+    return this.getContents(index, length).filter(op => typeof op.insert === 'string').map(op => op.insert).join('');
+  }
+
+  insertEmbed(index, embed, value) {
+    this.scroll.insertAt(index, embed, value);
+    return this.update(new _quillDelta2.default().retain(index).insert({ [embed]: value }));
+  }
+
+  insertText(index, text, formats = {}) {
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    this.scroll.insertAt(index, text);
+    Object.keys(formats).forEach(format => {
+      this.scroll.formatAt(index, text.length, format, formats[format]);
+    });
+    return this.update(new _quillDelta2.default().retain(index).insert(text, (0, _clone2.default)(formats)));
+  }
+
+  isBlank() {
+    if (this.scroll.children.length === 0) return true;
+    if (this.scroll.children.length > 1) return false;
+    const block = this.scroll.children.head;
+    if (block.statics.blotName !== _block2.default.blotName) return false;
+    if (block.children.length > 1) return false;
+    return block.children.head instanceof _break2.default;
+  }
+
+  removeFormat(index, length) {
+    const text = this.getText(index, length);
+
+    var _scroll$line3 = this.scroll.line(index + length),
+        _scroll$line4 = _slicedToArray(_scroll$line3, 2);
+
+    const line = _scroll$line4[0],
+          offset = _scroll$line4[1];
+
+    let suffixLength = 0;
+    let suffix = new _quillDelta2.default();
+    if (line != null) {
+      if (!(line instanceof _code2.default)) {
+        suffixLength = line.length() - offset;
+      } else {
+        suffixLength = line.newlineIndex(offset) - offset + 1;
+      }
+      suffix = line.delta().slice(offset, offset + suffixLength - 1).insert('\n');
+    }
+    const contents = this.getContents(index, length + suffixLength);
+    const diff = contents.diff(new _quillDelta2.default().insert(text).concat(suffix));
+    const delta = new _quillDelta2.default().retain(index).concat(diff);
+    return this.applyDelta(delta);
+  }
+
+  update(change, mutations = [], cursorIndex = undefined) {
+    const oldDelta = this.delta;
+    if (mutations.length === 1 && mutations[0].type === 'characterData' && mutations[0].target.data.match(ASCII) && this.editorRegistry.find(mutations[0].target)) {
+      // Optimization for character changes
+      const textBlot = this.editorRegistry.find(mutations[0].target);
+      const formats = (0, _block.bubbleFormats)(textBlot);
+      const index = textBlot.offset(this.scroll);
+      const oldValue = mutations[0].oldValue.replace(_cursor2.default.CONTENTS, '');
+      const oldText = new _quillDelta2.default().insert(oldValue);
+      const newText = new _quillDelta2.default().insert(textBlot.value());
+      const diffDelta = new _quillDelta2.default().retain(index).concat(oldText.diff(newText, cursorIndex));
+      change = diffDelta.reduce((delta, op) => {
+        if (op.insert) {
+          return delta.insert(op.insert, formats);
+        }
+        return delta.push(op);
+      }, new _quillDelta2.default());
+      this.delta = oldDelta.compose(change);
+    } else {
+      this.delta = this.getDelta();
+      if (!change || !(0, _deepEqual2.default)(oldDelta.compose(change), this.delta)) {
+        change = oldDelta.diff(this.delta, cursorIndex);
+      }
+    }
+    return change;
+  }
+}
+
+function combineFormats(formats, combined) {
+  return Object.keys(combined).reduce((merged, name) => {
+    if (formats[name] == null) return merged;
+    if (combined[name] === formats[name]) {
+      merged[name] = combined[name];
+    } else if (Array.isArray(combined[name])) {
+      if (combined[name].indexOf(formats[name]) < 0) {
+        merged[name] = combined[name].concat([formats[name]]);
+      }
+    } else {
+      merged[name] = [combined[name], formats[name]];
+    }
+    return merged;
+  }, {});
+}
+
+function normalizeDelta(delta) {
+  return delta.reduce((normalizedDelta, op) => {
+    if (op.insert === 1) {
+      const attributes = (0, _clone2.default)(op.attributes);
+      delete attributes.image;
+      return normalizedDelta.insert({ image: op.attributes.image }, attributes);
+    }
+    if (op.attributes != null && (op.attributes.list === true || op.attributes.bullet === true)) {
+      op = (0, _clone2.default)(op);
+      if (op.attributes.list) {
+        op.attributes.list = 'ordered';
+      } else {
+        op.attributes.list = 'bullet';
+        delete op.attributes.bullet;
+      }
+    }
+    if (typeof op.insert === 'string') {
+      const text = op.insert.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      return normalizedDelta.insert(text, op.attributes);
+    }
+    return normalizedDelta.push(op);
+  }, new _quillDelta2.default());
+}
+
+exports.default = Editor;
 
 /***/ }),
 /* 52 */
@@ -8953,7 +8953,7 @@ var _emitter = __webpack_require__(8);
 
 var _emitter2 = _interopRequireDefault(_emitter);
 
-var _base = __webpack_require__(42);
+var _base = __webpack_require__(41);
 
 var _base2 = _interopRequireDefault(_base);
 
@@ -9992,7 +9992,7 @@ var _emitter = __webpack_require__(8);
 
 var _emitter2 = _interopRequireDefault(_emitter);
 
-var _base = __webpack_require__(42);
+var _base = __webpack_require__(41);
 
 var _base2 = _interopRequireDefault(_base);
 
@@ -10206,7 +10206,7 @@ var _quill2 = _interopRequireDefault(_quill);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const div = document.createElement('div');
+let div = document.createElement('div');
 div.id = 'test-container';
 document.body.appendChild(div);
 
@@ -10215,6 +10215,12 @@ window.onerror = function (msg) {
 };
 
 beforeEach(function () {
+  if (div) {
+    div.remove();
+    div = document.createElement('div');
+    div.id = 'test-container';
+    document.body.appendChild(div);
+  }
   jasmine.addMatchers({
     toEqualHTML() {
       return { compare: compareHTML };
@@ -10820,10 +10826,6 @@ var _quillDelta = __webpack_require__(1);
 
 var _quillDelta2 = _interopRequireDefault(_quillDelta);
 
-var _editor = __webpack_require__(39);
-
-var _editor2 = _interopRequireDefault(_editor);
-
 var _selection = __webpack_require__(16);
 
 var _quill = __webpack_require__(4);
@@ -10969,51 +10971,72 @@ describe('Editor', function () {
 
   describe('delete', function () {
     it('inner node', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong><em>0123</em></strong></p>');
+      var _initialize13 = this.initialize(_quill2.default, '<p><strong><em>0123</em></strong></p>');
+
+      const editor = _initialize13.editor;
+
       editor.deleteText(1, 2);
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('03', { bold: true, italic: true }).insert('\n'));
-      expect(this.container).toEqualHTML('<p><strong><em>03</em></strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong><em>03</em></strong></p>');
     });
 
     it('parts of multiple lines', function () {
-      const editor = this.initialize(_editor2.default, '<p><em>0123</em></p><p><em>5678</em></p>');
+      var _initialize14 = this.initialize(_quill2.default, '<p><em>0123</em></p><p><em>5678</em></p>');
+
+      const editor = _initialize14.editor;
+
       editor.deleteText(2, 5);
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0178', { italic: true }).insert('\n'));
-      expect(this.container).toEqualHTML('<p><em>0178</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>0178</em></p>');
     });
 
     it('entire line keeping newline', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong><em>0123</em></strong></p>');
+      var _initialize15 = this.initialize(_quill2.default, '<p><strong><em>0123</em></strong></p>');
+
+      const editor = _initialize15.editor;
+
       editor.deleteText(0, 4);
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('\n'));
-      expect(this.container).toEqualHTML('<p><br></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><br></p>');
     });
 
     it('newline', function () {
-      const editor = this.initialize(_editor2.default, '<p><em>0123</em></p><p><em>5678</em></p>');
+      var _initialize16 = this.initialize(_quill2.default, '<p><em>0123</em></p><p><em>5678</em></p>');
+
+      const editor = _initialize16.editor;
+
       editor.deleteText(4, 1);
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01235678', { italic: true }).insert('\n'));
-      expect(this.container).toEqualHTML('<p><em>01235678</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>01235678</em></p>');
     });
 
     it('entire document', function () {
-      const editor = this.initialize(_editor2.default, '<p><strong><em>0123</em></strong></p>');
+      var _initialize17 = this.initialize(_quill2.default, '<p><strong><em>0123</em></strong></p>');
+
+      const editor = _initialize17.editor;
+
       editor.deleteText(0, 5);
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('\n'));
-      expect(this.container).toEqualHTML('<p><br></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><br></p>');
     });
 
     it('multiple complete lines', function () {
-      const editor = this.initialize(_editor2.default, '<p><em>012</em></p><p><em>456</em></p><p><em>890</em></p>');
+      var _initialize18 = this.initialize(_quill2.default, '<p><em>012</em></p><p><em>456</em></p><p><em>890</em></p>');
+
+      const editor = _initialize18.editor;
+
       editor.deleteText(0, 8);
       expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('890', { italic: true }).insert('\n'));
-      expect(this.container).toEqualHTML('<p><em>890</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>890</em></p>');
     });
   });
 
   describe('format', function () {
     it('line', function () {
-      const editor = this.initialize(_editor2.default, '<p>0123</p>');
+      var _initialize19 = this.initialize(_quill2.default, '<p>0123</p>');
+
+      const editor = _initialize19.editor;
+
       editor.formatLine(1, 1, { header: 1 });
       expect(editor.scroll.domNode).toEqualHTML('<h1>0123</h1>');
     });
@@ -11021,31 +11044,43 @@ describe('Editor', function () {
 
   describe('removeFormat', function () {
     it('unwrap', function () {
-      const editor = this.initialize(_editor2.default, '<p>0<em>12</em>3</p>');
+      var _initialize20 = this.initialize(_quill2.default, '<p>0<em>12</em>3</p>');
+
+      const editor = _initialize20.editor;
+
       editor.removeFormat(1, 2);
-      expect(this.container).toEqualHTML('<p>0123</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p>');
     });
 
     it('split inline', function () {
-      const editor = this.initialize(_editor2.default, '<p>0<strong><em>12</em></strong>3</p>');
+      var _initialize21 = this.initialize(_quill2.default, '<p>0<strong><em>12</em></strong>3</p>');
+
+      const editor = _initialize21.editor;
+
       editor.removeFormat(1, 1);
-      expect(this.container).toEqualHTML('<p>01<strong><em>2</em></strong>3</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01<strong><em>2</em></strong>3</p>');
     });
 
     it('partial line', function () {
-      const editor = this.initialize(_editor2.default, '<ul><li>01</li></ul><ol><li>34</li></ol>');
+      var _initialize22 = this.initialize(_quill2.default, '<ul><li>01</li></ul><ol><li>34</li></ol>');
+
+      const editor = _initialize22.editor;
+
       editor.removeFormat(1, 3);
-      expect(this.container).toEqualHTML('<p>01</p><p>34</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01</p><p>34</p>');
     });
 
     it('remove embed', function () {
-      const editor = this.initialize(_editor2.default, '<p>0<img src="/assets/favicon.png">2</p>');
+      var _initialize23 = this.initialize(_quill2.default, '<p>0<img src="/assets/favicon.png">2</p>');
+
+      const editor = _initialize23.editor;
+
       editor.removeFormat(1, 1);
-      expect(this.container).toEqualHTML('<p>02</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>02</p>');
     });
 
     it('combined', function () {
-      const editor = this.initialize(_editor2.default, `
+      var _initialize24 = this.initialize(_quill2.default, `
         <ul>
           <li>01<img src="/assets/favicon.png">3</li>
         </ul>
@@ -11053,22 +11088,28 @@ describe('Editor', function () {
           <li>5<strong>6<em>78</em>9</strong>0</li>
         </ol>
       `);
+
+      const editor = _initialize24.editor;
+
       editor.removeFormat(1, 7);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>013</p>
         <p>567<strong><em>8</em>9</strong>0</p>
       `);
     });
 
     it('end of document', function () {
-      const editor = this.initialize(_editor2.default, `
+      var _initialize25 = this.initialize(_quill2.default, `
         <ul>
           <li>0123</li>
           <li>5678</li>
         </ol>
       `);
+
+      const editor = _initialize25.editor;
+
       editor.removeFormat(0, 12);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>0123</p>
         <p>5678</p>
       `);
@@ -11077,36 +11118,36 @@ describe('Editor', function () {
 
   describe('applyDelta', function () {
     it('insert', function () {
-      var _initialize13 = this.initialize(_quill2.default, '<p></p>');
+      var _initialize26 = this.initialize(_quill2.default, '<p></p>');
 
-      const editor = _initialize13.editor;
+      const editor = _initialize26.editor;
 
       editor.applyDelta(new _quillDelta2.default().insert('01'));
       expect(this.container.firstChild).toEqualHTML('<p>01</p>');
     });
 
     it('attributed insert', function () {
-      var _initialize14 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize27 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize14.editor;
+      const editor = _initialize27.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(2).insert('|', { bold: true }));
       expect(this.container.firstChild).toEqualHTML('<p>01<strong>|</strong>23</p>');
     });
 
     it('format', function () {
-      var _initialize15 = this.initialize(_quill2.default, '<p>01</p>');
+      var _initialize28 = this.initialize(_quill2.default, '<p>01</p>');
 
-      const editor = _initialize15.editor;
+      const editor = _initialize28.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(2, { bold: true }));
       expect(this.container.firstChild).toEqualHTML('<p><strong>01</strong></p>');
     });
 
     it('discontinuous formats', function () {
-      var _initialize16 = this.initialize(_quill2.default, '');
+      var _initialize29 = this.initialize(_quill2.default, '');
 
-      const editor = _initialize16.editor;
+      const editor = _initialize29.editor;
 
       const delta = new _quillDelta2.default().insert('ab', { bold: true }).insert('23\n45').insert('cd', { bold: true });
       editor.applyDelta(delta);
@@ -11114,146 +11155,146 @@ describe('Editor', function () {
     });
 
     it('unformatted insert', function () {
-      var _initialize17 = this.initialize(_quill2.default, '<p><em>01</em></p>');
+      var _initialize30 = this.initialize(_quill2.default, '<p><em>01</em></p>');
 
-      const editor = _initialize17.editor;
+      const editor = _initialize30.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(1).insert('|'));
       expect(this.container.firstChild).toEqualHTML('<p><em>0</em>|<em>1</em></p>');
     });
 
     it('insert at format boundary', function () {
-      var _initialize18 = this.initialize(_quill2.default, '<p><em>0</em><u>1</u></p>');
+      var _initialize31 = this.initialize(_quill2.default, '<p><em>0</em><u>1</u></p>');
 
-      const editor = _initialize18.editor;
+      const editor = _initialize31.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(1).insert('|', { strike: true }));
       expect(this.container.firstChild).toEqualHTML('<p><em>0</em><s>|</s><u>1</u></p>');
     });
 
     it('unformatted newline', function () {
-      var _initialize19 = this.initialize(_quill2.default, '<h1>01</h1>');
+      var _initialize32 = this.initialize(_quill2.default, '<h1>01</h1>');
 
-      const editor = _initialize19.editor;
+      const editor = _initialize32.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(2).insert('\n'));
       expect(this.container.firstChild).toEqualHTML('<p>01</p><h1><br></h1>');
     });
 
     it('formatted embed', function () {
-      var _initialize20 = this.initialize(_quill2.default, '');
+      var _initialize33 = this.initialize(_quill2.default, '');
 
-      const editor = _initialize20.editor;
+      const editor = _initialize33.editor;
 
       editor.applyDelta(new _quillDelta2.default().insert({ image: '/assets/favicon.png' }, { italic: true }));
       expect(this.container.firstChild).toEqualHTML('<p><em><img src="/assets/favicon.png"></em>');
     });
 
     it('old embed', function () {
-      var _initialize21 = this.initialize(_quill2.default, '');
+      var _initialize34 = this.initialize(_quill2.default, '');
 
-      const editor = _initialize21.editor;
+      const editor = _initialize34.editor;
 
       editor.applyDelta(new _quillDelta2.default().insert(1, { image: '/assets/favicon.png', italic: true }));
       expect(this.container.firstChild).toEqualHTML('<p><em><img src="/assets/favicon.png"></em>');
     });
 
     it('old list', function () {
-      var _initialize22 = this.initialize(_quill2.default, '');
+      var _initialize35 = this.initialize(_quill2.default, '');
 
-      const editor = _initialize22.editor;
+      const editor = _initialize35.editor;
 
       editor.applyDelta(new _quillDelta2.default().insert('\n', { bullet: true }).insert('\n', { list: true }));
       expect(this.container.firstChild).toEqualHTML('<ul><li><br></li></ul><ol><li><br></li></ol><p><br></p>');
     });
 
     it('improper block embed insert', function () {
-      var _initialize23 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize36 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize23.editor;
+      const editor = _initialize36.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(2).insert({ video: '#' }));
       expect(this.container.firstChild).toEqualHTML('<p>01</p><iframe src="#" class="ql-video" frameborder="0" allowfullscreen="true"></iframe><p>23</p>');
     });
 
     it('append formatted block embed', function () {
-      var _initialize24 = this.initialize(_quill2.default, '<p>0123</p><p><br></p>');
+      var _initialize37 = this.initialize(_quill2.default, '<p>0123</p><p><br></p>');
 
-      const editor = _initialize24.editor;
+      const editor = _initialize37.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(5).insert({ video: '#' }, { align: 'right' }));
       expect(this.container.firstChild).toEqualHTML('<p>0123</p><iframe src="#" class="ql-video ql-align-right" frameborder="0" allowfullscreen="true"></iframe><p><br></p>');
     });
 
     it('append', function () {
-      var _initialize25 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize38 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize25.editor;
+      const editor = _initialize38.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678'));
       expect(this.container.firstChild).toEqualHTML('<p>0123</p><p>5678</p>');
     });
 
     it('append newline', function () {
-      var _initialize26 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize39 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize26.editor;
+      const editor = _initialize39.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('\n', { header: 2 }));
       expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2><br></h2>');
     });
 
     it('append text with newline', function () {
-      var _initialize27 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize40 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize27.editor;
+      const editor = _initialize40.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678').insert('\n', { header: 2 }));
       expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678</h2>');
     });
 
     it('append non-isolated newline', function () {
-      var _initialize28 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize41 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize28.editor;
+      const editor = _initialize41.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678\n', { header: 2 }));
       expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678</h2>');
     });
 
     it('eventual append', function () {
-      var _initialize29 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize42 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize29.editor;
+      const editor = _initialize42.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(2).insert('ab\n', { header: 1 }).retain(3).insert('cd\n', { header: 2 }));
       expect(this.container.firstChild).toEqualHTML('<h1>01ab</h1><p>23</p><h2>cd</h2>');
     });
 
     it('append text, embed and newline', function () {
-      var _initialize30 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize43 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize30.editor;
+      const editor = _initialize43.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('5678').insert({ image: '/assets/favicon.png' }).insert('\n', { header: 2 }));
       expect(this.container.firstChild).toEqualHTML('<p>0123</p><h2>5678<img src="/assets/favicon.png"></h2>');
     });
 
     it('append multiple lines', function () {
-      var _initialize31 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize44 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize31.editor;
+      const editor = _initialize44.editor;
 
       editor.applyDelta(new _quillDelta2.default().retain(5).insert('56').insert('\n', { header: 1 }).insert('89').insert('\n', { header: 2 }));
       expect(this.container.firstChild).toEqualHTML('<p>0123</p><h1>56</h1><h2>89</h2>');
     });
 
     it('code', function () {
-      var _initialize32 = this.initialize(_quill2.default, {
+      var _initialize45 = this.initialize(_quill2.default, {
         html: '<p>0</p><pre>1\n23\n</pre><p><br></p>'
       });
 
-      const editor = _initialize32.editor;
+      const editor = _initialize45.editor;
 
       editor.applyDelta(new _quillDelta2.default().delete(4).retain(1).delete(2));
       expect(editor.scroll.domNode.innerHTML).toEqual('<p>2</p>');
@@ -11262,25 +11303,25 @@ describe('Editor', function () {
 
   describe('getFormat()', function () {
     it('unformatted', function () {
-      var _initialize33 = this.initialize(_quill2.default, '<p>0123</p>');
+      var _initialize46 = this.initialize(_quill2.default, '<p>0123</p>');
 
-      const editor = _initialize33.editor;
+      const editor = _initialize46.editor;
 
       expect(editor.getFormat(1)).toEqual({});
     });
 
     it('formatted', function () {
-      var _initialize34 = this.initialize(_quill2.default, '<h1><em>0123</em></h1>');
+      var _initialize47 = this.initialize(_quill2.default, '<h1><em>0123</em></h1>');
 
-      const editor = _initialize34.editor;
+      const editor = _initialize47.editor;
 
       expect(editor.getFormat(1)).toEqual({ header: 1, italic: true });
     });
 
     it('cursor', function () {
-      var _initialize35 = this.initialize(_quill2.default, '<h1><strong><em>0123</em></strong></h1><h2><u>5678</u></h2>');
+      var _initialize48 = this.initialize(_quill2.default, '<h1><strong><em>0123</em></strong></h1><h2><u>5678</u></h2>');
 
-      const editor = _initialize35.editor;
+      const editor = _initialize48.editor;
 
       expect(editor.getFormat(2)).toEqual({
         bold: true,
@@ -11290,10 +11331,10 @@ describe('Editor', function () {
     });
 
     it('cursor with preformat', function () {
-      var _initialize36 = this.initialize(_quill2.default, '<h1><strong><em>0123</em></strong></h1>');
+      var _initialize49 = this.initialize(_quill2.default, '<h1><strong><em>0123</em></strong></h1>');
 
-      const editor = _initialize36.editor,
-            selection = _initialize36.selection;
+      const editor = _initialize49.editor,
+            selection = _initialize49.selection;
 
       selection.setRange(new _selection.Range(2));
       selection.format('underline', true);
@@ -11308,7 +11349,7 @@ describe('Editor', function () {
     });
 
     it('across leaves', function () {
-      var _initialize37 = this.initialize(_quill2.default, `
+      var _initialize50 = this.initialize(_quill2.default, `
         <h1>
           <strong class="ql-size-small"><em>01</em></strong>
           <em class="ql-size-large"><u>23</u></em>
@@ -11316,7 +11357,7 @@ describe('Editor', function () {
         </h1>
       `);
 
-      const editor = _initialize37.editor;
+      const editor = _initialize50.editor;
 
       expect(editor.getFormat(1, 4)).toEqual({
         italic: true,
@@ -11326,12 +11367,12 @@ describe('Editor', function () {
     });
 
     it('across lines', function () {
-      var _initialize38 = this.initialize(_quill2.default, `
+      var _initialize51 = this.initialize(_quill2.default, `
         <h1 class="ql-align-right"><em>01</em></h1>
         <h1 class="ql-align-center"><em>34</em></h1>
       `);
 
-      const editor = _initialize38.editor;
+      const editor = _initialize51.editor;
 
       expect(editor.getFormat(1, 3)).toEqual({
         italic: true,
@@ -13080,7 +13121,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 describe('Code', function () {
   it('newline', function () {
-    var _initialize = this.initialize(_core2.default, `
+    const quill = this.initialize(_core2.default, `
       <pre></pre>
       <p><br></p>
       <pre>\n</pre>
@@ -13088,10 +13129,7 @@ describe('Code', function () {
       <pre>\n\n</pre>
       <p><br></p>
     `);
-
-    const editor = _initialize.editor;
-
-    expect(editor.scroll.domNode).toEqualHTML(`
+    expect(quill.editor.scroll.domNode).toEqualHTML(`
       <pre>\n</pre>
       <p><br></p>
       <pre>\n</pre>
@@ -13102,16 +13140,16 @@ describe('Code', function () {
   });
 
   it('default child', function () {
-    var _initialize2 = this.initialize(_core2.default, '<p><br></p>');
+    var _initialize = this.initialize(_core2.default, '<p><br></p>');
 
-    const editor = _initialize2.editor;
+    const editor = _initialize.editor;
 
     editor.formatLine(0, 1, { 'code-block': true });
     expect(editor.scroll.domNode.innerHTML).toEqual('<pre spellcheck="false">\n</pre>');
   });
 
   it('merge', function () {
-    var _initialize3 = this.initialize(_core2.default, `
+    var _initialize2 = this.initialize(_core2.default, `
       <pre>0</pre>
       <pre>0</pre>
       <p><br></p>
@@ -13140,7 +13178,7 @@ describe('Code', function () {
       <pre>2\n\n</pre>
     `);
 
-    const editor = _initialize3.editor;
+    const editor = _initialize2.editor;
 
     editor.scroll.lines().forEach(function (line) {
       line.optimize();
@@ -13167,14 +13205,14 @@ describe('Code', function () {
   });
 
   it('merge multiple', function () {
-    var _initialize4 = this.initialize(_core2.default, `
+    var _initialize3 = this.initialize(_core2.default, `
       <pre>0</pre>
       <pre>1</pre>
       <pre>2</pre>
       <pre>3</pre>
     `);
 
-    const editor = _initialize4.editor;
+    const editor = _initialize3.editor;
 
     editor.scroll.children.head.optimize();
     expect(editor.scroll.domNode).toEqualHTML(`
@@ -13183,9 +13221,9 @@ describe('Code', function () {
   });
 
   it('add', function () {
-    var _initialize5 = this.initialize(_core2.default, '<p><em>0123</em></p><p>5678</p>');
+    var _initialize4 = this.initialize(_core2.default, '<p><em>0123</em></p><p>5678</p>');
 
-    const editor = _initialize5.editor;
+    const editor = _initialize4.editor;
 
     editor.formatLine(2, 5, { 'code-block': true });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123').insert('\n', { 'code-block': true }).insert('5678').insert('\n', { 'code-block': true }));
@@ -13193,9 +13231,9 @@ describe('Code', function () {
   });
 
   it('remove', function () {
-    var _initialize6 = this.initialize(_core2.default, { html: '<pre>0123\n</pre>' });
+    var _initialize5 = this.initialize(_core2.default, { html: '<pre>0123\n</pre>' });
 
-    const editor = _initialize6.editor;
+    const editor = _initialize5.editor;
 
     editor.formatText(4, 1, { 'code-block': false });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123\n'));
@@ -13203,11 +13241,11 @@ describe('Code', function () {
   });
 
   it('delete last', function () {
-    var _initialize7 = this.initialize(_core2.default, {
+    var _initialize6 = this.initialize(_core2.default, {
       html: '<p>0123</p><pre>\n</pre><p>5678</p>'
     });
 
-    const editor = _initialize7.editor;
+    const editor = _initialize6.editor;
 
     editor.deleteText(4, 1);
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123').insert('\n', { 'code-block': true }).insert('5678\n'));
@@ -13215,11 +13253,11 @@ describe('Code', function () {
   });
 
   it('delete merge before', function () {
-    var _initialize8 = this.initialize(_core2.default, {
+    var _initialize7 = this.initialize(_core2.default, {
       html: '<h1>0123</h1><pre>4567\n</pre>'
     });
 
-    const editor = _initialize8.editor;
+    const editor = _initialize7.editor;
 
     editor.deleteText(4, 1);
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01234567').insert('\n', { 'code-block': true }));
@@ -13227,11 +13265,11 @@ describe('Code', function () {
   });
 
   it('delete merge after', function () {
-    var _initialize9 = this.initialize(_core2.default, {
+    var _initialize8 = this.initialize(_core2.default, {
       html: '<pre>0123\n</pre><h1>4567</h1>'
     });
 
-    const editor = _initialize9.editor;
+    const editor = _initialize8.editor;
 
     editor.deleteText(4, 1);
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01234567').insert('\n', { header: 1 }));
@@ -13239,11 +13277,11 @@ describe('Code', function () {
   });
 
   it('delete across before partial merge', function () {
-    var _initialize10 = this.initialize(_core2.default, {
+    var _initialize9 = this.initialize(_core2.default, {
       html: '<pre>01\n34\n67\n</pre><h1>90</h1>'
     });
 
-    const editor = _initialize10.editor;
+    const editor = _initialize9.editor;
 
     editor.deleteText(7, 3);
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01').insert('\n', { 'code-block': true }).insert('34').insert('\n', { 'code-block': true }).insert('60').insert('\n', { header: 1 }));
@@ -13251,11 +13289,11 @@ describe('Code', function () {
   });
 
   it('delete across before no merge', function () {
-    var _initialize11 = this.initialize(_core2.default, {
+    var _initialize10 = this.initialize(_core2.default, {
       html: '<pre>01\n34\n</pre><h1>6789</h1>'
     });
 
-    const editor = _initialize11.editor;
+    const editor = _initialize10.editor;
 
     editor.deleteText(3, 5);
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01').insert('\n', { 'code-block': true }).insert('89').insert('\n', { header: 1 }));
@@ -13263,11 +13301,11 @@ describe('Code', function () {
   });
 
   it('delete across after', function () {
-    var _initialize12 = this.initialize(_core2.default, {
+    var _initialize11 = this.initialize(_core2.default, {
       html: '<h1>0123</h1><pre>56\n89\n</pre>'
     });
 
-    const editor = _initialize12.editor;
+    const editor = _initialize11.editor;
 
     editor.deleteText(2, 4);
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('016').insert('\n', { 'code-block': true }).insert('89').insert('\n', { 'code-block': true }));
@@ -13275,9 +13313,9 @@ describe('Code', function () {
   });
 
   it('replace', function () {
-    var _initialize13 = this.initialize(_core2.default, { html: '<pre>0123\n</pre>' });
+    var _initialize12 = this.initialize(_core2.default, { html: '<pre>0123\n</pre>' });
 
-    const editor = _initialize13.editor;
+    const editor = _initialize12.editor;
 
     editor.formatText(4, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123').insert('\n', { header: 1 }));
@@ -13285,9 +13323,9 @@ describe('Code', function () {
   });
 
   it('replace multiple', function () {
-    var _initialize14 = this.initialize(_core2.default, { html: '<pre>01\n23\n</pre>' });
+    var _initialize13 = this.initialize(_core2.default, { html: '<pre>01\n23\n</pre>' });
 
-    const editor = _initialize14.editor;
+    const editor = _initialize13.editor;
 
     editor.formatText(0, 6, { header: 1 });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01').insert('\n', { header: 1 }).insert('23').insert('\n', { header: 1 }));
@@ -13295,9 +13333,9 @@ describe('Code', function () {
   });
 
   it('format interior line', function () {
-    var _initialize15 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
+    var _initialize14 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
 
-    const editor = _initialize15.editor;
+    const editor = _initialize14.editor;
 
     editor.formatText(5, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01').insert('\n', { 'code-block': true }).insert('23').insert('\n', { header: 1 }).insert('45').insert('\n', { 'code-block': true }));
@@ -13305,9 +13343,9 @@ describe('Code', function () {
   });
 
   it('format imprecise bounds', function () {
-    var _initialize16 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
+    var _initialize15 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
 
-    const editor = _initialize16.editor;
+    const editor = _initialize15.editor;
 
     editor.formatText(1, 6, { header: 1 });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01').insert('\n', { header: 1 }).insert('23').insert('\n', { header: 1 }).insert('45').insert('\n', { 'code-block': true }));
@@ -13315,9 +13353,9 @@ describe('Code', function () {
   });
 
   it('format without newline', function () {
-    var _initialize17 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
+    var _initialize16 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
 
-    const editor = _initialize17.editor;
+    const editor = _initialize16.editor;
 
     editor.formatText(3, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01').insert('\n', { 'code-block': true }).insert('23').insert('\n', { 'code-block': true }).insert('45').insert('\n', { 'code-block': true }));
@@ -13325,9 +13363,9 @@ describe('Code', function () {
   });
 
   it('format line', function () {
-    var _initialize18 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
+    var _initialize17 = this.initialize(_core2.default, { html: '<pre>01\n23\n45\n</pre>' });
 
-    const editor = _initialize18.editor;
+    const editor = _initialize17.editor;
 
     editor.formatLine(3, 1, { header: 1 });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('01').insert('\n', { 'code-block': true }).insert('23').insert('\n', { header: 1 }).insert('45').insert('\n', { 'code-block': true }));
@@ -13335,9 +13373,9 @@ describe('Code', function () {
   });
 
   it('ignore formatAt', function () {
-    var _initialize19 = this.initialize(_core2.default, '<pre>0123</pre>');
+    var _initialize18 = this.initialize(_core2.default, '<pre>0123</pre>');
 
-    const editor = _initialize19.editor;
+    const editor = _initialize18.editor;
 
     editor.formatText(1, 1, { bold: true });
     expect(editor.getDelta()).toEqual(new _quillDelta2.default().insert('0123').insert('\n', { 'code-block': true }));
@@ -13345,9 +13383,9 @@ describe('Code', function () {
   });
 
   it('partial block modification applyDelta', function () {
-    var _initialize20 = this.initialize(_core2.default, { html: '<pre>a\nb\n\n</pre>' });
+    var _initialize19 = this.initialize(_core2.default, { html: '<pre>a\nb\n\n</pre>' });
 
-    const editor = _initialize20.editor;
+    const editor = _initialize19.editor;
 
     const delta = new _quillDelta2.default().retain(3).insert('\n', { 'code-block': true }).delete(1).retain(1, { 'code-block': null });
     editor.applyDelta(delta);
@@ -13837,7 +13875,7 @@ var _core2 = _interopRequireDefault(_core);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-fdescribe('Clipboard', function () {
+describe('Clipboard', function () {
   describe('events', function () {
     beforeEach(function () {
       this.quill = this.initialize(_core2.default, '<h1>0123</h1><p>5<em>67</em>8</p>');
@@ -13962,7 +14000,7 @@ fdescribe('Clipboard', function () {
       expect(delta).toEqual(new _quillDelta2.default().insert('Test\n', { direction: 'rtl' }));
     });
 
-    fit('nested styles', function () {
+    it('nested styles', function () {
       const delta = this.clipboard.convert('<span style="color: red;"><span style="color: blue;">Test</span></span>');
       expect(delta).toEqual(new _quillDelta2.default().insert('Test', { color: 'blue' }));
     });
@@ -14005,7 +14043,7 @@ var _core = __webpack_require__(12);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _history = __webpack_require__(40);
+var _history = __webpack_require__(39);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -14197,7 +14235,7 @@ describe('History', function () {
 "use strict";
 
 
-var _keyboard = __webpack_require__(41);
+var _keyboard = __webpack_require__(40);
 
 var _keyboard2 = _interopRequireDefault(_keyboard);
 
@@ -32139,7 +32177,7 @@ var _core = __webpack_require__(12);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _base = __webpack_require__(42);
+var _base = __webpack_require__(41);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

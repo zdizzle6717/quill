@@ -89,11 +89,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var container_1 = __webpack_require__(18);
 var format_1 = __webpack_require__(19);
 var leaf_1 = __webpack_require__(20);
-var scroll_1 = __webpack_require__(47);
-var inline_1 = __webpack_require__(48);
-var block_1 = __webpack_require__(49);
-var embed_1 = __webpack_require__(50);
-var text_1 = __webpack_require__(51);
+var scroll_1 = __webpack_require__(46);
+var inline_1 = __webpack_require__(47);
+var block_1 = __webpack_require__(48);
+var embed_1 = __webpack_require__(49);
+var text_1 = __webpack_require__(50);
 var attributor_1 = __webpack_require__(13);
 var class_1 = __webpack_require__(30);
 var style_1 = __webpack_require__(31);
@@ -124,7 +124,7 @@ exports.default = Parchment;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var diff = __webpack_require__(43);
+var diff = __webpack_require__(42);
 var equal = __webpack_require__(10);
 var extend = __webpack_require__(3);
 var op = __webpack_require__(17);
@@ -723,7 +723,7 @@ var _extend = __webpack_require__(3);
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _editor = __webpack_require__(39);
+var _editor = __webpack_require__(51);
 
 var _editor2 = _interopRequireDefault(_editor);
 
@@ -1738,8 +1738,8 @@ exports.default = namespace;
 /***/ (function(module, exports, __webpack_require__) {
 
 var pSlice = Array.prototype.slice;
-var objectKeys = __webpack_require__(44);
-var isArguments = __webpack_require__(45);
+var objectKeys = __webpack_require__(43);
+var isArguments = __webpack_require__(44);
 
 var deepEqual = module.exports = function (actual, expected, opts) {
   if (!opts) opts = {};
@@ -1904,11 +1904,11 @@ var _clipboard = __webpack_require__(54);
 
 var _clipboard2 = _interopRequireDefault(_clipboard);
 
-var _history = __webpack_require__(40);
+var _history = __webpack_require__(39);
 
 var _history2 = _interopRequireDefault(_history);
 
-var _keyboard = __webpack_require__(41);
+var _keyboard = __webpack_require__(40);
 
 var _keyboard2 = _interopRequireDefault(_keyboard);
 
@@ -2815,7 +2815,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var linked_list_1 = __webpack_require__(46);
+var linked_list_1 = __webpack_require__(45);
 var shadow_1 = __webpack_require__(28);
 var Registry = __webpack_require__(2);
 var ContainerBlot = /** @class */ (function (_super) {
@@ -4672,328 +4672,6 @@ module.exports = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _clone = __webpack_require__(21);
-
-var _clone2 = _interopRequireDefault(_clone);
-
-var _deepEqual = __webpack_require__(10);
-
-var _deepEqual2 = _interopRequireDefault(_deepEqual);
-
-var _extend = __webpack_require__(3);
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _quillDelta = __webpack_require__(1);
-
-var _quillDelta2 = _interopRequireDefault(_quillDelta);
-
-var _op = __webpack_require__(17);
-
-var _op2 = _interopRequireDefault(_op);
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _code = __webpack_require__(14);
-
-var _code2 = _interopRequireDefault(_code);
-
-var _cursor = __webpack_require__(22);
-
-var _cursor2 = _interopRequireDefault(_cursor);
-
-var _block = __webpack_require__(5);
-
-var _block2 = _interopRequireDefault(_block);
-
-var _break = __webpack_require__(15);
-
-var _break2 = _interopRequireDefault(_break);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const ASCII = /^[ -~]*$/;
-
-class Editor {
-  constructor(scroll, editorRegistry) {
-    this.editorRegistry = editorRegistry;
-    this.scroll = scroll;
-    this.delta = this.getDelta();
-  }
-
-  applyDelta(delta) {
-    let consumeNextNewline = false;
-    this.scroll.update();
-    let scrollLength = this.scroll.length();
-    this.scroll.batchStart();
-    const normalizedDelta = normalizeDelta(delta);
-    normalizedDelta.reduce((index, op) => {
-      const length = op.retain || op.delete || op.insert.length || 1;
-      let attributes = op.attributes || {};
-      if (op.insert != null) {
-        if (typeof op.insert === 'string') {
-          let text = op.insert;
-          if (text.endsWith('\n') && consumeNextNewline) {
-            consumeNextNewline = false;
-            text = text.slice(0, -1);
-          }
-          if (index >= scrollLength && !text.endsWith('\n')) {
-            consumeNextNewline = true;
-          }
-          this.scroll.insertAt(index, text);
-
-          var _scroll$line = this.scroll.line(index),
-              _scroll$line2 = _slicedToArray(_scroll$line, 2);
-
-          const line = _scroll$line2[0],
-                offset = _scroll$line2[1];
-
-          let formats = (0, _extend2.default)({}, (0, _block.bubbleFormats)(line));
-          if (line instanceof _block2.default) {
-            var _line$descendant = line.descendant(_parchment2.default.Leaf, offset),
-                _line$descendant2 = _slicedToArray(_line$descendant, 1);
-
-            const leaf = _line$descendant2[0];
-
-            formats = (0, _extend2.default)(formats, (0, _block.bubbleFormats)(leaf));
-          }
-          attributes = _op2.default.attributes.diff(formats, attributes) || {};
-        } else if (typeof op.insert === 'object') {
-          const key = Object.keys(op.insert)[0]; // There should only be one key
-          if (key == null) return index;
-          this.scroll.insertAt(index, key, op.insert[key]);
-        }
-        scrollLength += length;
-      }
-      Object.keys(attributes).forEach(name => {
-        this.scroll.formatAt(index, length, name, attributes[name]);
-      });
-      return index + length;
-    }, 0);
-    normalizedDelta.reduce((index, op) => {
-      if (typeof op.delete === 'number') {
-        this.scroll.deleteAt(index, op.delete);
-        return index;
-      }
-      return index + (op.retain || op.insert.length || 1);
-    }, 0);
-    this.scroll.batchEnd();
-    return this.update(normalizedDelta);
-  }
-
-  deleteText(index, length) {
-    this.scroll.deleteAt(index, length);
-    return this.update(new _quillDelta2.default().retain(index).delete(length));
-  }
-
-  formatLine(index, length, formats = {}) {
-    this.scroll.update();
-    Object.keys(formats).forEach(format => {
-      if (this.scroll.whitelist != null && !this.scroll.whitelist[format]) return;
-      const lines = this.scroll.lines(index, Math.max(length, 1));
-      let lengthRemaining = length;
-      lines.forEach(line => {
-        const lineLength = line.length();
-        if (!(line instanceof _code2.default)) {
-          line.format(format, formats[format]);
-        } else {
-          const codeIndex = index - line.offset(this.scroll);
-          const codeLength = line.newlineIndex(codeIndex + lengthRemaining) - codeIndex + 1;
-          line.formatAt(codeIndex, codeLength, format, formats[format]);
-        }
-        lengthRemaining -= lineLength;
-      });
-    });
-    this.scroll.optimize();
-    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
-  }
-
-  formatText(index, length, formats = {}) {
-    Object.keys(formats).forEach(format => {
-      this.scroll.formatAt(index, length, format, formats[format]);
-    });
-    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
-  }
-
-  getContents(index, length) {
-    return this.delta.slice(index, index + length);
-  }
-
-  getDelta() {
-    return this.scroll.lines().reduce((delta, line) => {
-      return delta.concat(line.delta());
-    }, new _quillDelta2.default());
-  }
-
-  getFormat(index, length = 0) {
-    let lines = [];
-    let leaves = [];
-    if (length === 0) {
-      this.scroll.path(index).forEach(path => {
-        var _path = _slicedToArray(path, 1);
-
-        const blot = _path[0];
-
-        if (blot instanceof _block2.default) {
-          lines.push(blot);
-        } else if (blot instanceof _parchment2.default.Leaf) {
-          leaves.push(blot);
-        }
-      });
-    } else {
-      lines = this.scroll.lines(index, length);
-      leaves = this.scroll.descendants(_parchment2.default.Leaf, index, length);
-    }
-    const formatsArr = [lines, leaves].map(blots => {
-      if (blots.length === 0) return {};
-      let formats = (0, _block.bubbleFormats)(blots.shift());
-      while (Object.keys(formats).length > 0) {
-        const blot = blots.shift();
-        if (blot == null) return formats;
-        formats = combineFormats((0, _block.bubbleFormats)(blot), formats);
-      }
-      return formats;
-    });
-    return _extend2.default.apply(_extend2.default, formatsArr);
-  }
-
-  getText(index, length) {
-    return this.getContents(index, length).filter(op => typeof op.insert === 'string').map(op => op.insert).join('');
-  }
-
-  insertEmbed(index, embed, value) {
-    this.scroll.insertAt(index, embed, value);
-    return this.update(new _quillDelta2.default().retain(index).insert({ [embed]: value }));
-  }
-
-  insertText(index, text, formats = {}) {
-    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    this.scroll.insertAt(index, text);
-    Object.keys(formats).forEach(format => {
-      this.scroll.formatAt(index, text.length, format, formats[format]);
-    });
-    return this.update(new _quillDelta2.default().retain(index).insert(text, (0, _clone2.default)(formats)));
-  }
-
-  isBlank() {
-    if (this.scroll.children.length === 0) return true;
-    if (this.scroll.children.length > 1) return false;
-    const block = this.scroll.children.head;
-    if (block.statics.blotName !== _block2.default.blotName) return false;
-    if (block.children.length > 1) return false;
-    return block.children.head instanceof _break2.default;
-  }
-
-  removeFormat(index, length) {
-    const text = this.getText(index, length);
-
-    var _scroll$line3 = this.scroll.line(index + length),
-        _scroll$line4 = _slicedToArray(_scroll$line3, 2);
-
-    const line = _scroll$line4[0],
-          offset = _scroll$line4[1];
-
-    let suffixLength = 0;
-    let suffix = new _quillDelta2.default();
-    if (line != null) {
-      if (!(line instanceof _code2.default)) {
-        suffixLength = line.length() - offset;
-      } else {
-        suffixLength = line.newlineIndex(offset) - offset + 1;
-      }
-      suffix = line.delta().slice(offset, offset + suffixLength - 1).insert('\n');
-    }
-    const contents = this.getContents(index, length + suffixLength);
-    const diff = contents.diff(new _quillDelta2.default().insert(text).concat(suffix));
-    const delta = new _quillDelta2.default().retain(index).concat(diff);
-    return this.applyDelta(delta);
-  }
-
-  update(change, mutations = [], cursorIndex = undefined) {
-    const oldDelta = this.delta;
-    if (mutations.length === 1 && mutations[0].type === 'characterData' && mutations[0].target.data.match(ASCII) && this.editorRegistry.find(mutations[0].target)) {
-      // Optimization for character changes
-      const textBlot = this.editorRegistry.find(mutations[0].target);
-      const formats = (0, _block.bubbleFormats)(textBlot);
-      const index = textBlot.offset(this.scroll);
-      const oldValue = mutations[0].oldValue.replace(_cursor2.default.CONTENTS, '');
-      const oldText = new _quillDelta2.default().insert(oldValue);
-      const newText = new _quillDelta2.default().insert(textBlot.value());
-      const diffDelta = new _quillDelta2.default().retain(index).concat(oldText.diff(newText, cursorIndex));
-      change = diffDelta.reduce((delta, op) => {
-        if (op.insert) {
-          return delta.insert(op.insert, formats);
-        }
-        return delta.push(op);
-      }, new _quillDelta2.default());
-      this.delta = oldDelta.compose(change);
-    } else {
-      this.delta = this.getDelta();
-      if (!change || !(0, _deepEqual2.default)(oldDelta.compose(change), this.delta)) {
-        change = oldDelta.diff(this.delta, cursorIndex);
-      }
-    }
-    return change;
-  }
-}
-
-function combineFormats(formats, combined) {
-  return Object.keys(combined).reduce((merged, name) => {
-    if (formats[name] == null) return merged;
-    if (combined[name] === formats[name]) {
-      merged[name] = combined[name];
-    } else if (Array.isArray(combined[name])) {
-      if (combined[name].indexOf(formats[name]) < 0) {
-        merged[name] = combined[name].concat([formats[name]]);
-      }
-    } else {
-      merged[name] = [combined[name], formats[name]];
-    }
-    return merged;
-  }, {});
-}
-
-function normalizeDelta(delta) {
-  return delta.reduce((normalizedDelta, op) => {
-    if (op.insert === 1) {
-      const attributes = (0, _clone2.default)(op.attributes);
-      delete attributes.image;
-      return normalizedDelta.insert({ image: op.attributes.image }, attributes);
-    }
-    if (op.attributes != null && (op.attributes.list === true || op.attributes.bullet === true)) {
-      op = (0, _clone2.default)(op);
-      if (op.attributes.list) {
-        op.attributes.list = 'ordered';
-      } else {
-        op.attributes.list = 'bullet';
-        delete op.attributes.bullet;
-      }
-    }
-    if (typeof op.insert === 'string') {
-      const text = op.insert.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      return normalizedDelta.insert(text, op.attributes);
-    }
-    return normalizedDelta.push(op);
-  }, new _quillDelta2.default());
-}
-
-exports.default = Editor;
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.getLastChangeIndex = exports.default = undefined;
 
 var _parchment = __webpack_require__(0);
@@ -5126,7 +4804,7 @@ exports.default = History;
 exports.getLastChangeIndex = getLastChangeIndex;
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5704,7 +5382,7 @@ exports.SHORTKEY = SHORTKEY;
 exports.normalize = normalize;
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5996,7 +5674,7 @@ exports.BaseTooltip = BaseTooltip;
 exports.default = BaseTheme;
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports) {
 
 /**
@@ -6740,7 +6418,7 @@ function merge_tuples (diffs, start, length) {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports) {
 
 exports = module.exports = typeof Object.keys === 'function'
@@ -6755,7 +6433,7 @@ function shim (obj) {
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports) {
 
 var supportsArgumentsClass = (function(){
@@ -6781,7 +6459,7 @@ function unsupported(object){
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6920,7 +6598,7 @@ exports.default = LinkedList;
 
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7092,7 +6770,7 @@ exports.default = ScrollBlot;
 
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7177,7 +6855,7 @@ exports.default = InlineBlot;
 
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7256,7 +6934,7 @@ exports.default = BlockBlot;
 
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7304,7 +6982,7 @@ exports.default = EmbedBlot;
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7405,6 +7083,328 @@ var TextBlot = /** @class */ (function (_super) {
 }(leaf_1.default));
 exports.default = TextBlot;
 
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _clone = __webpack_require__(21);
+
+var _clone2 = _interopRequireDefault(_clone);
+
+var _deepEqual = __webpack_require__(10);
+
+var _deepEqual2 = _interopRequireDefault(_deepEqual);
+
+var _extend = __webpack_require__(3);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _quillDelta = __webpack_require__(1);
+
+var _quillDelta2 = _interopRequireDefault(_quillDelta);
+
+var _op = __webpack_require__(17);
+
+var _op2 = _interopRequireDefault(_op);
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _code = __webpack_require__(14);
+
+var _code2 = _interopRequireDefault(_code);
+
+var _cursor = __webpack_require__(22);
+
+var _cursor2 = _interopRequireDefault(_cursor);
+
+var _block = __webpack_require__(5);
+
+var _block2 = _interopRequireDefault(_block);
+
+var _break = __webpack_require__(15);
+
+var _break2 = _interopRequireDefault(_break);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const ASCII = /^[ -~]*$/;
+
+class Editor {
+  constructor(scroll, editorRegistry) {
+    this.editorRegistry = editorRegistry;
+    this.scroll = scroll;
+    this.delta = this.getDelta();
+  }
+
+  applyDelta(delta) {
+    let consumeNextNewline = false;
+    this.scroll.update();
+    let scrollLength = this.scroll.length();
+    this.scroll.batchStart();
+    const normalizedDelta = normalizeDelta(delta);
+    normalizedDelta.reduce((index, op) => {
+      const length = op.retain || op.delete || op.insert.length || 1;
+      let attributes = op.attributes || {};
+      if (op.insert != null) {
+        if (typeof op.insert === 'string') {
+          let text = op.insert;
+          if (text.endsWith('\n') && consumeNextNewline) {
+            consumeNextNewline = false;
+            text = text.slice(0, -1);
+          }
+          if (index >= scrollLength && !text.endsWith('\n')) {
+            consumeNextNewline = true;
+          }
+          this.scroll.insertAt(index, text);
+
+          var _scroll$line = this.scroll.line(index),
+              _scroll$line2 = _slicedToArray(_scroll$line, 2);
+
+          const line = _scroll$line2[0],
+                offset = _scroll$line2[1];
+
+          let formats = (0, _extend2.default)({}, (0, _block.bubbleFormats)(line));
+          if (line instanceof _block2.default) {
+            var _line$descendant = line.descendant(_parchment2.default.Leaf, offset),
+                _line$descendant2 = _slicedToArray(_line$descendant, 1);
+
+            const leaf = _line$descendant2[0];
+
+            formats = (0, _extend2.default)(formats, (0, _block.bubbleFormats)(leaf));
+          }
+          attributes = _op2.default.attributes.diff(formats, attributes) || {};
+        } else if (typeof op.insert === 'object') {
+          const key = Object.keys(op.insert)[0]; // There should only be one key
+          if (key == null) return index;
+          this.scroll.insertAt(index, key, op.insert[key]);
+        }
+        scrollLength += length;
+      }
+      Object.keys(attributes).forEach(name => {
+        this.scroll.formatAt(index, length, name, attributes[name]);
+      });
+      return index + length;
+    }, 0);
+    normalizedDelta.reduce((index, op) => {
+      if (typeof op.delete === 'number') {
+        this.scroll.deleteAt(index, op.delete);
+        return index;
+      }
+      return index + (op.retain || op.insert.length || 1);
+    }, 0);
+    this.scroll.batchEnd();
+    return this.update(normalizedDelta);
+  }
+
+  deleteText(index, length) {
+    this.scroll.deleteAt(index, length);
+    return this.update(new _quillDelta2.default().retain(index).delete(length));
+  }
+
+  formatLine(index, length, formats = {}) {
+    this.scroll.update();
+    Object.keys(formats).forEach(format => {
+      if (this.scroll.whitelist != null && !this.scroll.whitelist[format]) return;
+      const lines = this.scroll.lines(index, Math.max(length, 1));
+      let lengthRemaining = length;
+      lines.forEach(line => {
+        const lineLength = line.length();
+        if (!(line instanceof _code2.default)) {
+          line.format(format, formats[format]);
+        } else {
+          const codeIndex = index - line.offset(this.scroll);
+          const codeLength = line.newlineIndex(codeIndex + lengthRemaining) - codeIndex + 1;
+          line.formatAt(codeIndex, codeLength, format, formats[format]);
+        }
+        lengthRemaining -= lineLength;
+      });
+    });
+    this.scroll.optimize();
+    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
+  }
+
+  formatText(index, length, formats = {}) {
+    Object.keys(formats).forEach(format => {
+      this.scroll.formatAt(index, length, format, formats[format]);
+    });
+    return this.update(new _quillDelta2.default().retain(index).retain(length, (0, _clone2.default)(formats)));
+  }
+
+  getContents(index, length) {
+    return this.delta.slice(index, index + length);
+  }
+
+  getDelta() {
+    return this.scroll.lines().reduce((delta, line) => {
+      return delta.concat(line.delta());
+    }, new _quillDelta2.default());
+  }
+
+  getFormat(index, length = 0) {
+    let lines = [];
+    let leaves = [];
+    if (length === 0) {
+      this.scroll.path(index).forEach(path => {
+        var _path = _slicedToArray(path, 1);
+
+        const blot = _path[0];
+
+        if (blot instanceof _block2.default) {
+          lines.push(blot);
+        } else if (blot instanceof _parchment2.default.Leaf) {
+          leaves.push(blot);
+        }
+      });
+    } else {
+      lines = this.scroll.lines(index, length);
+      leaves = this.scroll.descendants(_parchment2.default.Leaf, index, length);
+    }
+    const formatsArr = [lines, leaves].map(blots => {
+      if (blots.length === 0) return {};
+      let formats = (0, _block.bubbleFormats)(blots.shift());
+      while (Object.keys(formats).length > 0) {
+        const blot = blots.shift();
+        if (blot == null) return formats;
+        formats = combineFormats((0, _block.bubbleFormats)(blot), formats);
+      }
+      return formats;
+    });
+    return _extend2.default.apply(_extend2.default, formatsArr);
+  }
+
+  getText(index, length) {
+    return this.getContents(index, length).filter(op => typeof op.insert === 'string').map(op => op.insert).join('');
+  }
+
+  insertEmbed(index, embed, value) {
+    this.scroll.insertAt(index, embed, value);
+    return this.update(new _quillDelta2.default().retain(index).insert({ [embed]: value }));
+  }
+
+  insertText(index, text, formats = {}) {
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    this.scroll.insertAt(index, text);
+    Object.keys(formats).forEach(format => {
+      this.scroll.formatAt(index, text.length, format, formats[format]);
+    });
+    return this.update(new _quillDelta2.default().retain(index).insert(text, (0, _clone2.default)(formats)));
+  }
+
+  isBlank() {
+    if (this.scroll.children.length === 0) return true;
+    if (this.scroll.children.length > 1) return false;
+    const block = this.scroll.children.head;
+    if (block.statics.blotName !== _block2.default.blotName) return false;
+    if (block.children.length > 1) return false;
+    return block.children.head instanceof _break2.default;
+  }
+
+  removeFormat(index, length) {
+    const text = this.getText(index, length);
+
+    var _scroll$line3 = this.scroll.line(index + length),
+        _scroll$line4 = _slicedToArray(_scroll$line3, 2);
+
+    const line = _scroll$line4[0],
+          offset = _scroll$line4[1];
+
+    let suffixLength = 0;
+    let suffix = new _quillDelta2.default();
+    if (line != null) {
+      if (!(line instanceof _code2.default)) {
+        suffixLength = line.length() - offset;
+      } else {
+        suffixLength = line.newlineIndex(offset) - offset + 1;
+      }
+      suffix = line.delta().slice(offset, offset + suffixLength - 1).insert('\n');
+    }
+    const contents = this.getContents(index, length + suffixLength);
+    const diff = contents.diff(new _quillDelta2.default().insert(text).concat(suffix));
+    const delta = new _quillDelta2.default().retain(index).concat(diff);
+    return this.applyDelta(delta);
+  }
+
+  update(change, mutations = [], cursorIndex = undefined) {
+    const oldDelta = this.delta;
+    if (mutations.length === 1 && mutations[0].type === 'characterData' && mutations[0].target.data.match(ASCII) && this.editorRegistry.find(mutations[0].target)) {
+      // Optimization for character changes
+      const textBlot = this.editorRegistry.find(mutations[0].target);
+      const formats = (0, _block.bubbleFormats)(textBlot);
+      const index = textBlot.offset(this.scroll);
+      const oldValue = mutations[0].oldValue.replace(_cursor2.default.CONTENTS, '');
+      const oldText = new _quillDelta2.default().insert(oldValue);
+      const newText = new _quillDelta2.default().insert(textBlot.value());
+      const diffDelta = new _quillDelta2.default().retain(index).concat(oldText.diff(newText, cursorIndex));
+      change = diffDelta.reduce((delta, op) => {
+        if (op.insert) {
+          return delta.insert(op.insert, formats);
+        }
+        return delta.push(op);
+      }, new _quillDelta2.default());
+      this.delta = oldDelta.compose(change);
+    } else {
+      this.delta = this.getDelta();
+      if (!change || !(0, _deepEqual2.default)(oldDelta.compose(change), this.delta)) {
+        change = oldDelta.diff(this.delta, cursorIndex);
+      }
+    }
+    return change;
+  }
+}
+
+function combineFormats(formats, combined) {
+  return Object.keys(combined).reduce((merged, name) => {
+    if (formats[name] == null) return merged;
+    if (combined[name] === formats[name]) {
+      merged[name] = combined[name];
+    } else if (Array.isArray(combined[name])) {
+      if (combined[name].indexOf(formats[name]) < 0) {
+        merged[name] = combined[name].concat([formats[name]]);
+      }
+    } else {
+      merged[name] = [combined[name], formats[name]];
+    }
+    return merged;
+  }, {});
+}
+
+function normalizeDelta(delta) {
+  return delta.reduce((normalizedDelta, op) => {
+    if (op.insert === 1) {
+      const attributes = (0, _clone2.default)(op.attributes);
+      delete attributes.image;
+      return normalizedDelta.insert({ image: op.attributes.image }, attributes);
+    }
+    if (op.attributes != null && (op.attributes.list === true || op.attributes.bullet === true)) {
+      op = (0, _clone2.default)(op);
+      if (op.attributes.list) {
+        op.attributes.list = 'ordered';
+      } else {
+        op.attributes.list = 'bullet';
+        delete op.attributes.bullet;
+      }
+    }
+    if (typeof op.insert === 'string') {
+      const text = op.insert.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      return normalizedDelta.insert(text, op.attributes);
+    }
+    return normalizedDelta.push(op);
+  }, new _quillDelta2.default());
+}
+
+exports.default = Editor;
 
 /***/ }),
 /* 52 */
@@ -8953,7 +8953,7 @@ var _emitter = __webpack_require__(8);
 
 var _emitter2 = _interopRequireDefault(_emitter);
 
-var _base = __webpack_require__(42);
+var _base = __webpack_require__(41);
 
 var _base2 = _interopRequireDefault(_base);
 
@@ -9992,7 +9992,7 @@ var _emitter = __webpack_require__(8);
 
 var _emitter2 = _interopRequireDefault(_emitter);
 
-var _base = __webpack_require__(42);
+var _base = __webpack_require__(41);
 
 var _base2 = _interopRequireDefault(_base);
 

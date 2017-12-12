@@ -1,5 +1,4 @@
 import Delta from 'quill-delta';
-import Editor from '../../../core/editor';
 import { Range } from '../../../core/selection';
 import Quill from '../../../core/quill';
 
@@ -152,77 +151,77 @@ describe('Editor', function() {
 
   describe('delete', function() {
     it('inner node', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p><strong><em>0123</em></strong></p>',
       );
       editor.deleteText(1, 2);
       expect(editor.getDelta()).toEqual(
         new Delta().insert('03', { bold: true, italic: true }).insert('\n'),
       );
-      expect(this.container).toEqualHTML('<p><strong><em>03</em></strong></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><strong><em>03</em></strong></p>');
     });
 
     it('parts of multiple lines', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p><em>0123</em></p><p><em>5678</em></p>',
       );
       editor.deleteText(2, 5);
       expect(editor.getDelta()).toEqual(
         new Delta().insert('0178', { italic: true }).insert('\n'),
       );
-      expect(this.container).toEqualHTML('<p><em>0178</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>0178</em></p>');
     });
 
     it('entire line keeping newline', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p><strong><em>0123</em></strong></p>',
       );
       editor.deleteText(0, 4);
       expect(editor.getDelta()).toEqual(new Delta().insert('\n'));
-      expect(this.container).toEqualHTML('<p><br></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><br></p>');
     });
 
     it('newline', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p><em>0123</em></p><p><em>5678</em></p>',
       );
       editor.deleteText(4, 1);
       expect(editor.getDelta()).toEqual(
         new Delta().insert('01235678', { italic: true }).insert('\n'),
       );
-      expect(this.container).toEqualHTML('<p><em>01235678</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>01235678</em></p>');
     });
 
     it('entire document', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p><strong><em>0123</em></strong></p>',
       );
       editor.deleteText(0, 5);
       expect(editor.getDelta()).toEqual(new Delta().insert('\n'));
-      expect(this.container).toEqualHTML('<p><br></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><br></p>');
     });
 
     it('multiple complete lines', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p><em>012</em></p><p><em>456</em></p><p><em>890</em></p>',
       );
       editor.deleteText(0, 8);
       expect(editor.getDelta()).toEqual(
         new Delta().insert('890', { italic: true }).insert('\n'),
       );
-      expect(this.container).toEqualHTML('<p><em>890</em></p>');
+      expect(this.container.firstChild).toEqualHTML('<p><em>890</em></p>');
     });
   });
 
   describe('format', function() {
     it('line', function() {
-      const editor = this.initialize(Editor, '<p>0123</p>');
+      const { editor } = this.initialize(Quill, '<p>0123</p>');
       editor.formatLine(1, 1, { header: 1 });
       expect(editor.scroll.domNode).toEqualHTML('<h1>0123</h1>');
     });
@@ -230,43 +229,43 @@ describe('Editor', function() {
 
   describe('removeFormat', function() {
     it('unwrap', function() {
-      const editor = this.initialize(Editor, '<p>0<em>12</em>3</p>');
+      const { editor } = this.initialize(Quill, '<p>0<em>12</em>3</p>');
       editor.removeFormat(1, 2);
-      expect(this.container).toEqualHTML('<p>0123</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>0123</p>');
     });
 
     it('split inline', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p>0<strong><em>12</em></strong>3</p>',
       );
       editor.removeFormat(1, 1);
-      expect(this.container).toEqualHTML(
+      expect(this.container.firstChild).toEqualHTML(
         '<p>01<strong><em>2</em></strong>3</p>',
       );
     });
 
     it('partial line', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<ul><li>01</li></ul><ol><li>34</li></ol>',
       );
       editor.removeFormat(1, 3);
-      expect(this.container).toEqualHTML('<p>01</p><p>34</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>01</p><p>34</p>');
     });
 
     it('remove embed', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         '<p>0<img src="/assets/favicon.png">2</p>',
       );
       editor.removeFormat(1, 1);
-      expect(this.container).toEqualHTML('<p>02</p>');
+      expect(this.container.firstChild).toEqualHTML('<p>02</p>');
     });
 
     it('combined', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         `
         <ul>
           <li>01<img src="/assets/favicon.png">3</li>
@@ -277,15 +276,15 @@ describe('Editor', function() {
       `,
       );
       editor.removeFormat(1, 7);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>013</p>
         <p>567<strong><em>8</em>9</strong>0</p>
       `);
     });
 
     it('end of document', function() {
-      const editor = this.initialize(
-        Editor,
+      const { editor } = this.initialize(
+        Quill,
         `
         <ul>
           <li>0123</li>
@@ -294,7 +293,7 @@ describe('Editor', function() {
       `,
       );
       editor.removeFormat(0, 12);
-      expect(this.container).toEqualHTML(`
+      expect(this.container.firstChild).toEqualHTML(`
         <p>0123</p>
         <p>5678</p>
       `);
