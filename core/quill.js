@@ -18,9 +18,9 @@ class Quill {
     logger.level(limit);
   }
 
-  static find(node, editorRegistry) {
+  static find(node) {
     // eslint-disable-next-line no-underscore-dangle
-    return node.__quill || editorRegistry.find(node);
+    return node.__quill || Parchment.find(node);
   }
 
   constructor(container, options = {}, editorRegistry = new EditorRegistry) {
