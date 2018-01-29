@@ -1,5 +1,5 @@
 /*!
- * Quill Editor v1.3.4
+ * Quill Editor v1.3.5
  * https://quilljs.com/
  * Copyright (c) 2014, Jason Chen
  * Copyright (c) 2013, salesforce.com
@@ -95,9 +95,9 @@ var block_1 = __webpack_require__(48);
 var embed_1 = __webpack_require__(49);
 var text_1 = __webpack_require__(50);
 var attributor_1 = __webpack_require__(13);
-var class_1 = __webpack_require__(30);
-var style_1 = __webpack_require__(31);
-var store_1 = __webpack_require__(29);
+var class_1 = __webpack_require__(29);
+var style_1 = __webpack_require__(30);
+var store_1 = __webpack_require__(28);
 var registry_1 = __webpack_require__(2);
 exports.EditorRegistry = registry_1.default;
 var Parchment = {
@@ -743,7 +743,7 @@ var _logger = __webpack_require__(9);
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _theme = __webpack_require__(32);
+var _theme = __webpack_require__(31);
 
 var _theme2 = _interopRequireDefault(_theme);
 
@@ -759,9 +759,9 @@ class Quill {
     _logger2.default.level(limit);
   }
 
-  static find(node, editorRegistry) {
+  static find(node) {
     // eslint-disable-next-line no-underscore-dangle
-    return node.__quill || editorRegistry.find(node);
+    return node.__quill || _parchment2.default.find(node);
   }
 
   constructor(container, options = {}, editorRegistry = new _parchment.EditorRegistry()) {
@@ -1175,7 +1175,7 @@ Quill.DEFAULTS = {
 Quill.events = _emitter2.default.events;
 Quill.sources = _emitter2.default.sources;
 // eslint-disable-next-line no-undef
-Quill.version =  false ? 'dev' : "1.3.4";
+Quill.version =  false ? 'dev' : "1.3.5";
 
 function expandConfig(quillInstance, container, userConfig) {
   userConfig = (0, _extend2.default)(true, {
@@ -1884,7 +1884,7 @@ var _cursor = __webpack_require__(22);
 
 var _cursor2 = _interopRequireDefault(_cursor);
 
-var _embed = __webpack_require__(24);
+var _embed = __webpack_require__(32);
 
 var _embed2 = _interopRequireDefault(_embed);
 
@@ -2816,7 +2816,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var linked_list_1 = __webpack_require__(45);
-var shadow_1 = __webpack_require__(28);
+var shadow_1 = __webpack_require__(27);
 var Registry = __webpack_require__(2);
 var ContainerBlot = /** @class */ (function (_super) {
     __extends(ContainerBlot, _super);
@@ -3077,7 +3077,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var attributor_1 = __webpack_require__(13);
-var store_1 = __webpack_require__(29);
+var store_1 = __webpack_require__(28);
 var container_1 = __webpack_require__(18);
 var FormatBlot = /** @class */ (function (_super) {
     __extends(FormatBlot, _super);
@@ -3158,7 +3158,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var shadow_1 = __webpack_require__(28);
+var shadow_1 = __webpack_require__(27);
 var Registry = __webpack_require__(2);
 var LeafBlot = /** @class */ (function (_super) {
     __extends(LeafBlot, _super);
@@ -3632,102 +3632,6 @@ exports.default = Container;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _parchment = __webpack_require__(0);
-
-var _parchment2 = _interopRequireDefault(_parchment);
-
-var _text = __webpack_require__(7);
-
-var _text2 = _interopRequireDefault(_text);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const GUARD_TEXT = '\uFEFF';
-
-class Embed extends _parchment2.default.Embed {
-  constructor(editorRegistry, node) {
-    super(editorRegistry, node);
-    this.contentNode = document.createElement('span');
-    this.contentNode.setAttribute('contenteditable', false);
-    [].slice.call(this.domNode.childNodes).forEach(childNode => {
-      this.contentNode.appendChild(childNode);
-    });
-    this.leftGuard = document.createTextNode(GUARD_TEXT);
-    this.rightGuard = document.createTextNode(GUARD_TEXT);
-    this.domNode.appendChild(this.leftGuard);
-    this.domNode.appendChild(this.contentNode);
-    this.domNode.appendChild(this.rightGuard);
-  }
-
-  index(node, offset) {
-    if (node === this.leftGuard) return 0;
-    if (node === this.rightGuard) return 1;
-    return super.index(node, offset);
-  }
-
-  restore(node) {
-    let range;
-    let textNode;
-    const text = node.data.split(GUARD_TEXT).join('');
-    if (node === this.leftGuard) {
-      if (this.prev instanceof _text2.default) {
-        const prevLength = this.prev.length();
-        this.prev.insertAt(prevLength, text);
-        range = {
-          startNode: this.prev.domNode,
-          startOffset: prevLength + text.length
-        };
-      } else {
-        textNode = document.createTextNode(text);
-        this.parent.insertBefore(this.editorRegistry.create(textNode), this);
-        range = {
-          startNode: textNode,
-          startOffset: text.length
-        };
-      }
-    } else if (node === this.rightGuard) {
-      if (this.next instanceof _text2.default) {
-        this.next.insertAt(0, text);
-        range = {
-          startNode: this.next.domNode,
-          startOffset: text.length
-        };
-      } else {
-        textNode = document.createTextNode(text);
-        this.parent.insertBefore(this.editorRegistry.create(textNode), this.next);
-        range = {
-          startNode: textNode,
-          startOffset: text.length
-        };
-      }
-    }
-    node.data = GUARD_TEXT;
-    return range;
-  }
-
-  update(mutations, context) {
-    mutations.forEach(mutation => {
-      if (mutation.type === 'characterData' && (mutation.target === this.leftGuard || mutation.target === this.rightGuard)) {
-        const range = this.restore(mutation.target);
-        if (range) context.range = range;
-      }
-    });
-  }
-}
-
-exports.default = Embed;
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.ColorStyle = exports.ColorClass = exports.ColorAttributor = undefined;
 
 var _parchment = __webpack_require__(0);
@@ -3758,7 +3662,7 @@ exports.ColorClass = ColorClass;
 exports.ColorStyle = ColorStyle;
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3815,7 +3719,7 @@ exports.default = Link;
 exports.sanitize = sanitize;
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3942,7 +3846,7 @@ class Picker {
 exports.default = Picker;
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4099,15 +4003,15 @@ exports.default = ShadowBlot;
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var attributor_1 = __webpack_require__(13);
-var class_1 = __webpack_require__(30);
-var style_1 = __webpack_require__(31);
+var class_1 = __webpack_require__(29);
+var style_1 = __webpack_require__(30);
 var Registry = __webpack_require__(2);
 var AttributorStore = /** @class */ (function () {
     function AttributorStore(editorRegistry, domNode) {
@@ -4177,7 +4081,7 @@ exports.default = AttributorStore;
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4240,7 +4144,7 @@ exports.default = ClassAttributor;
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4300,7 +4204,7 @@ exports.default = StyleAttributor;
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4338,6 +4242,102 @@ Theme.themes = {
 };
 
 exports.default = Theme;
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _parchment = __webpack_require__(0);
+
+var _parchment2 = _interopRequireDefault(_parchment);
+
+var _text = __webpack_require__(7);
+
+var _text2 = _interopRequireDefault(_text);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const GUARD_TEXT = '\uFEFF';
+
+class Embed extends _parchment2.default.Embed {
+  constructor(editorRegistry, node) {
+    super(editorRegistry, node);
+    this.contentNode = document.createElement('span');
+    this.contentNode.setAttribute('contenteditable', false);
+    [].slice.call(this.domNode.childNodes).forEach(childNode => {
+      this.contentNode.appendChild(childNode);
+    });
+    this.leftGuard = document.createTextNode(GUARD_TEXT);
+    this.rightGuard = document.createTextNode(GUARD_TEXT);
+    this.domNode.appendChild(this.leftGuard);
+    this.domNode.appendChild(this.contentNode);
+    this.domNode.appendChild(this.rightGuard);
+  }
+
+  index(node, offset) {
+    if (node === this.leftGuard) return 0;
+    if (node === this.rightGuard) return 1;
+    return super.index(node, offset);
+  }
+
+  restore(node) {
+    let range;
+    let textNode;
+    const text = node.data.split(GUARD_TEXT).join('');
+    if (node === this.leftGuard) {
+      if (this.prev instanceof _text2.default) {
+        const prevLength = this.prev.length();
+        this.prev.insertAt(prevLength, text);
+        range = {
+          startNode: this.prev.domNode,
+          startOffset: prevLength + text.length
+        };
+      } else {
+        textNode = document.createTextNode(text);
+        this.parent.insertBefore(this.editorRegistry.create(textNode), this);
+        range = {
+          startNode: textNode,
+          startOffset: text.length
+        };
+      }
+    } else if (node === this.rightGuard) {
+      if (this.next instanceof _text2.default) {
+        this.next.insertAt(0, text);
+        range = {
+          startNode: this.next.domNode,
+          startOffset: text.length
+        };
+      } else {
+        textNode = document.createTextNode(text);
+        this.parent.insertBefore(this.editorRegistry.create(textNode), this.next);
+        range = {
+          startNode: textNode,
+          startOffset: text.length
+        };
+      }
+    }
+    node.data = GUARD_TEXT;
+    return range;
+  }
+
+  update(mutations, context) {
+    mutations.forEach(mutation => {
+      if (mutation.type === 'characterData' && (mutation.target === this.leftGuard || mutation.target === this.rightGuard)) {
+        const range = this.restore(mutation.target);
+        if (range) context.range = range;
+      }
+    });
+  }
+}
+
+exports.default = Embed;
 
 /***/ }),
 /* 33 */
@@ -4386,7 +4386,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _color = __webpack_require__(25);
+var _color = __webpack_require__(24);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4712,13 +4712,13 @@ class History extends _module2.default {
   change(source, dest) {
     if (this.stack[source].length === 0) return;
     const delta = this.stack[source].pop();
+    this.stack[dest].push(delta);
     this.lastRecorded = 0;
     this.ignoreChange = true;
     this.quill.updateContents(delta[source], _quill2.default.sources.USER);
     this.ignoreChange = false;
     const index = getLastChangeIndex(delta[source], this.quill.editorInstance);
     this.quill.setSelection(index);
-    this.stack[dest].push(delta);
   }
 
   clear() {
@@ -4840,10 +4840,6 @@ var _op2 = _interopRequireDefault(_op);
 var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
-
-var _embed = __webpack_require__(24);
-
-var _embed2 = _interopRequireDefault(_embed);
 
 var _quill = __webpack_require__(4);
 
@@ -5080,7 +5076,8 @@ Keyboard.DEFAULTS = {
         const line = _quill$getLine4[0],
               offset = _quill$getLine4[1];
 
-        const delta = new _quillDelta2.default().retain(range.index).insert('\n', { list: 'checked' }).retain(line.length() - offset - 1).retain(1, { list: 'unchecked' });
+        const formats = (0, _extend2.default)({}, line.formats(), { list: 'checked' });
+        const delta = new _quillDelta2.default().retain(range.index).insert('\n', formats).retain(line.length() - offset - 1).retain(1, { list: 'unchecked' });
         this.quill.updateContents(delta, _quill2.default.sources.USER);
         this.quill.setSelection(range.index + 1, _quill2.default.sources.SILENT);
         this.quill.scrollIntoView();
@@ -5108,7 +5105,7 @@ Keyboard.DEFAULTS = {
       key: ' ',
       collapsed: true,
       format: { list: false },
-      prefix: /^\s*?(1\.|-|\[ ?\]|\[x\])$/,
+      prefix: /^\s*?(\d+\.|-|\*|\[ ?\]|\[x\])$/,
       handler(range, context) {
         const length = context.prefix.length;
 
@@ -5129,6 +5126,7 @@ Keyboard.DEFAULTS = {
             value = 'checked';
             break;
           case '-':
+          case '*':
             value = 'bullet';
             break;
           default:
@@ -5173,6 +5171,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
   return {
     key,
     shiftKey,
+    altKey: null,
     [where]: /^$/,
     handler(range) {
       let index = range.index;
@@ -5186,7 +5185,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
 
       const leaf = _quill$getLeaf4[0];
 
-      if (!(leaf instanceof _embed2.default)) return true;
+      if (!(leaf instanceof _parchment2.default.Embed)) return true;
       if (key === 'ArrowLeft') {
         if (shiftKey) {
           this.quill.setSelection(range.index - 1, range.length + 1, _quill2.default.sources.USER);
@@ -5405,7 +5404,7 @@ var _emitter = __webpack_require__(8);
 
 var _emitter2 = _interopRequireDefault(_emitter);
 
-var _theme = __webpack_require__(32);
+var _theme = __webpack_require__(31);
 
 var _theme2 = _interopRequireDefault(_theme);
 
@@ -5417,7 +5416,7 @@ var _iconPicker = __webpack_require__(58);
 
 var _iconPicker2 = _interopRequireDefault(_iconPicker);
 
-var _picker = __webpack_require__(27);
+var _picker = __webpack_require__(26);
 
 var _picker2 = _interopRequireDefault(_picker);
 
@@ -7986,7 +7985,7 @@ var _code = __webpack_require__(14);
 
 var _code2 = _interopRequireDefault(_code);
 
-var _color = __webpack_require__(25);
+var _color = __webpack_require__(24);
 
 var _direction = __webpack_require__(35);
 
@@ -8060,10 +8059,13 @@ class Clipboard extends _module2.default {
 
   dangerouslyPasteHTML(index, html, source = _quill2.default.sources.API) {
     if (typeof index === 'string') {
-      return this.quill.setContents(this.convert(index), html);
+      this.quill.setContents(this.convert(index), html);
+      this.quill.setSelection(0, _quill2.default.sources.SILENT);
+    } else {
+      const paste = this.convert(html);
+      this.quill.updateContents(new _quillDelta2.default().retain(index).concat(paste), source);
+      this.quill.setSelection(index + paste.length(), _quill2.default.sources.SILENT);
     }
-    const paste = this.convert(html);
-    return this.quill.updateContents(new _quillDelta2.default().retain(index).concat(paste), source);
   }
 
   onCapturePaste(e) {
@@ -8201,11 +8203,11 @@ function matchAttributor(node, delta, editorRegistry) {
       if (formats[attr.attrName]) return;
     }
     attr = ATTRIBUTE_ATTRIBUTORS[name];
-    if (attr != null && attr.attrName === name) {
+    if (attr != null && (attr.attrName === name || attr.keyName === name)) {
       formats[attr.attrName] = attr.value(node, editorRegistry) || undefined;
     }
     attr = STYLE_ATTRIBUTORS[name];
-    if (attr != null && attr.attrName === name) {
+    if (attr != null && (attr.attrName === name || attr.keyName === name)) {
       attr = STYLE_ATTRIBUTORS[name];
       formats[attr.attrName] = attr.value(node, editorRegistry) || undefined;
     }
@@ -8667,7 +8669,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _picker = __webpack_require__(27);
+var _picker = __webpack_require__(26);
 
 var _picker2 = _interopRequireDefault(_picker);
 
@@ -8716,7 +8718,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _picker = __webpack_require__(27);
+var _picker = __webpack_require__(26);
 
 var _picker2 = _interopRequireDefault(_picker);
 
@@ -8957,7 +8959,7 @@ var _base = __webpack_require__(41);
 
 var _base2 = _interopRequireDefault(_base);
 
-var _link = __webpack_require__(26);
+var _link = __webpack_require__(25);
 
 var _link2 = _interopRequireDefault(_link);
 
@@ -9113,7 +9115,7 @@ var _list2 = _interopRequireDefault(_list);
 
 var _background = __webpack_require__(34);
 
-var _color = __webpack_require__(25);
+var _color = __webpack_require__(24);
 
 var _font = __webpack_require__(36);
 
@@ -9127,7 +9129,7 @@ var _italic = __webpack_require__(67);
 
 var _italic2 = _interopRequireDefault(_italic);
 
-var _link = __webpack_require__(26);
+var _link = __webpack_require__(25);
 
 var _link2 = _interopRequireDefault(_link);
 
@@ -9171,7 +9173,7 @@ var _icons = __webpack_require__(38);
 
 var _icons2 = _interopRequireDefault(_icons);
 
-var _picker = __webpack_require__(27);
+var _picker = __webpack_require__(26);
 
 var _picker2 = _interopRequireDefault(_picker);
 
@@ -9620,7 +9622,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _embed = __webpack_require__(24);
+var _embed = __webpack_require__(32);
 
 var _embed2 = _interopRequireDefault(_embed);
 
@@ -9670,7 +9672,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _link = __webpack_require__(26);
+var _link = __webpack_require__(25);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9746,7 +9748,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _block = __webpack_require__(5);
 
-var _link = __webpack_require__(26);
+var _link = __webpack_require__(25);
 
 var _link2 = _interopRequireDefault(_link);
 

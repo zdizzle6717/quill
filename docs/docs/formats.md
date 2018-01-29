@@ -2,7 +2,9 @@
 layout: docs
 title: Formats
 permalink: /docs/formats/
-redirect_from: /docs/modules/formula
+redirect_from:
+  - /docs/modules/formula/
+  - /docs/modules/formulas/
 ---
 
 Quill supports a number of formats, both in UI controls and API calls.
@@ -11,7 +13,7 @@ By default all formats are enabled and allowed to exist within a Quill editor an
 
 {% include standalone/full.html %}
 
-<a class="standalone-link" href="/standalone/full">Standalone</a>
+<a class="standalone-link" href="/standalone/full/">Standalone</a>
 
 #### Inline
 

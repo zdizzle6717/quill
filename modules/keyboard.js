@@ -4,7 +4,6 @@ import extend from 'extend';
 import Delta from 'quill-delta';
 import DeltaOp from 'quill-delta/lib/op';
 import Parchment from 'parchment';
-import Embed from '../blots/embed';
 import Quill from '../core/quill';
 import logger from '../core/logger';
 import Module from '../core/module';
@@ -264,9 +263,10 @@ Keyboard.DEFAULTS = {
       format: { list: 'checked' },
       handler(range) {
         const [line, offset] = this.quill.getLine(range.index);
+        const formats = extend({}, line.formats(), { list: 'checked' });
         const delta = new Delta()
           .retain(range.index)
-          .insert('\n', { list: 'checked' })
+          .insert('\n', formats)
           .retain(line.length() - offset - 1)
           .retain(1, { list: 'unchecked' });
         this.quill.updateContents(delta, Quill.sources.USER);
@@ -295,7 +295,7 @@ Keyboard.DEFAULTS = {
       key: ' ',
       collapsed: true,
       format: { list: false },
-      prefix: /^\s*?(1\.|-|\[ ?\]|\[x\])$/,
+      prefix: /^\s*?(\d+\.|-|\*|\[ ?\]|\[x\])$/,
       handler(range, context) {
         const { length } = context.prefix;
         const [line, offset] = this.quill.getLine(range.index);
@@ -310,6 +310,7 @@ Keyboard.DEFAULTS = {
             value = 'checked';
             break;
           case '-':
+          case '*':
             value = 'bullet';
             break;
           default:
@@ -356,6 +357,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
   return {
     key,
     shiftKey,
+    altKey: null,
     [where]: /^$/,
     handler(range) {
       let { index } = range;
@@ -363,7 +365,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
         index += range.length + 1;
       }
       const [leaf] = this.quill.getLeaf(index);
-      if (!(leaf instanceof Embed)) return true;
+      if (!(leaf instanceof Parchment.Embed)) return true;
       if (key === 'ArrowLeft') {
         if (shiftKey) {
           this.quill.setSelection(

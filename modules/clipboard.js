@@ -31,13 +31,13 @@ const CLIPBOARD_CONFIG = [
   ['style', matchIgnore],
 ];
 
-const ATTRIBUTE_ATTRIBUTORS = [
-  AlignAttribute,
-  DirectionAttribute,
-].reduce((memo, attr) => {
-  memo[attr.keyName] = attr;
-  return memo;
-}, {});
+const ATTRIBUTE_ATTRIBUTORS = [AlignAttribute, DirectionAttribute].reduce(
+  (memo, attr) => {
+    memo[attr.keyName] = attr;
+    return memo;
+  },
+  {},
+);
 
 const STYLE_ATTRIBUTORS = [
   AlignStyle,
@@ -59,11 +59,11 @@ class Clipboard extends Module {
     this.container.setAttribute('contenteditable', true);
     this.container.setAttribute('tabindex', -1);
     this.matchers = [];
-    CLIPBOARD_CONFIG.concat(
-      this.options.matchers,
-    ).forEach(([selector, matcher]) => {
-      this.addMatcher(selector, matcher);
-    });
+    CLIPBOARD_CONFIG.concat(this.options.matchers).forEach(
+      ([selector, matcher]) => {
+        this.addMatcher(selector, matcher);
+      },
+    );
   }
 
   addMatcher(selector, matcher) {
@@ -98,13 +98,16 @@ class Clipboard extends Module {
 
   dangerouslyPasteHTML(index, html, source = Quill.sources.API) {
     if (typeof index === 'string') {
-      return this.quill.setContents(this.convert(index), html);
+      this.quill.setContents(this.convert(index), html);
+      this.quill.setSelection(0, Quill.sources.SILENT);
+    } else {
+      const paste = this.convert(html);
+      this.quill.updateContents(
+        new Delta().retain(index).concat(paste),
+        source,
+      );
+      this.quill.setSelection(index + paste.length(), Quill.sources.SILENT);
     }
-    const paste = this.convert(html);
-    return this.quill.updateContents(
-      new Delta().retain(index).concat(paste),
-      source,
-    );
   }
 
   onCapturePaste(e) {
@@ -254,11 +257,11 @@ function matchAttributor(node, delta, editorRegistry) {
         if (formats[attr.attrName]) return;
       }
       attr = ATTRIBUTE_ATTRIBUTORS[name];
-      if (attr != null && attr.attrName === name) {
+      if (attr != null && (attr.attrName === name || attr.keyName === name)) {
         formats[attr.attrName] = attr.value(node, editorRegistry) || undefined;
       }
       attr = STYLE_ATTRIBUTORS[name];
-      if (attr != null && attr.attrName === name) {
+      if (attr != null && (attr.attrName === name || attr.keyName === name)) {
         attr = STYLE_ATTRIBUTORS[name];
         formats[attr.attrName] = attr.value(node, editorRegistry) || undefined;
       }
